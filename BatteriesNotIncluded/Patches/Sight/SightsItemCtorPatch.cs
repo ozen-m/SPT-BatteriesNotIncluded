@@ -20,7 +20,7 @@ public class SightsItemCtorPatch : ModulePatch
             __instance is NightVisionItemClass or ThermalVisionItemClass /* Already has own togglable component */ ||
             __instance.TryGetItemComponent(out TogglableComponent _)) return;
 
-        var component = new TogglableComponent(__instance);
-        __instance.Components.Add(component);
+        __instance.Togglable = new TogglableComponent(__instance);
+        __instance.Components.Add(__instance.Togglable);
     }
 }

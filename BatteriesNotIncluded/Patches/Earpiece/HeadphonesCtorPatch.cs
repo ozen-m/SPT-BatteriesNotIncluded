@@ -21,7 +21,7 @@ public class HeadphonesCtorPatchPatch : ModulePatch
     {
         if (!__instance.IsBatteryOperated()) return;
         
-        var component = new TogglableComponent(__instance);
-        __instance.Components.Add(component);
+        __instance.Togglable = new TogglableComponent(__instance);
+        __instance.Components.Add(__instance.Togglable);
     }
 }
