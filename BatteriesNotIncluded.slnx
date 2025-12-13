@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="BatteriesNotIncluded.Server/BatteriesNotIncluded.Server.csproj" />
+  <Project Path="BatteriesNotIncluded/BatteriesNotIncluded.csproj" />
+</Solution>

@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>BatteriesNotIncluded</RootNamespace>
+    <AssemblyName>$(Authors)-$(RootNamespace)</AssemblyName>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Version>0.0.1</Version>
+    <Authors>ozen</Authors>
+    <RepositoryUrl>https://github.com/ozen-m/SPT-BatteriesNotIncluded</RepositoryUrl>
+    <!-- The two lines below will set the output path for the binaries -->
+    <OutputPath>bin\$(Configuration)\$(ProjectName)\$(AssemblyName)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SPTarkov.Common" Version="4.0.8" />
+    <PackageReference Include="SPTarkov.DI" Version="4.0.8" />
+    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.8" />
+    <PackageReference Include="SPTarkov.Reflection" Version="4.0.8" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.14.*-*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Target Name="SetOutput" AfterTargets="Build">
+    <PropertyGroup>
+      <DestDir>SPT\user\mods\$(Authors)-$(RootNamespace)</DestDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <OutputDLL Include="$(TargetPath)" />
+      <Config Include="$(TargetDir)\config\**\*" />
+      <Bundles Include="$(TargetDir)\bundles\**\*" />
+      <PDB Include="$(TargetDir)$(TargetName).pdb" Condition="'$(Configuration)' != 'Release'" />
+    </ItemGroup>
+  </Target>
+</Project>

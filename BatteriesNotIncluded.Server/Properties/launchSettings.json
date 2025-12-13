@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "SPTarkov.Server": {
+      "commandName": "Executable",
+      "executablePath": ".\\SPT.Server.exe",
+      "workingDirectory": "..\\..\\..\\SPT"
+    }
+  }
+}
