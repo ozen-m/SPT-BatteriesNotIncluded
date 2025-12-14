@@ -25,6 +25,9 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
         var patchManager = new PatchManager(this, true);
         patchManager.EnablePatches();
+        
+        // TODO: Add file check for PrePatch
+        // TODO: Check fika compat
     }
 
     public static BatteryData GetBatteryData(string templateId)

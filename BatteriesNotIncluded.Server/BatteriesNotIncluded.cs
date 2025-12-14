@@ -37,6 +37,7 @@ public class BatteriesNotIncluded(
         var localesPath = Path.Combine(modConfigContainer.ConfigPath, "locales");
         LoadLocales(localesPath);
 
+        // TODO: Add file check for PrePatch
 
         Dictionary<MongoId, TemplateItem> items = databaseService.GetItems();
         foreach (var batt in _batteryIds)
