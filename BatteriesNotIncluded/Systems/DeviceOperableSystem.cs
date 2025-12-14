@@ -4,29 +4,28 @@ using EFT.InventoryLogic;
 
 namespace BatteriesNotIncluded.Systems;
 
-public class DeviceOperableSystem : ISystem
+public class DeviceOperableSystem : BaseSystem
 {
-    public void Run(DeviceManager manager)
+    public override void Run(DeviceManager manager, int i)
     {
-        for (var i = 0; i < manager.Devices.Count; i++)
+        if (i == -1) return;
+
+        Item battery = manager.BatterySlot[i].ContainedItem;
+        if (battery is null)
         {
-            Item battery = manager.BatterySlot[i].ContainedItem;
-            if (battery is null)
-            {
-                manager.IsOperable[i] = false;
-                manager.ResourceComponentRef[i] = null;
-                continue;
-            }
-
-            var resourceComponent = battery.GetItemComponent<ResourceComponent>();
-            manager.ResourceComponentRef[i] = resourceComponent;
-            if (resourceComponent.IsDrained())
-            {
-                manager.IsOperable[i] = false;
-                continue;
-            }
-
-            manager.IsOperable[i] = true;
+            manager.IsOperable[i] = false;
+            manager.ResourceComponentRef[i] = null;
+            return;
         }
+
+        var resourceComponent = battery.GetItemComponent<ResourceComponent>();
+        manager.ResourceComponentRef[i] = resourceComponent;
+        if (resourceComponent.IsDrained())
+        {
+            manager.IsOperable[i] = false;
+            return;
+        }
+
+        manager.IsOperable[i] = true;
     }
 }

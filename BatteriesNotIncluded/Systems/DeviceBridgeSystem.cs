@@ -6,115 +6,109 @@ using EFT.InventoryLogic;
 
 namespace BatteriesNotIncluded.Systems;
 
-public class DeviceBridgeSystem : ISystem
+public class DeviceBridgeSystem : BaseSystem
 {
-    public void Run(DeviceManager manager)
+    public override void Run(DeviceManager manager, int i)
     {
-        for (var i = 0; i < manager.Devices.Count; i++)
+        if (i == -1) return;
+
+        var isOperable = manager.IsOperable[i];
+        var previouslyActive = manager.IsActive[i];
+
+        var component = manager.RelatedComponentRef[i];
+        var item = component.Item;
+        switch (component)
         {
-            var isOperable = manager.IsOperable[i];
-            var previouslyActive = manager.IsActive[i];
-
-            var component = manager.RelatedComponentRef[i];
-            switch (component)
+            case LightComponent lightComponent:
             {
-                case LightComponent lightComponent:
+                // All lights
+                if (!isOperable && previouslyActive)
                 {
-                    if (!isOperable && previouslyActive)
-                    {
-                        // Removed batteries or battery drained
-                        lightComponent.IsActive = false;
-                        SetLightState(lightComponent);
-                    }
+                    // Removed batteries or battery drained
+                    lightComponent.IsActive = false;
+                    SetLightState(lightComponent);
+                }
 
+                // Replaced with new batteries while toggled on
+                // Different approach when it comes to tac devices
+
+                manager.IsActive[i] = lightComponent.IsActive;
+                return;
+            }
+            case NightVisionComponent nightVisionComponent:
+            {
+                var isToggled = nightVisionComponent.Togglable.On;
+                var shouldBeActive = isOperable && isToggled;
+                manager.IsActive[i] = shouldBeActive;
+
+                // Only control cameras for player
+                if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
+                    !playerInvCont.Player_0.IsYourPlayer ||
+                    item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */ ||
+                    CameraUtil.NightVisionInProcessSwitching /* Check to not conflict when turning on/off normally */) return;
+
+                if (!shouldBeActive && previouslyActive)
+                {
+                    // Removed batteries or battery drained
+                    CameraUtil.SetNightVision(false);
+                }
+                else if (shouldBeActive)
+                {
                     // Replaced with new batteries while toggled on
-                    // Different approach when it comes to tac devices
+                    CameraUtil.SetNightVision(true);
+                    playerInvCont.Player_0.PlayNightVisionSound();
+                }
+                return;
+            }
+            case ThermalVisionComponent thermalVisionComponent:
+            {
+                var isToggled = thermalVisionComponent.Togglable.On;
+                var shouldBeActive = isOperable && isToggled;
+                manager.IsActive[i] = shouldBeActive;
 
-                    manager.IsActive[i] = lightComponent.IsActive;
-                    continue;
-                }
-                case NightVisionComponent nightVisionComponent:
-                {
-                    var isToggled = nightVisionComponent.Togglable.On;
-                    var shouldBeActive = isOperable && isToggled;
-                    manager.IsActive[i] = shouldBeActive;
+                // Only control cameras for your player
+                if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
+                    !playerInvCont.Player_0.IsYourPlayer ||
+                    item.CurrentAddress is GClass3393 /* If not in active slot (a grid?) */ ||
+                    CameraUtil.ThermalVisionInProcessSwitching /* Check to not conflict when turning on/off normally */) return;
 
-                    if (nightVisionComponent.Item.CurrentAddress is not GClass3393 /* If in active slot (TODO: check if only for your player) */ &&
-                        !CameraUtil.NightVisionInProcessSwitching /* Check to not conflict when turning on/off normally */)
-                    {
-                        if (!shouldBeActive && previouslyActive)
-                        {
-                            // Removed batteries or battery drained
-                            CameraUtil.SetNightVision(false);
-                        }
-                        else if (shouldBeActive)
-                        {
-                            // Replaced with new batteries while toggled on
-                            CameraUtil.SetNightVision(true);
-                            if (nightVisionComponent.Item.Owner is not Player.PlayerInventoryController playerInvCont) continue;
+                if (!shouldBeActive && previouslyActive)
+                {
+                    // Removed batteries or battery drained
+                    CameraUtil.SetThermalVision(false);
+                }
+                else if (shouldBeActive)
+                {
+                    // Replaced with new batteries while toggled on
+                    CameraUtil.SetThermalVision(true);
+                    playerInvCont.Player_0.PlayThermalVisionSound();
+                }
+                return;
+            }
+            case TogglableComponent togglableComponent:
+            {
+                manager.IsActive[i] = isOperable && togglableComponent.On;
 
-                            playerInvCont.Player_0.PlayNightVisionSound();
-                        }
-                    }
-                    continue;
-                }
-                case ThermalVisionComponent thermalVisionComponent:
-                {
-                    var isToggled = thermalVisionComponent.Togglable.On;
-                    var shouldBeActive = isOperable && isToggled;
-                    manager.IsActive[i] = shouldBeActive;
+                // Only control devices for your player (only your player ever sees/hears these)
+                if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
+                    !playerInvCont.Player_0.IsYourPlayer ||
+                    item.CurrentAddress is GClass3393 /* If not in active slot (a grid?) */) return;
 
-                    if (thermalVisionComponent.Item.CurrentAddress is not GClass3393 /* If in active slot (TODO: check if only for your player)*/ &&
-                        !CameraUtil.ThermalVisionInProcessSwitching /* Check to not conflict when turning on/off normally */)
-                    {
-                        if (!shouldBeActive && previouslyActive)
-                        {
-                            // Removed batteries or battery drained
-                            CameraUtil.SetThermalVision(false);
-                        }
-                        else if (shouldBeActive)
-                        {
-                            // Replaced with new batteries while toggled on
-                            CameraUtil.SetThermalVision(true);
-                            if (thermalVisionComponent.Item.Owner is Player.PlayerInventoryController playerInvCont)
-                            {
-                                playerInvCont.Player_0.PlayThermalVisionSound();
-                            }
-                        }
-                    }
-                    continue;
-                }
-                case TogglableComponent togglableComponent:
+                if (item is SightsItemClass) // Should also be for player only?
                 {
-                    manager.IsActive[i] = isOperable && togglableComponent.On;
-
-                    var item = togglableComponent.Item;
-                    if (item.CurrentAddress is not GClass3393 /* If in active slot */)
-                    {
-                        if (item is SightsItemClass)
-                        {
-                            manager.UpdateSightVisibility(item.Id, i);
-                        }
-                        else if (item is HeadphonesItemClass)
-                        {
-                            if (item.Owner is Player.PlayerInventoryController playerInvCont)
-                            {
-                                // BUG: UpdatePhonesReally runs twice, one on Player.OnItemAddedOrRemoved (too late)
-                                //      and on RunManualUpdateNextFrame.
-                                playerInvCont.Player_0.UpdatePhonesReally();
-                            }
-                        }
-                    }
-                    continue;
+                    manager.UpdateSightVisibility(item.Id, i);
                 }
-                case null:
+                else if (item is HeadphonesItemClass)
                 {
-                    continue;
+                    // BUG: UpdatePhonesReally runs twice, one on Player.OnItemAddedOrRemoved (too late)
+                    //      and on ManualUpdate(Item).
+                    playerInvCont.Player_0.UpdatePhonesReally();
                 }
-                default:
-                {
-                    throw new ArgumentException($"Component {component} is not a valid component");
-                }
+                return;
+            }
+            default:
+            {
+                throw new ArgumentException($"Component {component} is not a valid component");
             }
         }
     }
@@ -122,6 +116,7 @@ public class DeviceBridgeSystem : ISystem
     /// <summary>
     /// Thank you IcyClawz for this code.
     /// <br></br><see href="https://github.com/IgorEisberg/SPT-ClientMods/blob/main/ItemContextMenuExt/ItemContextMenuExt.cs#L307"/>
+    /// <br></br><see href="https://github.com/IgorEisberg/SPT-ClientMods/blob/main/LICENSE"/>
     /// </summary>
     private static void SetLightState(LightComponent lightComponent)
     {

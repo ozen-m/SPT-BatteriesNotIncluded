@@ -6,5 +6,5 @@ public interface ISystem
 {
     public void Run(DeviceManager manager);
 
-    // TODO: Implement run for specific index?
+    public void Run(DeviceManager manager, int i);
 }
