@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using BatteriesNotIncluded.Components;
 using BatteriesNotIncluded.Patches;
@@ -37,7 +38,7 @@ public class DeviceManager : MonoBehaviour
 
     private void Start()
     {
-        _sightModVisualHandler = new SightModVisualHandler();
+        _sightModVisualHandler = new SightModVisualHandler(this);
 
         _manualSystems.Add(new DeviceOperableSystem());
         _manualSystems.Add(new DeviceBridgeSystem());
@@ -62,10 +63,25 @@ public class DeviceManager : MonoBehaviour
 
     private void ManualUpdate()
     {
-        // LoggerUtil.Debug("Running Manual Update");
+        LoggerUtil.Debug("Running Manual Update");
         foreach (ISystem system in _manualSystems)
         {
             system.Run(this);
+        }
+    }
+
+    public void ManualUpdate(Item item)
+    {
+        ManualUpdate(item.Id);
+    }
+
+    public void ManualUpdate(string itemId)
+    {
+        LoggerUtil.Debug($"Running Manual Update for {itemId}");
+        var index = GetItemIndex(itemId);
+        foreach (ISystem system in _manualSystems)
+        {
+            system.Run(this, index);
         }
     }
 
@@ -202,38 +218,32 @@ public class DeviceManager : MonoBehaviour
                 // Light component doesn't have an event we can subscribe to, do it in CanChangeLightStatePatch.
                 return;
             case NightVisionComponent nightVisionComponent:
-                _unsubscribeEvents.Add(nightVisionComponent.Togglable.OnChanged.Subscribe(RunManualUpdateNextFrame));
+                _unsubscribeEvents.Add(nightVisionComponent.Togglable.OnChanged.Subscribe(() =>
+                    StartCoroutine(RunManualUpdateNextFrame(nightVisionComponent.Togglable.Item))
+                ));
                 return;
             case ThermalVisionComponent thermalVisionComponent:
-                _unsubscribeEvents.Add(thermalVisionComponent.Togglable.OnChanged.Subscribe(RunManualUpdateNextFrame));
+                _unsubscribeEvents.Add(thermalVisionComponent.Togglable.OnChanged.Subscribe(() =>
+                    StartCoroutine(RunManualUpdateNextFrame(thermalVisionComponent.Togglable.Item))
+                ));
                 return;
             case TogglableComponent togglableComponent:
             {
-                if (togglableComponent.Item is HeadphonesItemClass)
-                {
-                    _unsubscribeEvents.Add(togglableComponent.OnChanged.Subscribe(() =>
-                    {
-                        if (togglableComponent.Item.Owner is not Player.PlayerInventoryController playerInvCont ||
-                            !playerInvCont.Player_0.IsYourPlayer) return;
-
-                        playerInvCont.Player_0.PlayTacticalSound();
-                        RunManualUpdateNextFrame(); // Has to be this frame
-                    }));
-                    return;
-                }
-
                 _unsubscribeEvents.Add(togglableComponent.OnChanged.Subscribe(() =>
-                {
-                    if (togglableComponent.Item.Owner is not Player.PlayerInventoryController playerInvCont ||
-                        !playerInvCont.Player_0.IsYourPlayer) return;
-
-                    playerInvCont.Player_0.PlayTacticalSound();
-                    RunManualUpdateNextFrame();
-                }));
+                    OnToggle(togglableComponent.Item)));
                 return;
             }
             default:
                 throw new ArgumentException($"Component {component} is not a valid component");
+        }
+    }
+
+    private void OnToggle(Item item)
+    {
+        ManualUpdate(item);
+        if (item.Owner is Player.PlayerInventoryController playerInvCont)
+        {
+            playerInvCont.Player_0.PlayTacticalSound();
         }
     }
 
@@ -248,7 +258,28 @@ public class DeviceManager : MonoBehaviour
         return -1;
 #endif
 
-        return _indexLookup.GetValueOrDefault(item.Id, -1);
+        return GetItemIndex(item.Id);
+    }
+
+    private int GetItemIndex(string itemId)
+    {
+#if DEBUG
+        if (_indexLookup.TryGetValue(itemId, out var index))
+        {
+            return index;
+        }
+        LoggerUtil.Debug($"Cannot find item index: ({itemId})");
+        return -1;
+#endif
+
+        return _indexLookup.GetValueOrDefault(itemId, -1);
+    }
+
+    private IEnumerator RunManualUpdateNextFrame(Item item)
+    {
+        yield return null; // wait one frame
+
+        ManualUpdate(item);
     }
 
     private void RemoveAt(int index)

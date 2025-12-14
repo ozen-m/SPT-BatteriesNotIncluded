@@ -8,6 +8,7 @@ namespace BatteriesNotIncluded.Managers;
 
 public class SightModVisualHandler
 {
+    private readonly DeviceManager _deviceManager;
     private readonly HashSet<SightModVisualControllers> _controllers = [];
     private readonly HashSet<SightModVisualControllers> _invalidControllers = [];
 
@@ -16,8 +17,9 @@ public class SightModVisualHandler
     /// </summary>
     private readonly Dictionary<string, List<SightModVisualControllers>> _itemIdsLookup = [];
 
-    public SightModVisualHandler()
+    public SightModVisualHandler(DeviceManager manager)
     {
+        _deviceManager = manager;
         CaptureSightControllerPatch.OnUpdateSightMode += AddController;
     }
 
