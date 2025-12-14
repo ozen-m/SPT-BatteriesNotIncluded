@@ -7,6 +7,7 @@ using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
+using SPTarkov.Server.Core.Utils.Json;
 using Path = System.IO.Path;
 
 namespace BatteriesNotIncluded;
@@ -25,6 +26,8 @@ public class BatteriesNotIncluded(
     private static readonly MongoId _rechargeableBatteryId = "590a358486f77429692b2790";
 
     private static readonly MongoId[] _batteryIds = [_aaBatteryId, _dBatteryId, _rechargeableBatteryId];
+
+    private Dictionary<string, LazyLoad<Dictionary<string, string>>> _globalLocales;
 
     public Task OnLoad()
     {
@@ -77,6 +80,7 @@ public class BatteriesNotIncluded(
             .AsParallel()
             .ForAll(i => ProcessTemplate(i, ref counter));
 
+        _globalLocales = null;
         loggerUtil.Info($"Added battery slots to {counter} items");
     }
 
@@ -92,6 +96,7 @@ public class BatteriesNotIncluded(
         }
 
         // TODO: Add battery to item description
+        AddBatteryToItemDescription(template.Id, batteryType.Value, 1);
 
         Slot batterySlot = new Slot()
         {
@@ -133,6 +138,19 @@ public class BatteriesNotIncluded(
         return null;
     }
 
+    private void AddBatteryToItemDescription(MongoId deviceId, MongoId batteryId, int slots)
+    {
+        foreach (var (_, lazyLoadLocale) in _globalLocales)
+        {
+            lazyLoadLocale.AddTransformer((localeData) =>
+            {
+                localeData[$"{deviceId} Description"] = $"Uses {slots}x {localeData[$"{batteryId} Name"]}\n\n{localeData[$"{deviceId} Description"]}";
+
+                return localeData;
+            });
+        }
+    }
+
     private void LoadLocales(string localesPath)
     {
         Dictionary<string, Dictionary<string, string>> locales = [];
@@ -160,7 +178,8 @@ public class BatteriesNotIncluded(
             return;
         }
 
-        foreach (var (lang, lazyLoadLocale) in databaseService.GetLocales().Global)
+        _globalLocales = databaseService.GetLocales().Global;
+        foreach (var (lang, lazyLoadLocale) in _globalLocales)
         {
             if (locales.TryGetValue(lang, out Dictionary<string, string> locale))
             {
@@ -170,6 +189,9 @@ public class BatteriesNotIncluded(
                     {
                         localeData[key] = value;
                     }
+                    localeData["TURNOFF"] = "TURN OFF";
+                    localeData["TURNON"] = "TURN ON";
+
                     return localeData;
                 });
             }
@@ -183,6 +205,9 @@ public class BatteriesNotIncluded(
                     {
                         localeData[key] = value;
                     }
+                    localeData["TURNOFF"] = "TURN OFF"; // FLIP UP
+                    localeData["TURNON"] = "TURN ON"; // FLIP DOWN
+
                     return localeData;
                 });
             }
