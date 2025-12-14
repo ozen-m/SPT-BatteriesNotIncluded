@@ -1,5 +1,5 @@
+using BatteriesNotIncluded.Models;
 using BatteriesNotIncluded.Utils;
-using HarmonyLib;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
@@ -22,8 +22,8 @@ public class BatteriesNotIncluded(
 ) : IOnLoad
 {
     private static readonly MongoId _aaBatteryId = "5672cb124bdc2d1a0f8b4568";
-    private static readonly MongoId _dBatteryId = "5672cb304bdc2dc2088b456a";
-    private static readonly MongoId _rechargeableBatteryId = "590a358486f77429692b2790";
+    private static readonly MongoId _dBatteryId = "5672cb304bdc2dc2088b456a"; // CR2032
+    private static readonly MongoId _rechargeableBatteryId = "590a358486f77429692b2790"; // CR123A
 
     private static readonly MongoId[] _batteryIds = [_aaBatteryId, _dBatteryId, _rechargeableBatteryId];
 
@@ -86,7 +86,8 @@ public class BatteriesNotIncluded(
 
     private void ProcessTemplate(TemplateItem template, ref int counter)
     {
-        var batteryType = GetBatteryType(template.Id);
+        var batteryData = GetBatteryData(template.Id);
+        var batteryType = batteryData.Battery;
         if (batteryType == MongoId.Empty()) return;
 
         if (batteryType is null)
@@ -95,47 +96,64 @@ public class BatteriesNotIncluded(
             batteryType = _dBatteryId;
         }
 
-        // TODO: Add battery to item description
-        AddBatteryToItemDescription(template.Id, batteryType.Value, 1);
+        AddBatteryToItemDescription(template.Id, batteryType.Value, batteryData.Slots);
 
-        Slot batterySlot = new Slot()
+        Slot[] newSlots = new Slot[batteryData.Slots];
+        for (var i = 0; i < newSlots.Length; i++)
         {
-            Name = "mod_equipment",
-            Id = template.Id,
-            Parent = template.Id,
-            Properties = new SlotProperties()
+            newSlots[i] = new Slot()
             {
-                // TODO: Multiple battery slots
-                Filters =
-                [
-                    new SlotFilter()
-                    {
-                        Shift = 0d,
-                        Filter = [batteryType.Value],
-                        // TODO: Multiple battery filters
-                    }
-                ]
-            },
-            Required = false,
-            MergeSlotWithChildren = false,
-            Prototype = "55d30c4c4bdc2db4468b457e"
-        };
-
-        template.Properties!.Slots = template.Properties.Slots.AddItem(batterySlot);
+                Name = $"mod_equipment_00{i}",
+                Id = template.Id,
+                Parent = template.Id,
+                Properties = new SlotProperties()
+                {
+                    Filters =
+                    [
+                        new SlotFilter()
+                        {
+                            Shift = 0d,
+                            Filter = [batteryType.Value],
+                            // TODO: Multiple battery filters
+                        }
+                    ]
+                },
+                Required = false,
+                MergeSlotWithChildren = false,
+                Prototype = "55d30c4c4bdc2db4468b457e"
+            };
+        }
+        template.Properties!.Slots = template.Properties.Slots != null
+            ? template.Properties.Slots.Concat(newSlots)
+            : newSlots;
+        
         Interlocked.Increment(ref counter);
         // loggerUtil.Debug($"{itemHelper.GetItemName(template.Id)} ({template.Id}) added slot with compatible battery {itemHelper.GetItemName(batteryType.Value)}");
     }
 
-    private MongoId? GetBatteryType(MongoId id)
+    private DeviceData GetBatteryData(MongoId id)
     {
-        foreach (var (batteryType, batteryHash) in modConfigContainer.ModConfig.Batteries)
+        if (modConfigContainer.ModConfig.NoBattery.TryGetValue(id, out DeviceData deviceData))
         {
-            if (batteryHash.Contains(id))
-            {
-                return batteryType;
-            }
+            deviceData.Battery = MongoId.Empty();
+            return deviceData;
         }
-        return null;
+        if (modConfigContainer.ModConfig.CR123A.TryGetValue(id, out deviceData))
+        {
+            deviceData.Battery = _rechargeableBatteryId;
+            return deviceData;
+        }
+        if (modConfigContainer.ModConfig.CR2032.TryGetValue(id, out deviceData))
+        {
+            deviceData.Battery = _dBatteryId;
+            return deviceData;
+        }
+        if (modConfigContainer.ModConfig.AA.TryGetValue(id, out deviceData))
+        {
+            deviceData.Battery = _aaBatteryId;
+            return deviceData;
+        }
+        return DeviceData.Empty;
     }
 
     private void AddBatteryToItemDescription(MongoId deviceId, MongoId batteryId, int slots)

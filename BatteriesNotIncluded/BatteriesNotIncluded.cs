@@ -25,11 +25,12 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
         var patchManager = new PatchManager(this, true);
         patchManager.EnablePatches();
-        
+
         // TODO: Add file check for PrePatch
         // TODO: Check fika compat
     }
 
+    // TODO: Get from server
     public static BatteryData GetBatteryData(string templateId)
     {
         if (_batteryDataCache.TryGetValue(templateId, out var foundTemplate))
@@ -42,6 +43,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         return batteryData;
     }
 
+    // Temporary
     private static float GetDrainMultiplier(string templateId)
     {
         // TODO: Implement device specific drain multiplier

@@ -21,18 +21,19 @@ public static class CommonExtensions
         return IsBatteryOperated(item, out _);
     }
 
-    public static bool IsBatteryOperated(this CompoundItem item, out Slot batterySlot)
+    public static bool IsBatteryOperated(this CompoundItem item, out Slot[] batterySlot)
     {
+        // Get slot number from DeviceData, new Slot[DeviceData.Slots];
+        List<Slot> slots = [];
         foreach (var slot in item.Slots)
         {
             if (slot.IsBatterySlot())
             {
-                batterySlot = slot;
-                return true;
+                slots.Add(slot);
             }
         }
-        batterySlot = null;
-        return false;
+        batterySlot = slots.ToArray();
+        return slots.Count > 0;
     }
 
     public static bool IsBattery(this Item item) => _batteryIds.Contains(item.TemplateId);

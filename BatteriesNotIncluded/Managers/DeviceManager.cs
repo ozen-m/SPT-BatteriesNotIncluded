@@ -19,8 +19,8 @@ public class DeviceManager : MonoBehaviour
     public readonly List<bool> IsOperable = [];
     public readonly List<bool> IsActive = [];
 
-    public readonly List<Slot> BatterySlot = [];
-    public readonly List<ResourceComponent> ResourceComponentRef = [];
+    public readonly List<Slot[]> BatterySlots = [];
+    public readonly List<ResourceComponent[]> ResourceComponentRef = [];
     public readonly List<GClass3379> RelatedComponentRef = [];
 
     private readonly List<ISystem> _systems = [];
@@ -98,7 +98,7 @@ public class DeviceManager : MonoBehaviour
         Singleton<DeviceManager>.TryRelease(this);
     }
 
-    public int Add(CompoundItem item, ref BatteryData batteryData, Slot batterySlot)
+    public int Add(CompoundItem item, ref BatteryData batteryData, Slot[] batterySlot)
     {
         string itemId = item.Id;
         if (_indexLookup.ContainsKey(itemId))
@@ -111,11 +111,11 @@ public class DeviceManager : MonoBehaviour
         Devices.Add(item);
         _indexLookup[itemId] = i;
         DrainMultiplier.Add(batteryData.DrainMultiplier);
-        BatterySlot.Add(batterySlot);
+        BatterySlots.Add(batterySlot);
         IsOperable.Add(false);
         IsActive.Add(false);
 
-        ResourceComponentRef.Add(null);
+        ResourceComponentRef.Add(new ResourceComponent[batterySlot.Length]);
         var relatedComponent = GetRelatedComponentToSet(item);
         RelatedComponentRef.Add(relatedComponent);
 
@@ -277,7 +277,7 @@ public class DeviceManager : MonoBehaviour
 
     private IEnumerator RunManualUpdateNextFrame(Item item)
     {
-        yield return null; // wait one frame
+        yield return null;
 
         ManualUpdate(item);
     }
@@ -286,7 +286,7 @@ public class DeviceManager : MonoBehaviour
     {
         Devices.SwapRemoveAt(index);
         DrainMultiplier.SwapRemoveAt(index);
-        BatterySlot.SwapRemoveAt(index);
+        BatterySlots.SwapRemoveAt(index);
         IsOperable.SwapRemoveAt(index);
         IsActive.SwapRemoveAt(index);
 

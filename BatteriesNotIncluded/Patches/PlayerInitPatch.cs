@@ -53,26 +53,29 @@ public class PlayerInitPatch : ModulePatch
         // TODO: Add devices of loot in world
     }
 
-    private static void AddBatteriesToBotDevice(Slot slot, Player botPlayer)
+    private static void AddBatteriesToBotDevice(Slot[] slots, Player botPlayer)
     {
         _aaBatteryTemplate ??= Singleton<ItemFactoryClass>.Instance.GetPresetItem(CommonExtensions.AABatteryId);
         _cr2032BatteryTemplate ??= Singleton<ItemFactoryClass>.Instance.GetPresetItem(CommonExtensions.CR2032BatteryId);
         _cr123ABatteryTemplate ??= Singleton<ItemFactoryClass>.Instance.GetPresetItem(CommonExtensions.CR123ABatteryId);
 
-        if (!slot.IsBatterySlot()) throw new ArgumentException("Slot is not a battery slot");
+        foreach (var slot in slots)
+        {
+            if (!slot.IsBatterySlot()) throw new ArgumentException("Slot is not a battery slot");
 
-        Item battery = null;
-        if (slot.CheckCompatibility(_aaBatteryTemplate))
-            battery = _aaBatteryTemplate.CloneItem();
-        if (slot.CheckCompatibility(_cr2032BatteryTemplate))
-            battery = _cr2032BatteryTemplate.CloneItem();
-        if (slot.CheckCompatibility(_cr123ABatteryTemplate))
-            battery = _cr123ABatteryTemplate.CloneItem();
+            Item battery = null;
+            if (slot.CheckCompatibility(_aaBatteryTemplate))
+                battery = _aaBatteryTemplate.CloneItem();
+            if (slot.CheckCompatibility(_cr2032BatteryTemplate))
+                battery = _cr2032BatteryTemplate.CloneItem();
+            if (slot.CheckCompatibility(_cr123ABatteryTemplate))
+                battery = _cr123ABatteryTemplate.CloneItem();
 
-        if (battery == null) return;
+            if (battery == null) return;
 
-        slot.Add(battery, false);
-        DrainSpawnedBattery(battery, botPlayer);
+            slot.Add(battery, false);
+            DrainSpawnedBattery(battery, botPlayer);
+        }
     }
 
     private static void DrainSpawnedBattery(Item spawnedBattery, Player botPlayer)
