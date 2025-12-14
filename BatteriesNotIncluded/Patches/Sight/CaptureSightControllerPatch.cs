@@ -13,7 +13,7 @@ public class CaptureSightControllerPatch : ModulePatch
 
     protected override MethodBase GetTargetMethod()
     {
-        // Use set_SightMod instead of Awake/Init, instead of checking if sightmod.item is battery operated since
+        // Use set_SightMod instead of Awake/Init, instead of checking if SightMod.Item is battery operated since
         // Awake/Init doesn't yet set SightModVisualControllers.SightMod.
         return typeof(SightModVisualControllers).GetMethod("set_SightMod");
     }

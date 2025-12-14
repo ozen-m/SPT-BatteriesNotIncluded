@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using BatteriesNotIncluded.Patches;
 using BatteriesNotIncluded.Patches.Sight;
 using BatteriesNotIncluded.Utils;
 using HarmonyLib;
@@ -57,21 +56,21 @@ public class SightModVisualHandler
     {
         if (IsExisting(controller))
         {
-            // LoggerUtil.Debug($"Skipping existing controller for {controller.SightMod.Item.LocalizedShortName()} ({controller.SightMod.Item.Id})"); // Spams
+            // LoggerUtil.Debug($"Skipping existing controller for {controller.SightMod.Item.LocalizedShortName()} ({controller.SightMod.Item.Id})");
             return;
         }
 
         var item = controller.SightMod.Item;
-        if (item.IsBatteryOperated())
+        if (_deviceManager.IsItemRegistered(item.Id))
         {
             _controllers.Add(controller);
             AddToLookUp(item.Id, controller);
-            LoggerUtil.Debug($"Adding controller for {item.LocalizedShortName()} ({item.Id})");
+            LoggerUtil.Debug($"Adding sight controller for {item.LocalizedShortName()} ({item.Id})");
         }
         else
         {
             _invalidControllers.Add(controller);
-            LoggerUtil.Debug($"Adding non-battery operated controller for {item.LocalizedShortName()} ({item.Id})");
+            LoggerUtil.Debug($"Adding invalid sight controller for {item.LocalizedShortName()} ({item.Id})");
         }
     }
 
@@ -100,11 +99,10 @@ public class SightModVisualHandler
                 collimatorSight.gameObject.SetActive(shouldBeActive);
             }
             var opticSight = scopeModeInfo.OpticSight;
-            if (opticSight != null && !shouldBeActive)
+            if (opticSight != null)
             {
-                // opticSight.LensFade();
-                // opticSight.gameObject.SetActive(false);
-                opticSight.enabled = false;
+                opticSight.enabled = shouldBeActive;
+                opticSight.LensFade(!shouldBeActive);
 
                 // TODO: Find a way to only disable the reticle
             }
