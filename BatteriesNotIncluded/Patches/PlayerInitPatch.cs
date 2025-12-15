@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 using BatteriesNotIncluded.Managers;
@@ -25,6 +26,9 @@ public class PlayerInitPatch : ModulePatch
     }
 
     [PatchPostfix]
+    [SuppressMessage("Usage", "VSTHRD100:Avoid async void methods")]
+    [SuppressMessage("Usage", "VSTHRD003:Avoid awaiting foreign Tasks")]
+    // ReSharper disable once AsyncVoidMethod
     protected static async void Postfix(Player __instance, Task __result)
     {
         if (!Singleton<DeviceManager>.Instantiated)
@@ -61,6 +65,8 @@ public class PlayerInitPatch : ModulePatch
 
         foreach (var slot in slots)
         {
+            if (slot.ContainedItem is not null) return;
+
             if (!slot.IsBatterySlot()) throw new ArgumentException("Slot is not a battery slot");
 
             Item battery = null;

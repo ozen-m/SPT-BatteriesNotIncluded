@@ -19,7 +19,7 @@ public class OnItemAddedOrRemovedPatch : ModulePatch
     [PatchPrefix]
     protected static void Prefix(Player __instance, Item item, ItemAddress location, bool added)
     {
-        if (location is GClass3393) return;
+        if (location is GClass3393 /* Location is grid? */) return;
 
 #if DEBUG
         if (!__instance.IsYourPlayer) LoggerUtil.Warning($"Player.OnItemAddedOrRemoved patch ran for {__instance.Profile.Nickname}");

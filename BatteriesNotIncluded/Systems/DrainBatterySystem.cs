@@ -15,6 +15,7 @@ public class DrainBatterySystem(int runInterval) : BaseDelayedSystem(runInterval
         foreach (var resourceComponent in resourceComponents)
         {
             // TODO: Drain calculation
+            // TODO: Light drain based on modes: light/laser/ir?
             var currentCharge = Mathf.Max(resourceComponent.Value - 50 / 100f * manager.DrainMultiplier[i], 0f);
             resourceComponent.Value = currentCharge;
             if (currentCharge == 0f)

@@ -29,7 +29,7 @@ public class HeadphoneTemplatePatch : ModulePatch
         }
         return true;
     }
-    
+
     // TODO: Check for conflicts with Realism mod
 
     /// <summary>

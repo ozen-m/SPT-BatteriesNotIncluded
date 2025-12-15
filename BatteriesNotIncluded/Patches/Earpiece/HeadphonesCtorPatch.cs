@@ -20,7 +20,7 @@ public class HeadphonesCtorPatchPatch : ModulePatch
     protected static void Postfix(HeadphonesItemClass __instance)
     {
         if (!__instance.IsBatteryOperated()) return;
-        
+
         __instance.Togglable = new TogglableComponent(__instance);
         __instance.Components.Add(__instance.Togglable);
     }

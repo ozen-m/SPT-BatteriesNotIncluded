@@ -23,7 +23,14 @@ public class DeviceOperableSystem : BaseSystem
                 return;
             }
 
-            var resourceComponent = battery.GetItemComponent<ResourceComponent>();
+            if (!battery.TryGetItemComponent(out ResourceComponent resourceComponent))
+            {
+                manager.IsOperable[i] = false;
+                manager.ResourceComponentRef[i][j] = null;
+                LoggerUtil.Warning($"Missing resource component for {battery.LocalizedShortName()} ({battery.Id})");
+                return;
+            }
+
             manager.ResourceComponentRef[i][j] = resourceComponent;
             if (resourceComponent.IsDrained())
             {

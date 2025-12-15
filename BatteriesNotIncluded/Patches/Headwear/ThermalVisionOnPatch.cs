@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using BatteriesNotIncluded.Managers;
-using BSG.CameraEffects;
 using Comfort.Common;
 using EFT;
 using EFT.InventoryLogic;
