@@ -43,21 +43,21 @@ public class BatteriesNotIncluded(
         // TODO: Add file check for PrePatch
 
         Dictionary<MongoId, TemplateItem> items = databaseService.GetItems();
-        foreach (var batt in _batteryIds)
+        foreach (var batteryId in _batteryIds)
         {
-            if (!items.TryGetValue(batt, out TemplateItem template))
+            if (!items.TryGetValue(batteryId, out TemplateItem template))
             {
-                throw new ArgumentOutOfRangeException($"Battery {batt} not found in items");
+                throw new ArgumentOutOfRangeException($"Battery {batteryId} not found in items");
             }
 
             template.Properties!.MaxResource = 100;
             template.Properties.Resource = 100;
             template.Properties.ItemSound = "food_tin_can";
-            if (batt == _dBatteryId)
+            if (batteryId == _dBatteryId)
             {
                 template.Properties.Prefab!.Path = "batteries/cr2032.bundle";
             }
-            else if (batt == _rechargeableBatteryId)
+            else if (batteryId == _rechargeableBatteryId)
             {
                 template.Properties.Prefab!.Path = "batteries/cr123.bundle";
             }
@@ -67,6 +67,8 @@ public class BatteriesNotIncluded(
             .Values
             .Where(i => itemHelper.IsOfBaseclasses(i.Id, _batteryConsumers));
         AddBatterySlots(itemsToUseBatteries);
+
+        AddToModPool();
 
         loggerUtil.Success("loaded successfully!");
         return Task.CompletedTask;
@@ -126,7 +128,7 @@ public class BatteriesNotIncluded(
         template.Properties!.Slots = template.Properties.Slots != null
             ? template.Properties.Slots.Concat(newSlots)
             : newSlots;
-        
+
         Interlocked.Increment(ref counter);
         // loggerUtil.Debug($"{itemHelper.GetItemName(template.Id)} ({template.Id}) added slot with compatible battery {itemHelper.GetItemName(batteryType.Value)}");
     }
@@ -169,6 +171,56 @@ public class BatteriesNotIncluded(
         }
     }
 
+    /// <summary>
+    /// This suppresses warnings in the SPT server console/logs.
+    /// We still add them, if not spawned since they're rolled, via client.
+    /// </summary>
+    private void AddToModPool()
+    {
+        foreach ((MongoId deviceId, DeviceData deviceData) in modConfigContainer.ModConfig.CR2032)
+        {
+            AddBatteriesToModPool(deviceId, _dBatteryId, deviceData.Slots);
+        }
+        foreach ((MongoId deviceId, DeviceData deviceData) in modConfigContainer.ModConfig.CR123A)
+        {
+            AddBatteriesToModPool(deviceId, _rechargeableBatteryId, deviceData.Slots);
+        }
+        foreach ((MongoId deviceId, DeviceData deviceData) in modConfigContainer.ModConfig.AA)
+        {
+            AddBatteriesToModPool(deviceId, _aaBatteryId, deviceData.Slots);
+        }
+        loggerUtil.Info($"Added batteries to mod pools");
+    }
+
+    private void AddBatteriesToModPool(MongoId itemId, MongoId batteryId, int slots)
+    {
+        var botTypes = databaseService.GetBots().Types;
+        foreach (var (_, value) in botTypes)
+        {
+            if (value!.BotInventory.Mods.TryGetValue(itemId, out var botMods))
+            {
+                for (var i = 0; i < slots; i++)
+                {
+                    if (botMods.TryGetValue($"mod_equipment_00{i}", out var botMod))
+                    {
+                        botMod.Add(batteryId);
+                        continue;
+                    }
+                    botMods[$"mod_equipment_00{i}"] = [batteryId];
+                }
+            }
+            else
+            {
+                var newBotMod = value.BotInventory.Mods[itemId] = [];
+                HashSet<MongoId> botMod = [batteryId];
+                for (var i = 0; i < slots; i++)
+                {
+                    newBotMod[$"mod_equipment_00{i}"] = botMod;
+                }
+            }
+        }
+    }
+
     private void LoadLocales(string localesPath)
     {
         Dictionary<string, Dictionary<string, string>> locales = [];
@@ -207,8 +259,8 @@ public class BatteriesNotIncluded(
                     {
                         localeData[key] = value;
                     }
-                    localeData["TURNOFF"] = "TURN OFF";
-                    localeData["TURNON"] = "TURN ON";
+                    localeData["TURNOFF"] = "TURN OFF"; // FLIP UP
+                    localeData["TURNON"] = "TURN ON"; // FLIP DOWN
 
                     return localeData;
                 });
