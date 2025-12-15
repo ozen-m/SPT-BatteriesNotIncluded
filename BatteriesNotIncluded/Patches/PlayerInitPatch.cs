@@ -46,15 +46,27 @@ public class PlayerInitPatch : ModulePatch
             if (item is not CompoundItem compoundItem || !compoundItem.IsBatteryOperated(out var batterySlot)) continue;
 
             var batteryData = BatteriesNotIncluded.GetBatteryData(compoundItem.TemplateId);
-            manager.Add(compoundItem, ref batteryData, batterySlot);
 
             if (!__instance.IsYourPlayer)
             {
                 AddBatteriesToBotDevice(batterySlot, __instance);
+                TurnOnBotDevice(compoundItem);
             }
+
+            manager.Add(compoundItem, ref batteryData, batterySlot);
         }
 
         // TODO: Add devices of loot in world
+    }
+
+    private static void TurnOnBotDevice(Item item)
+    {
+        if (!item.TryGetItemComponent(out TogglableComponent togglableComponent)) return;
+
+        if (togglableComponent.Item.Owner is InventoryController invController)
+        {
+            _ = invController.TryRunNetworkTransaction(togglableComponent.Set(true, true));
+        }
     }
 
     private static void AddBatteriesToBotDevice(Slot[] slots, Player botPlayer)
