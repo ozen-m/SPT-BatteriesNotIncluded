@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace BatteriesNotIncluded.Patches;
 
+/// <summary>
+/// This suppresses warnings in the client logs about bones not being found in mod slots.
+/// </summary>
+[IgnoreAutoPatch]
 public class AddFakeBonePatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
