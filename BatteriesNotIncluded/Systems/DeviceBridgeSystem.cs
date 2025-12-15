@@ -12,8 +12,8 @@ public class DeviceBridgeSystem : BaseSystem
     {
         if (i == -1) return;
 
+        var isPrevOperable = manager.IsPrevOperable[i];
         var isOperable = manager.IsOperable[i];
-        var previouslyActive = manager.IsActive[i];
 
         var component = manager.RelatedComponentRef[i];
         var item = component.Item;
@@ -21,38 +21,49 @@ public class DeviceBridgeSystem : BaseSystem
         {
             case LightComponent lightComponent:
             {
-                // All lights
-                if (!isOperable && previouslyActive)
+                var isToggled = lightComponent.IsActive;
+                var shouldBeActive = isOperable && isToggled;
+                manager.IsActive[i] = shouldBeActive;
+
+                // Became inoperable/operable
+                var shouldTransition = isPrevOperable ^ isOperable;
+                if (!shouldTransition) return;
+
+                if (!isOperable)
                 {
                     // Removed batteries or battery drained
                     lightComponent.IsActive = false;
                     SetLightState(lightComponent);
                 }
+                // else if (isToggled)
+                // {
+                //     // Replaced with new batteries while toggled on.
+                //     // Different approach when it comes to tac devices (see SetLightsStatePatch)
+                //     // since tac devices cannot be "on" while not emitting lights.
+                // }
 
-                // Replaced with new batteries while toggled on
-                // Different approach when it comes to tac devices
-
-                manager.IsActive[i] = lightComponent.IsActive;
                 return;
             }
             case NightVisionComponent nightVisionComponent:
             {
                 var isToggled = nightVisionComponent.Togglable.On;
-                var shouldBeActive = isOperable && isToggled;
-                manager.IsActive[i] = shouldBeActive;
+                manager.IsActive[i] = isOperable && isToggled;
 
-                // Only control cameras for player
+                // Became inoperable/operable
+                var shouldTransition = isPrevOperable ^ isOperable;
+                if (!shouldTransition) return;
+
+                // Only control cameras for your player and device is in your equipment
                 if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
                     !playerInvCont.Player_0.IsYourPlayer ||
-                    item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */ ||
-                    CameraUtil.NightVisionInProcessSwitching /* Check to not conflict when turning on/off normally */) return;
+                    item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */) return;
 
-                if (!shouldBeActive && previouslyActive)
+                if (!isOperable)
                 {
                     // Removed batteries or battery drained
                     CameraUtil.SetNightVision(false);
                 }
-                else if (shouldBeActive)
+                else if (isToggled)
                 {
                     // Replaced with new batteries while toggled on
                     CameraUtil.SetNightVision(true);
@@ -63,21 +74,23 @@ public class DeviceBridgeSystem : BaseSystem
             case ThermalVisionComponent thermalVisionComponent:
             {
                 var isToggled = thermalVisionComponent.Togglable.On;
-                var shouldBeActive = isOperable && isToggled;
-                manager.IsActive[i] = shouldBeActive;
+                manager.IsActive[i] = isOperable && isToggled;
 
-                // Only control cameras for your player
+                // Became inoperable/operable
+                var shouldTransition = isPrevOperable ^ isOperable;
+                if (!shouldTransition) return;
+
+                // Only control cameras for your player and device is in your equipment
                 if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
                     !playerInvCont.Player_0.IsYourPlayer ||
-                    item.CurrentAddress is GClass3393 /* If not in active slot (a grid?) */ ||
-                    CameraUtil.ThermalVisionInProcessSwitching /* Check to not conflict when turning on/off normally */) return;
+                    item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */) return;
 
-                if (!shouldBeActive && previouslyActive)
+                if (!isOperable)
                 {
                     // Removed batteries or battery drained
                     CameraUtil.SetThermalVision(false);
                 }
-                else if (shouldBeActive)
+                else if (isToggled)
                 {
                     // Replaced with new batteries while toggled on
                     CameraUtil.SetThermalVision(true);
@@ -87,22 +100,29 @@ public class DeviceBridgeSystem : BaseSystem
             }
             case TogglableComponent togglableComponent:
             {
-                manager.IsActive[i] = isOperable && togglableComponent.On;
+                var isToggled = togglableComponent.On;
+                manager.IsActive[i] = isOperable && isToggled;
 
-                // Only control devices for your player (only your player ever sees/hears these)
+                // Became inoperable/operable
+                var shouldTransition = isPrevOperable ^ isOperable;
+                if (!shouldTransition) return;
+
+                // Only control devices for your player and device is in your equipment
+                // (only your player ever hears/sees these)
                 if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
                     !playerInvCont.Player_0.IsYourPlayer ||
                     item.CurrentAddress is GClass3393 /* If not in active slot (a grid?) */) return;
 
-                if (item is SightsItemClass) // Should also be for player only?
+                switch (item)
                 {
-                    manager.UpdateSightVisibility(item.Id, i);
-                }
-                else if (item is HeadphonesItemClass)
-                {
-                    // BUG: UpdatePhonesReally runs twice, one on Player.OnItemAddedOrRemoved (too late)
-                    //      and on ManualUpdate(Item).
-                    playerInvCont.Player_0.UpdatePhonesReally();
+                    case SightsItemClass:
+                        manager.UpdateSightVisibility(item);
+                        break;
+                    case HeadphonesItemClass:
+                        // BUG: UpdatePhonesReally runs twice, one on Player.OnItemAddedOrRemoved (too late)
+                        //      and on ManualUpdate(Item).
+                        playerInvCont.Player_0.UpdatePhonesReally();
+                        break;
                 }
                 return;
             }

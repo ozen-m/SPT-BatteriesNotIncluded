@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using BatteriesNotIncluded.Components;
 using BatteriesNotIncluded.Patches;
@@ -17,6 +16,7 @@ public class DeviceManager : MonoBehaviour
     public readonly List<Item> Devices = [];
     public readonly List<float> DrainMultiplier = [];
     public readonly List<bool> IsOperable = [];
+    public readonly List<bool> IsPrevOperable = [];
     public readonly List<bool> IsActive = [];
 
     public readonly List<Slot[]> BatterySlots = [];
@@ -113,6 +113,7 @@ public class DeviceManager : MonoBehaviour
         DrainMultiplier.Add(batteryData.DrainMultiplier);
         BatterySlots.Add(batterySlot);
         IsOperable.Add(false);
+        IsPrevOperable.Add(false);
         IsActive.Add(false);
 
         ResourceComponentRef.Add(new ResourceComponent[batterySlot.Length]);
@@ -125,6 +126,11 @@ public class DeviceManager : MonoBehaviour
         return i;
     }
 
+    /// <summary>
+    /// Run manual systems if battery is added/removed from equipment slots.
+    /// TODO: Use Slot.OnAddOrRemoveItem?
+    /// </summary>
+    /// <param name="item"></param>
     public void OnItemAddedOrRemoved(Item item)
     {
         if (!item.IsBattery()) return;
@@ -163,11 +169,18 @@ public class DeviceManager : MonoBehaviour
     public void RunAfterGameStart()
     {
         _sightModVisualHandler.RemoveDestroyedControllers();
-        RunManualUpdateNextFrame();
+        // Run twice to set IsPrevOperable correctly in DeviceOperableSystem
+        ManualUpdate();
+        ManualUpdate();
     }
 
-    public void UpdateSightVisibility(string itemId, int index) =>
-        _sightModVisualHandler.UpdateSightVisibility(itemId, IsActive[index]);
+    public void UpdateSightVisibility(Item item)
+    {
+        var index = GetItemIndex(item);
+        if (index == -1) return;
+
+        _sightModVisualHandler.UpdateSightVisibility(item.Id, IsActive[index]);
+    }
 
     public bool IsItemRegistered(string itemId) => _indexLookup.ContainsKey(itemId);
 
@@ -219,18 +232,19 @@ public class DeviceManager : MonoBehaviour
                 return;
             case NightVisionComponent nightVisionComponent:
                 _unsubscribeEvents.Add(nightVisionComponent.Togglable.OnChanged.Subscribe(() =>
-                    StartCoroutine(RunManualUpdateNextFrame(nightVisionComponent.Togglable.Item))
+                    ManualUpdate(nightVisionComponent.Togglable.Item)
                 ));
                 return;
             case ThermalVisionComponent thermalVisionComponent:
                 _unsubscribeEvents.Add(thermalVisionComponent.Togglable.OnChanged.Subscribe(() =>
-                    StartCoroutine(RunManualUpdateNextFrame(thermalVisionComponent.Togglable.Item))
+                    ManualUpdate(thermalVisionComponent.Togglable.Item)
                 ));
                 return;
             case TogglableComponent togglableComponent:
             {
                 _unsubscribeEvents.Add(togglableComponent.OnChanged.Subscribe(() =>
-                    OnToggle(togglableComponent.Item)));
+                    OnToggle(togglableComponent.Item)
+                ));
                 return;
             }
             default:
@@ -241,9 +255,19 @@ public class DeviceManager : MonoBehaviour
     private void OnToggle(Item item)
     {
         ManualUpdate(item);
-        if (item.Owner is Player.PlayerInventoryController playerInvCont)
+        if (item.Owner is not Player.PlayerInventoryController playerInvCont) return;
+
+        playerInvCont.Player_0.PlayTacticalSound();
+        if (!playerInvCont.Player_0.IsYourPlayer || item.CurrentAddress is GClass3393) return;
+
+        switch (item)
         {
-            playerInvCont.Player_0.PlayTacticalSound();
+            case HeadphonesItemClass:
+                playerInvCont.Player_0.UpdatePhonesReally();
+                break;
+            case SightsItemClass:
+                UpdateSightVisibility(item);
+                break;
         }
     }
 
@@ -275,19 +299,13 @@ public class DeviceManager : MonoBehaviour
         return _indexLookup.GetValueOrDefault(itemId, -1);
     }
 
-    private IEnumerator RunManualUpdateNextFrame(Item item)
-    {
-        yield return null;
-
-        ManualUpdate(item);
-    }
-
     private void RemoveAt(int index)
     {
         Devices.SwapRemoveAt(index);
         DrainMultiplier.SwapRemoveAt(index);
         BatterySlots.SwapRemoveAt(index);
         IsOperable.SwapRemoveAt(index);
+        IsPrevOperable.SwapRemoveAt(index);
         IsActive.SwapRemoveAt(index);
 
         ResourceComponentRef.SwapRemoveAt(index);

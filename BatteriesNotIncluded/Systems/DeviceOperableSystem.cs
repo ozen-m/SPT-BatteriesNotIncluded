@@ -10,6 +10,8 @@ public class DeviceOperableSystem : BaseSystem
     {
         if (i == -1) return;
 
+        manager.IsPrevOperable[i] = manager.IsOperable[i];
+
         var slots = manager.BatterySlots[i];
         for (var j = 0; j < slots.Length; j++)
         {

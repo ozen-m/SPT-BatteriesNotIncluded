@@ -8,7 +8,7 @@ using SPT.Reflection.Patching;
 namespace BatteriesNotIncluded.Patches.Sight;
 
 /// <summary>
-/// Run manual systems for sights on actions (equip gun, ADS, change sight mode)
+/// UpdateSightVisibility on actions (equip gun, ADS, change sight mode)
 /// </summary>
 public class SightsChangePatch : ModulePatch
 {
@@ -28,7 +28,7 @@ public class SightsChangePatch : ModulePatch
             var item = sight.Mod.Item;
             if (manager.IsItemRegistered(item.Id))
             {
-                manager.ManualUpdate(item);
+                manager.UpdateSightVisibility(item);
             }
         }
     }

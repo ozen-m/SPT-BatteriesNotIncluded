@@ -101,7 +101,7 @@ public class SightModVisualHandler
             var opticSight = scopeModeInfo.OpticSight;
             if (opticSight != null)
             {
-                opticSight.enabled = shouldBeActive;
+                // opticSight.enabled = shouldBeActive;
                 opticSight.LensFade(!shouldBeActive);
 
                 // TODO: Find a way to only disable the reticle
