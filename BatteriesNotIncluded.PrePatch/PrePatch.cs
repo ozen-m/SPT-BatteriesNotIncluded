@@ -14,6 +14,8 @@ public static class BatteriesNotIncludedPrePatch
 
     public static void Patch(AssemblyDefinition assembly)
     {
+        // TODO: Find a way to not break icons
+        return;
         var patcherPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         var pluginPath = Path.Combine(patcherPath!, "..", "plugins", "ozen-BatteriesNotIncluded.dll");
         var logSource = Logger.CreateLogSource("Batteries Not Included");
