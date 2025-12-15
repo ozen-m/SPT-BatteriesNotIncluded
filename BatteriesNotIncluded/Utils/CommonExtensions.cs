@@ -18,7 +18,14 @@ public static class CommonExtensions
 
     public static bool IsBatteryOperated(this CompoundItem item)
     {
-        return IsBatteryOperated(item, out _);
+        foreach (var slot in item.Slots)
+        {
+            if (slot.IsBatterySlot())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static bool IsBatteryOperated(this CompoundItem item, out Slot[] batterySlot)
