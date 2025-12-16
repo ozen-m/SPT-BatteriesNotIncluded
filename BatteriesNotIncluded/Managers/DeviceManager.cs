@@ -32,6 +32,7 @@ public class DeviceManager : MonoBehaviour
 
     private readonly List<Action> _unsubscribeEvents = [];
     private SightModVisualHandler _sightModVisualHandler;
+    private GameWorld _gameWorld;
     private bool _gameStarted;
 
     private void Start()
@@ -41,6 +42,13 @@ public class DeviceManager : MonoBehaviour
         _manualSystems.Add(new DeviceOperableSystem());
         _manualSystems.Add(new DeviceBridgeSystem());
         _systems.Add(new DrainBatterySystem(1000));
+    }
+
+    public void SubscribeToGameWorld(GameWorld gameWorld)
+    {
+        _gameWorld = gameWorld;
+        _gameWorld.OnPersonAdd += RegisterPlayerItems;
+        _gameWorld.AfterGameStarted += RunAfterGameStart;
     }
 
     private void Update()
@@ -83,6 +91,9 @@ public class DeviceManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        _gameWorld.OnPersonAdd -= RegisterPlayerItems;
+        _gameWorld.AfterGameStarted -= RunAfterGameStart;
+
         foreach (Action action in _unsubscribeEvents)
         {
             action.Invoke();
@@ -91,11 +102,6 @@ public class DeviceManager : MonoBehaviour
         _sightModVisualHandler.Cleanup();
 
         Singleton<DeviceManager>.TryRelease(this);
-    }
-
-    public void SubscribeToGameWorldAfterStart(GameWorld gameWorld)
-    {
-        gameWorld.AfterGameStarted += RunAfterGameStart;
     }
 
     public int Add(CompoundItem item, Slot[] batterySlots, ref DeviceData deviceData)
@@ -172,15 +178,35 @@ public class DeviceManager : MonoBehaviour
 
     private void RunAfterGameStart()
     {
-        var go = gameObject.GetComponent<GameWorld>();
-        go.AfterGameStarted -= RunAfterGameStart;
-
         _gameStarted = true;
         _sightModVisualHandler.RemoveDestroyedControllers();
 
         // Run twice to set IsPrevOperable correctly in DeviceOperableSystem
         ManualUpdate();
         ManualUpdate();
+    }
+
+    private void RegisterPlayerItems(IPlayer iPlayer)
+    {
+        if (iPlayer is not Player player) return;
+
+        var allPlayerItems = player.Inventory.Equipment.GetAllItems();
+        foreach (var item in allPlayerItems)
+        {
+            if (item is not CompoundItem compoundItem || !BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData))
+            {
+                continue;
+            }
+            var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
+
+            if (player.IsAI)
+            {
+                player.AddBatteriesToBotDevice(batterySlots);
+                compoundItem.TurnOnDevice();
+            }
+
+            Add(compoundItem, batterySlots, ref deviceData);
+        }
     }
 
     private static GClass3379 GetRelatedComponentToSet(Item item)
