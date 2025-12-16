@@ -32,6 +32,7 @@ public class DeviceManager : MonoBehaviour
 
     private readonly List<Action> _unsubscribeEvents = [];
     private SightModVisualHandler _sightModVisualHandler;
+    private bool _gameStarted;
 
     private void Start()
     {
@@ -44,6 +45,8 @@ public class DeviceManager : MonoBehaviour
 
     private void Update()
     {
+        if (!_gameStarted) return;
+
         foreach (ISystem system in _systems)
         {
             system.Run(this);
@@ -52,6 +55,8 @@ public class DeviceManager : MonoBehaviour
 
     private void ManualUpdate()
     {
+        if (!_gameStarted) return;
+
         LoggerUtil.Debug("Running Manual Update");
         foreach (ISystem system in _manualSystems)
         {
@@ -61,12 +66,14 @@ public class DeviceManager : MonoBehaviour
 
     public void ManualUpdate(Item item)
     {
+        LoggerUtil.Debug($"Running Manual Update for {item.Id}");
         ManualUpdate(item.Id);
     }
 
     public void ManualUpdate(string itemId)
     {
-        LoggerUtil.Debug($"Running Manual Update for {itemId}");
+        if (!_gameStarted) return;
+
         var index = GetItemIndex(itemId);
         foreach (ISystem system in _manualSystems)
         {
@@ -84,6 +91,11 @@ public class DeviceManager : MonoBehaviour
         _sightModVisualHandler.Cleanup();
 
         Singleton<DeviceManager>.TryRelease(this);
+    }
+
+    public void SubscribeToGameWorldAfterStart(GameWorld gameWorld)
+    {
+        gameWorld.AfterGameStarted += RunAfterGameStart;
     }
 
     public int Add(CompoundItem item, Slot[] batterySlots, ref DeviceData deviceData)
@@ -134,15 +146,6 @@ public class DeviceManager : MonoBehaviour
         return index == -1 || IsOperable[index];
     }
 
-    public void RunAfterGameStart()
-    {
-        _sightModVisualHandler.RemoveDestroyedControllers();
-
-        // Run twice to set IsPrevOperable correctly in DeviceOperableSystem
-        ManualUpdate();
-        ManualUpdate();
-    }
-
     public void UpdateSightVisibility(Item item)
     {
         var index = GetItemIndex(item);
@@ -165,6 +168,19 @@ public class DeviceManager : MonoBehaviour
         }
         _indexLookup.Remove(item.Id);
         RemoveAt(index);
+    }
+
+    private void RunAfterGameStart()
+    {
+        var go = gameObject.GetComponent<GameWorld>();
+        go.AfterGameStarted -= RunAfterGameStart;
+
+        _gameStarted = true;
+        _sightModVisualHandler.RemoveDestroyedControllers();
+
+        // Run twice to set IsPrevOperable correctly in DeviceOperableSystem
+        ManualUpdate();
+        ManualUpdate();
     }
 
     private static GClass3379 GetRelatedComponentToSet(Item item)

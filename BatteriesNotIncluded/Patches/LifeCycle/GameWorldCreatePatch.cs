@@ -24,7 +24,9 @@ public class GameWorldCreatePatch : ModulePatch
         }
 
         var manager = __result.GetOrAddComponent<DeviceManager>();
+        manager.SubscribeToGameWorldAfterStart(__result);
         Singleton<DeviceManager>.Create(manager);
-        LoggerUtil.Debug("DeviceManager created");
+
+        LoggerUtil.Info("DeviceManager created");
     }
 }

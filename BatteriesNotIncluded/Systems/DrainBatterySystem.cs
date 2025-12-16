@@ -18,13 +18,14 @@ public class DrainBatterySystem(int runInterval) : BaseDelayedSystem(runInterval
             // TODO: Light drain based on modes: light/laser/ir?
             var currentCharge = Mathf.Max(resourceComponent.Value - 50 / 100f * manager.DrainMultiplier[i], 0f);
             resourceComponent.Value = currentCharge;
+
+            // Warning: spams
+            LoggerUtil.Debug($"Drained item {manager.Devices[i].LocalizedShortName()} {manager.Devices[i].Id} to {resourceComponent.Value}");
+
             if (currentCharge == 0f)
             {
                 manager.ManualUpdate(manager.Devices[i].Id);
             }
-
-            // Warning: spams
-            LoggerUtil.Debug($"Drained item {manager.Devices[i].LocalizedShortName()} {manager.Devices[i].Id} to {resourceComponent.Value}");
         }
     }
 
