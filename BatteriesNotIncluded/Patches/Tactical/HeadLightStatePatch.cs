@@ -27,17 +27,3 @@ public class GetHeadLightStatePatch : ModulePatch
         }
     }
 }
-
-public class SetHeadLightStatePatch : ModulePatch
-{
-    protected override MethodBase GetTargetMethod()
-    {
-        return typeof(LightComponent).GetMethod(nameof(LightComponent.SetLightState));
-    }
-
-    [PatchPostfix]
-    protected static void Postfix(LightComponent __instance, FirearmLightStateStruct state)
-    {
-        Singleton<DeviceManager>.Instance.ManualUpdate(state.Id);
-    }
-}

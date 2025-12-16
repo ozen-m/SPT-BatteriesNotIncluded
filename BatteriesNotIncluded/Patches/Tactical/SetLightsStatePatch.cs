@@ -31,16 +31,4 @@ public class SetLightsStatePatch : ModulePatch
             }
         }
     }
-
-    [PatchPostfix]
-    protected static void Postfix(FirearmLightStateStruct[] lightsStates)
-    {
-        var manager = Singleton<DeviceManager>.Instance;
-        for (var i = 0; i < lightsStates.Length; i++)
-        {
-            // Light component doesn't have an event we can subscribe to, do it here.
-            // IsRegistered check?
-            manager.ManualUpdate(lightsStates[i].Id);
-        }
-    }
 }
