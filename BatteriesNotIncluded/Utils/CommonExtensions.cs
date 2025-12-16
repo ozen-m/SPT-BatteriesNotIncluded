@@ -45,27 +45,6 @@ public static class CommonExtensions
 
     public static bool IsBattery(this Item item) => _batteryIds.Contains(item.TemplateId);
 
-    public static int GetBatterySlotIndex(this Item item)
-    {
-        if (item is not CompoundItem compoundItem) return -1;
-
-        return compoundItem.GetBatterySlotIndex();
-    }
-
-    // TODO: Multiple battery slots? Or drain faster?
-    public static int GetBatterySlotIndex(this CompoundItem item)
-    {
-        var slots = item.Slots;
-        for (var i = 0; i < slots.Length; i++)
-        {
-            if (slots[i].IsBatterySlot())
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     public static bool IsBatterySlot(this Slot slot)
     {
         foreach (var slotFilter in slot.Filters)

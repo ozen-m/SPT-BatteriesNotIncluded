@@ -5,6 +5,7 @@ using SPT.Reflection.Patching;
 
 namespace BatteriesNotIncluded.Patches.Debug;
 
+[IgnoreAutoPatch]
 public class UpdatePhonesReallyPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()

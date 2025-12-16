@@ -25,7 +25,7 @@ public abstract class BaseDelayedSystem(int _runInterval) : ISystem
         Run(manager);
     }
 
-    protected bool CanRun()
+    private bool CanRun()
     {
         if (_runTimer.ElapsedMilliseconds <= _runInterval) return false;
 

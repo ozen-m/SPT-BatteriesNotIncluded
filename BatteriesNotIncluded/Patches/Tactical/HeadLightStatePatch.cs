@@ -21,8 +21,7 @@ public class GetHeadLightStatePatch : ModulePatch
         if (!__result.IsActive) return;
 
         // If player wants light on but has no/drained batteries, don't allow
-        var manager = Singleton<DeviceManager>.Instance;
-        if (!manager.GetIsOperable(__result.Id))
+        if (!Singleton<DeviceManager>.Instance.GetIsOperable(__result.Id))
         {
             __result.IsActive = false;
         }
@@ -39,7 +38,6 @@ public class SetHeadLightStatePatch : ModulePatch
     [PatchPostfix]
     protected static void Postfix(LightComponent __instance, FirearmLightStateStruct state)
     {
-        var manager = Singleton<DeviceManager>.Instance;
-        manager.ManualUpdate(state.Id);
+        Singleton<DeviceManager>.Instance.ManualUpdate(state.Id);
     }
 }

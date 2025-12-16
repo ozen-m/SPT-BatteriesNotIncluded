@@ -54,11 +54,7 @@ public class SightModVisualHandler
 
     private void AddController(SightModVisualControllers controller)
     {
-        if (IsExisting(controller))
-        {
-            // LoggerUtil.Debug($"Skipping existing controller for {controller.SightMod.Item.LocalizedShortName()} ({controller.SightMod.Item.Id})");
-            return;
-        }
+        if (IsExisting(controller)) return;
 
         var item = controller.SightMod.Item;
         if (_deviceManager.IsItemRegistered(item))

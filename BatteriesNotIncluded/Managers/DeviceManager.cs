@@ -31,7 +31,6 @@ public class DeviceManager : MonoBehaviour
     private readonly Dictionary<string, int> _indexLookup = [];
 
     private readonly List<Action> _unsubscribeEvents = [];
-
     private SightModVisualHandler _sightModVisualHandler;
 
     private void Start()
@@ -138,6 +137,7 @@ public class DeviceManager : MonoBehaviour
     public void RunAfterGameStart()
     {
         _sightModVisualHandler.RemoveDestroyedControllers();
+
         // Run twice to set IsPrevOperable correctly in DeviceOperableSystem
         ManualUpdate();
         ManualUpdate();
@@ -194,6 +194,9 @@ public class DeviceManager : MonoBehaviour
         return relatedComponent;
     }
 
+    /// <summary>
+    /// Run manual system for device if toggled.
+    /// </summary>
     private void SubscribeToComponent(GClass3379 component)
     {
         switch (component)

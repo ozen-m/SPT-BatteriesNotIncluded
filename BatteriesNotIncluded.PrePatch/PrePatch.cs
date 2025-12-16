@@ -14,8 +14,8 @@ public static class BatteriesNotIncludedPrePatch
 
     public static void Patch(AssemblyDefinition assembly)
     {
-        // TODO: Find a way to not break icons
-        return;
+        // TODO: Find a way to not break NVG/Thermal icons
+
         var patcherPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         var pluginPath = Path.Combine(patcherPath!, "..", "plugins", "ozen-BatteriesNotIncluded.dll");
         var logSource = Logger.CreateLogSource("Batteries Not Included");
@@ -33,24 +33,24 @@ public static class BatteriesNotIncludedPrePatch
         var componentAttributeCtor = componentAttributeType.Methods.First(m => m.IsConstructor);
 
         // Headphones
-        var headphonesAttribute = new CustomAttribute(componentAttributeCtor);
+        var headphonesItemType = assembly.MainModule.GetType("HeadphonesItemClass");
         var headphonesTogglableField = new FieldDefinition(
             "Togglable",
             FieldAttributes.Public,
             togglableComponentType
         );
-        var headphonesItemType = assembly.MainModule.GetType("HeadphonesItemClass");
-        headphonesItemType.Fields.Add(headphonesTogglableField);
+        var headphonesAttribute = new CustomAttribute(componentAttributeCtor);
         headphonesTogglableField.CustomAttributes.Add(headphonesAttribute);
+        headphonesItemType.Fields.Add(headphonesTogglableField);
 
         // Sights
-        var sightsAttribute = new CustomAttribute(componentAttributeCtor);
+        var sightsItemType = assembly.MainModule.GetType("SightsItemClass");
         var sightsTogglableField = new FieldDefinition(
             "Togglable",
             FieldAttributes.Public,
             togglableComponentType
         );
-        var sightsItemType = assembly.MainModule.GetType("SightsItemClass");
+        var sightsAttribute = new CustomAttribute(componentAttributeCtor);
         sightsItemType.Fields.Add(sightsTogglableField);
         sightsTogglableField.CustomAttributes.Add(sightsAttribute);
 
