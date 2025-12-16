@@ -26,10 +26,10 @@ public class SightsChangePatch : ModulePatch
             if (sight.ScopePrefabCache == null) continue;
 
             var item = sight.Mod.Item;
-            if (manager.IsItemRegistered(item.Id)) // TODO: Remove check on release
-            {
+#if DEBUG
+            if (manager.IsItemRegistered(item.Id))
+#endif
                 manager.UpdateSightVisibility(item);
-            }
         }
     }
 }

@@ -5,6 +5,7 @@ using SPT.Reflection.Patching;
 
 namespace BatteriesNotIncluded.Patches.Debug;
 
+[DebugPatch]
 [IgnoreAutoPatch]
 public class UpdatePhonesReallyPatch : ModulePatch
 {

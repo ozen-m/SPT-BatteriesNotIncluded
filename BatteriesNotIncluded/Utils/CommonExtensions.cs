@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Comfort.Common;
 using EFT;
 using EFT.InventoryLogic;
@@ -28,19 +29,23 @@ public static class CommonExtensions
         return false;
     }
 
-    public static bool IsBatteryOperated(this CompoundItem item, out Slot[] batterySlot)
+    public static Slot[] GetBatterySlots(this CompoundItem device, int slotCount)
     {
-        // Get slot number from DeviceData, new Slot[DeviceData.Slots];
-        List<Slot> slots = [];
-        foreach (var slot in item.Slots)
+        var batterySlots = new Slot[slotCount];
+        var slotIndex = 0;
+        foreach (var slot in device.Slots)
         {
-            if (slot.IsBatterySlot())
-            {
-                slots.Add(slot);
-            }
+            if (!slot.IsBatterySlot()) continue;
+
+            batterySlots[slotIndex++] = slot;
         }
-        batterySlot = slots.ToArray();
-        return slots.Count > 0;
+#if DEBUG
+        foreach (var slot in batterySlots)
+        {
+            if (slot is null) throw new InvalidOperationException($"Cannot get all battery slots ({slotCount}) for {device.LocalizedShortName()} ({device.Id})");
+        }
+#endif
+        return batterySlots;
     }
 
     public static bool IsBattery(this Item item) => _batteryIds.Contains(item.TemplateId);

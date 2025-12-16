@@ -43,17 +43,19 @@ public class PlayerInitPatch : ModulePatch
         var allPlayerItems = __instance.Inventory.Equipment.GetAllItems();
         foreach (var item in allPlayerItems)
         {
-            if (item is not CompoundItem compoundItem || !compoundItem.IsBatteryOperated(out var batterySlot)) continue;
-
-            var batteryData = BatteriesNotIncluded.GetBatteryData(compoundItem.TemplateId);
-
-            if (!__instance.IsYourPlayer)
+            if (item is not CompoundItem compoundItem || !BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData))
             {
-                AddBatteriesToBotDevice(batterySlot, __instance);
+                continue;
+            }
+            var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
+
+            if (!__instance.IsYourPlayer || __instance.IsAI)
+            {
+                AddBatteriesToBotDevice(batterySlots, __instance);
                 TurnOnBotDevice(compoundItem);
             }
 
-            manager.Add(compoundItem, ref batteryData, batterySlot);
+            manager.Add(compoundItem, batterySlots, ref deviceData);
         }
 
         // TODO: Add devices of loot in world

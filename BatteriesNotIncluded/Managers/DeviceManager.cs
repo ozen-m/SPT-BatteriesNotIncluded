@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using BatteriesNotIncluded.Components;
+using BatteriesNotIncluded.Models;
 using BatteriesNotIncluded.Systems;
 using BatteriesNotIncluded.Utils;
 using Comfort.Common;
@@ -86,7 +86,7 @@ public class DeviceManager : MonoBehaviour
         Singleton<DeviceManager>.TryRelease(this);
     }
 
-    public int Add(CompoundItem item, ref BatteryData batteryData, Slot[] batterySlots)
+    public int Add(CompoundItem item, Slot[] batterySlots, ref DeviceData deviceData)
     {
         string itemId = item.Id;
         if (_indexLookup.ContainsKey(itemId))
@@ -98,7 +98,7 @@ public class DeviceManager : MonoBehaviour
 
         Devices.Add(item);
         _indexLookup[itemId] = i;
-        DrainMultiplier.Add(batteryData.DrainMultiplier);
+        DrainMultiplier.Add(deviceData.DrainRate);
         BatterySlots.Add(batterySlots);
         IsOperable.Add(false);
         IsPrevOperable.Add(false);

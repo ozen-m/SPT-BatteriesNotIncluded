@@ -22,4 +22,9 @@ public static class LoggerUtil
     {
         BatteriesNotIncluded.LogSource.LogWarning(msg);
     }
+
+    public static void Info(string msg)
+    {
+        BatteriesNotIncluded.LogSource.LogInfo(msg);
+    }
 }

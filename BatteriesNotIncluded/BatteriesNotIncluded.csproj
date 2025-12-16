@@ -29,9 +29,15 @@
       <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\ItemTemplate.Types.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Sirenix.Serialization">
       <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\Sirenix.Serialization.dll</HintPath>
       <Private>false</Private>
+    </Reference>
+    <Reference Include="spt-common">
+      <HintPath>$(SPTPath)BepInEx\plugins\spt\spt-common.dll</HintPath>
     </Reference>
     <Reference Include="spt-reflection">
       <HintPath>$(SPTPath)BepInEx\plugins\spt\spt-reflection.dll</HintPath>

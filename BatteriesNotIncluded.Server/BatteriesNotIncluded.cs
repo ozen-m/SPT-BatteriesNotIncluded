@@ -88,19 +88,13 @@ public class BatteriesNotIncluded(
 
     private void ProcessTemplate(TemplateItem template, ref int counter)
     {
-        var batteryData = GetBatteryData(template.Id);
-        var batteryType = batteryData.Battery;
+        var deviceData = GetDeviceData(template.Id);
+        var batteryType = deviceData.Battery;
         if (batteryType == MongoId.Empty()) return;
 
-        if (batteryType is null)
-        {
-            loggerUtil.Warning($"{itemHelper.GetItemName(template.Id)} ({template.Id}) has no defined battery, defaulting to CR2032");
-            batteryType = _dBatteryId;
-        }
+        AddBatteryToItemDescription(template.Id, batteryType, deviceData.SlotCount);
 
-        AddBatteryToItemDescription(template.Id, batteryType.Value, batteryData.Slots);
-
-        Slot[] newSlots = new Slot[batteryData.Slots];
+        Slot[] newSlots = new Slot[deviceData.SlotCount];
         for (var i = 0; i < newSlots.Length; i++)
         {
             newSlots[i] = new Slot()
@@ -115,8 +109,8 @@ public class BatteriesNotIncluded(
                         new SlotFilter()
                         {
                             Shift = 0d,
-                            Filter = [batteryType.Value],
-                            // TODO: Multiple battery filters
+                            Filter = [batteryType],
+                            // TODO: Multiple battery filters?
                         }
                     ]
                 },
@@ -133,29 +127,19 @@ public class BatteriesNotIncluded(
         // loggerUtil.Debug($"{itemHelper.GetItemName(template.Id)} ({template.Id}) added slot with compatible battery {itemHelper.GetItemName(batteryType.Value)}");
     }
 
-    private DeviceData GetBatteryData(MongoId id)
+    private DeviceData GetDeviceData(MongoId deviceId)
     {
-        if (modConfigContainer.ModConfig.NoBattery.TryGetValue(id, out DeviceData deviceData))
+        foreach ((MongoId batteryType, Dictionary<MongoId, DeviceData> deviceDatas) in modConfigContainer.ModConfig.Batteries)
         {
-            deviceData.Battery = MongoId.Empty();
+            if (!deviceDatas.TryGetValue(deviceId, out DeviceData deviceData)) continue;
+
+            deviceData.Battery = batteryType;
             return deviceData;
         }
-        if (modConfigContainer.ModConfig.CR123A.TryGetValue(id, out deviceData))
-        {
-            deviceData.Battery = _rechargeableBatteryId;
-            return deviceData;
-        }
-        if (modConfigContainer.ModConfig.CR2032.TryGetValue(id, out deviceData))
-        {
-            deviceData.Battery = _dBatteryId;
-            return deviceData;
-        }
-        if (modConfigContainer.ModConfig.AA.TryGetValue(id, out deviceData))
-        {
-            deviceData.Battery = _aaBatteryId;
-            return deviceData;
-        }
-        return DeviceData.Empty;
+        var defaultData = DeviceData.Default;
+        modConfigContainer.ModConfig.Batteries[_dBatteryId].Add(deviceId, defaultData);
+        loggerUtil.Warning($"{deviceId}) has no defined battery, defaulting to CR2032");
+        return defaultData;
     }
 
     private void AddBatteryToItemDescription(MongoId deviceId, MongoId batteryId, int slots)
@@ -177,17 +161,14 @@ public class BatteriesNotIncluded(
     /// </summary>
     private void AddToModPool()
     {
-        foreach ((MongoId deviceId, DeviceData deviceData) in modConfigContainer.ModConfig.CR2032)
+        foreach ((MongoId batteryId, Dictionary<MongoId, DeviceData> deviceDatas) in modConfigContainer.ModConfig.Batteries)
         {
-            AddBatteriesToModPool(deviceId, _dBatteryId, deviceData.Slots);
-        }
-        foreach ((MongoId deviceId, DeviceData deviceData) in modConfigContainer.ModConfig.CR123A)
-        {
-            AddBatteriesToModPool(deviceId, _rechargeableBatteryId, deviceData.Slots);
-        }
-        foreach ((MongoId deviceId, DeviceData deviceData) in modConfigContainer.ModConfig.AA)
-        {
-            AddBatteriesToModPool(deviceId, _aaBatteryId, deviceData.Slots);
+            if (batteryId == MongoId.Empty()) continue;
+
+            foreach ((MongoId deviceId, DeviceData deviceData) in deviceDatas)
+            {
+                AddBatteriesToModPool(deviceId, batteryId, deviceData.SlotCount);
+            }
         }
         loggerUtil.Info($"Added batteries to mod pools");
     }
