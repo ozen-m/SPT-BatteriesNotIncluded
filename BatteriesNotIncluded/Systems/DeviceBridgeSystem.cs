@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Utils;
 using EFT;
 using EFT.InventoryLogic;
+using HarmonyLib;
 
 namespace BatteriesNotIncluded.Systems;
 
@@ -147,20 +149,45 @@ public class DeviceBridgeSystem : BaseSystem
         }
 
         var player = playerInvCont.Player_0;
+
+        // LightComponent is headlight
+        var helmetLights = _helmetLightControllersField(player) as List<TacticalComboVisualController>;
+        if (helmetLights!.Count > 0)
+        {
+            foreach (var lightController in helmetLights)
+            {
+                if (lightController.LightMod.Item.Id != lightComponent.Item.Id) continue;
+
+                SetHeadLightState(player);
+                return;
+            }
+        }
+
+        // LightComponent is weapon light
         if (player.HandsController is Player.FirearmController firearmController)
         {
             firearmController.SetLightsState([lightComponent.GetLightState()], true, false);
         }
-        else
-        {
-            // TODO: Tac devices on the ground do not turn off
-            foreach (TacticalComboVisualController lightController in player.GetComponentsInChildren<TacticalComboVisualController>())
-            {
-                if (!ReferenceEquals(lightController.LightMod, lightComponent)) continue;
-
-                lightController.UpdateBeams();
-                LoggerUtil.Debug($"DeviceBridgeSystem::SetLightState lightController.UpdateBeams");
-            }
-        }
     }
+
+    private static void SetHeadLightState(Player player)
+    {
+        /*
+        // IsActive already false;
+        FirearmLightStateStruct lightState = lightController.LightMod.GetLightState(true);
+        lightController.LightMod.SetLightState(lightState);
+        BUG: Using ItemContextMenuExt to turn off headlights does not update systems
+        */
+        player.SendHeadlightsPacket(false);
+
+        // Set animation active to true to avoid animation
+        _isHeadLightsAnimationActiveField(player) = true;
+        player.SwitchHeadLightsAnimation();
+    }
+
+    private static readonly AccessTools.FieldRef<Player, IEnumerable<TacticalComboVisualController>> _helmetLightControllersField =
+        AccessTools.FieldRefAccess<Player, IEnumerable<TacticalComboVisualController>>("_helmetLightControllers");
+
+    private static readonly AccessTools.FieldRef<Player, bool> _isHeadLightsAnimationActiveField =
+        AccessTools.FieldRefAccess<Player, bool>("IsHeadLightsAnimationActive");
 }

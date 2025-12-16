@@ -311,6 +311,4 @@ public class DeviceManager : MonoBehaviour
         ResourceComponentRef.SwapRemoveAt(index);
         RelatedComponentRef.SwapRemoveAt(index);
     }
-
-    // TODO: Fix helmet light devices!
 }
