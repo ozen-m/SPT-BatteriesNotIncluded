@@ -26,7 +26,7 @@ public class NightVisionOnPatch : ModulePatch
 
         var manager = Singleton<DeviceManager>.Instance;
         NightVisionComponent component = GamePlayerOwner.MyPlayer.NightVisionObserver.Component;
-        if (component is not null && !manager.GetIsActive(component.Item.Id))
+        if (component is not null && !manager.GetIsOperable(component.Item))
         {
             // Skip turning on components, but enable mask
             __instance.TextureMask.TryToEnable(__instance, true);

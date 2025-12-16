@@ -61,7 +61,7 @@ public class SightModVisualHandler
         }
 
         var item = controller.SightMod.Item;
-        if (_deviceManager.IsItemRegistered(item.Id))
+        if (_deviceManager.IsItemRegistered(item))
         {
             _controllers.Add(controller);
             AddToLookUp(item.Id, controller);

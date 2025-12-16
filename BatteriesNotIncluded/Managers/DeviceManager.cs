@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using BatteriesNotIncluded.Components;
-using BatteriesNotIncluded.Patches;
 using BatteriesNotIncluded.Systems;
 using BatteriesNotIncluded.Utils;
 using Comfort.Common;
@@ -34,7 +33,6 @@ public class DeviceManager : MonoBehaviour
     private readonly List<Action> _unsubscribeEvents = [];
 
     private SightModVisualHandler _sightModVisualHandler;
-    private bool _shouldRunManualUpdate;
 
     private void Start()
     {
@@ -43,18 +41,10 @@ public class DeviceManager : MonoBehaviour
         _manualSystems.Add(new DeviceOperableSystem());
         _manualSystems.Add(new DeviceBridgeSystem());
         _systems.Add(new DrainBatterySystem(1000));
-
-        OnItemAddedOrRemovedPatch.OnItemAddedOrRemoved += OnItemAddedOrRemoved;
     }
 
     private void Update()
     {
-        if (_shouldRunManualUpdate)
-        {
-            _shouldRunManualUpdate = false;
-            ManualUpdate();
-        }
-
         foreach (ISystem system in _systems)
         {
             system.Run(this);
@@ -87,7 +77,6 @@ public class DeviceManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        OnItemAddedOrRemovedPatch.OnItemAddedOrRemoved -= OnItemAddedOrRemoved;
         foreach (Action action in _unsubscribeEvents)
         {
             action.Invoke();
@@ -98,7 +87,7 @@ public class DeviceManager : MonoBehaviour
         Singleton<DeviceManager>.TryRelease(this);
     }
 
-    public int Add(CompoundItem item, ref BatteryData batteryData, Slot[] batterySlot)
+    public int Add(CompoundItem item, ref BatteryData batteryData, Slot[] batterySlots)
     {
         string itemId = item.Id;
         if (_indexLookup.ContainsKey(itemId))
@@ -111,34 +100,21 @@ public class DeviceManager : MonoBehaviour
         Devices.Add(item);
         _indexLookup[itemId] = i;
         DrainMultiplier.Add(batteryData.DrainMultiplier);
-        BatterySlots.Add(batterySlot);
+        BatterySlots.Add(batterySlots);
         IsOperable.Add(false);
         IsPrevOperable.Add(false);
         IsActive.Add(false);
 
-        ResourceComponentRef.Add(new ResourceComponent[batterySlot.Length]);
+        ResourceComponentRef.Add(new ResourceComponent[batterySlots.Length]);
         var relatedComponent = GetRelatedComponentToSet(item);
         RelatedComponentRef.Add(relatedComponent);
 
         SubscribeToComponent(relatedComponent);
+        SubscribeToDeviceSlots(batterySlots);
 
         LoggerUtil.Debug($"Device {item.LocalizedShortName()} ({itemId}) added");
         return i;
     }
-
-    /// <summary>
-    /// Run manual systems if battery is added/removed from equipment slots.
-    /// TODO: Use Slot.OnAddOrRemoveItem?
-    /// </summary>
-    /// <param name="item"></param>
-    public void OnItemAddedOrRemoved(Item item)
-    {
-        if (!item.IsBattery()) return;
-
-        RunManualUpdateNextFrame();
-    }
-
-    public void RunManualUpdateNextFrame() => _shouldRunManualUpdate = true;
 
     /// <summary>
     /// Check if an item is operable.
@@ -146,8 +122,7 @@ public class DeviceManager : MonoBehaviour
     /// <returns>Defaults to <c>true</c> if item is not found</returns>
     public bool GetIsOperable(Item item)
     {
-        var index = GetItemIndex(item);
-        return index == -1 || IsOperable[index];
+        return GetIsOperable(item.Id);
     }
 
     /// <summary>
@@ -155,12 +130,6 @@ public class DeviceManager : MonoBehaviour
     /// </summary>
     /// <returns>Defaults to <c>true</c> if item is not found</returns>
     public bool GetIsOperable(string itemId)
-    {
-        var index = _indexLookup.GetValueOrDefault(itemId, -1);
-        return index == -1 || IsOperable[index];
-    }
-
-    public bool GetIsActive(string itemId)
     {
         var index = _indexLookup.GetValueOrDefault(itemId, -1);
         return index == -1 || IsOperable[index];
@@ -181,6 +150,8 @@ public class DeviceManager : MonoBehaviour
 
         _sightModVisualHandler.UpdateSightVisibility(item.Id, IsActive[index]);
     }
+
+    public bool IsItemRegistered(Item item) => IsItemRegistered(item.Id);
 
     public bool IsItemRegistered(string itemId) => _indexLookup.ContainsKey(itemId);
 
@@ -249,6 +220,17 @@ public class DeviceManager : MonoBehaviour
             }
             default:
                 throw new ArgumentException($"Component {component} is not a valid component");
+        }
+    }
+
+    /// <summary>
+    /// Run manual system for device if battery is added/removed from device slots.
+    /// </summary>
+    private void SubscribeToDeviceSlots(Slot[] batterySlots)
+    {
+        foreach (var slot in batterySlots)
+        {
+            _unsubscribeEvents.Add(slot.ReactiveContainedItem.Subscribe((_) => ManualUpdate(slot.ParentItem)));
         }
     }
 

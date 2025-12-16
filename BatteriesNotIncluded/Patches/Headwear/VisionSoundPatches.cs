@@ -27,7 +27,7 @@ public class PlayNightVisionSoundPatch : ModulePatch
 
         var manager = Singleton<DeviceManager>.Instance;
         NightVisionComponent component = __instance.NightVisionObserver.Component;
-        var shouldPlayOnSound = component != null && (component.Togglable == null || component.Togglable.On && manager.GetIsOperable(component.Item.Id));
+        var shouldPlayOnSound = component != null && (component.Togglable == null || component.Togglable.On && manager.GetIsOperable(component.Item));
         __instance.PlayToggleSound(shouldPlayOnSound ? ___NightVisionOn : ___NightVisionOff, ___SpeechLocalPosition);
         return false;
     }
@@ -47,7 +47,7 @@ public class PlayThermalVisionSoundPatch : ModulePatch
 
         var manager = Singleton<DeviceManager>.Instance;
         ThermalVisionComponent component = __instance.ThermalVisionObserver.Component;
-        var shouldPlayOnSound = component != null && (component.Togglable == null || component.Togglable.On && manager.GetIsOperable(component.Item.Id));
+        var shouldPlayOnSound = component != null && (component.Togglable == null || component.Togglable.On && manager.GetIsOperable(component.Item));
         __instance.PlayToggleSound(shouldPlayOnSound ? ___ThermalVisionOn : ___ThermalVisionOff, ___SpeechLocalPosition);
         return false;
     }

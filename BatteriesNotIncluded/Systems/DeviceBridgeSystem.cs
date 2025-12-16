@@ -121,8 +121,8 @@ public class DeviceBridgeSystem : BaseSystem
                         manager.UpdateSightVisibility(item);
                         break;
                     case HeadphonesItemClass:
-                        // BUG: UpdatePhonesReally runs twice, one on Player.OnItemAddedOrRemoved (too late)
-                        //      and on ManualUpdate(Item).
+                        // NOTE: UpdatePhonesReally runs twice, one on Player.OnItemAddedOrRemoved (too late)
+                        //       and on ManualUpdate(Item).
                         playerInvCont.Player_0.UpdatePhonesReally();
                         break;
                 }
