@@ -31,6 +31,7 @@ public class DeviceManager : MonoBehaviour
     private readonly Dictionary<string, int> _indexLookup = [];
 
     private readonly List<Action> _unsubscribeEvents = [];
+    private readonly List<Item> _playerItemsScratch = new(128);
     private SightModVisualHandler _sightModVisualHandler;
     private GameWorld _gameWorld;
     private bool _gameStarted;
@@ -180,6 +181,7 @@ public class DeviceManager : MonoBehaviour
     {
         _gameStarted = true;
         _sightModVisualHandler.RemoveDestroyedControllers();
+        RegisterWorldLootItems();
 
         // Run twice to set IsPrevOperable correctly in DeviceOperableSystem
         ManualUpdate();
@@ -190,23 +192,50 @@ public class DeviceManager : MonoBehaviour
     {
         if (iPlayer is not Player player) return;
 
-        var allPlayerItems = player.Inventory.Equipment.GetAllItems();
-        foreach (var item in allPlayerItems)
+        player.Inventory.Equipment.GetAllItemsNonAlloc(_playerItemsScratch, false, false);
+        foreach (var item in _playerItemsScratch)
         {
-            if (item is not CompoundItem compoundItem || !BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData))
-            {
-                continue;
-            }
-            var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
-
-            if (player.IsAI)
-            {
-                player.AddBatteriesToBotDevice(batterySlots);
-                compoundItem.TurnOnDevice();
-            }
-
-            Add(compoundItem, batterySlots, ref deviceData);
+            RegisterItem(item, true, player);
         }
+
+        _playerItemsScratch.Clear();
+    }
+
+    private void RegisterWorldLootItems()
+    {
+        var worldItems = new List<Item>(3072);
+        foreach (var itemOwner in _gameWorld.ItemOwners.Keys)
+        {
+            // Owner is a player, already registered in `RegisterPlayerItems`
+            if (itemOwner is InventoryController) continue;
+
+            itemOwner.RootItem.GetAllItemsNonAlloc(
+                worldItems,
+                false,
+                itemOwner.RootItem is not LootContainerItemClass
+            );
+        }
+        foreach (var item in worldItems)
+        {
+            RegisterItem(item, false, null);
+        }
+
+        worldItems.Clear();
+    }
+
+    private void RegisterItem(Item item, bool isPlayerItem, Player player)
+    {
+        if (item is not CompoundItem compoundItem) return;
+        if (!BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData)) return;
+
+        var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
+        Add(compoundItem, batterySlots, ref deviceData);
+
+        if (!isPlayerItem || !player.IsAI) return;
+
+        // Add batteries to bot devices and turn them on
+        player.AddBatteriesToBotDevice(batterySlots);
+        compoundItem.TurnOnDevice();
     }
 
     private static GClass3379 GetRelatedComponentToSet(Item item)
