@@ -110,7 +110,8 @@ public class DeviceManager : MonoBehaviour
         string itemId = item.Id;
         if (_indexLookup.ContainsKey(itemId))
         {
-            throw new ArgumentException($"Item {item.LocalizedShortName()} ({itemId}) already exists!");
+            LoggerUtil.Warning($"Item {item.LocalizedShortName()} ({itemId}) already exists!");
+            return -1;
         }
 
         int i = Devices.Count;
@@ -231,10 +232,11 @@ public class DeviceManager : MonoBehaviour
         var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
         Add(compoundItem, batterySlots, ref deviceData);
 
-        if (!isPlayerItem || !player.IsAI) return;
+        if (!isPlayerItem || player.IsYourPlayer /* || TODO: Fika compatibility */) return;
 
         // Add batteries to bot devices and turn them on
-        player.AddBatteriesToBotDevice(batterySlots);
+        batterySlots.AddBatteryToSlots(ref deviceData);
+        batterySlots.DrainResourceComponentInSlots(player);
         compoundItem.TurnOnDevice();
     }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BatteriesNotIncluded.Models;
 using Comfort.Common;
 using EFT;
 using EFT.InventoryLogic;
@@ -16,10 +17,6 @@ public static class CommonExtensions
 
     private static readonly HashSet<MongoID> _batteryIds = [AABatteryId, CR2032BatteryId, CR123ABatteryId];
     private static readonly Random _random = new();
-
-    private static Item _aaBatteryTemplate;
-    private static Item _cr2032BatteryTemplate;
-    private static Item _cr123ABatteryTemplate;
 
     public static bool IsBatteryOperated(this Item item) => item is CompoundItem compoundItem && compoundItem.IsBatteryOperated();
 
@@ -84,73 +81,85 @@ public static class CommonExtensions
     public static void TurnOnDevice(this Item item)
     {
         if (!item.TryGetItemComponent(out TogglableComponent togglableComponent)) return;
+        if (togglableComponent.Item.Owner is not InventoryController invController) return;
+        if (togglableComponent.On) return;
 
-        if (togglableComponent.Item.Owner is InventoryController invController)
-        {
-            _ = invController.TryRunNetworkTransaction(togglableComponent.Set(true, true));
-        }
+        _ = invController.TryRunNetworkTransaction(togglableComponent.Set(true, true));
     }
 
-    public static void AddBatteriesToBotDevice(this Player botPlayer, Slot[] slots)
+    /// <summary>
+    /// Add battery to slots using DeviceData's batteryId
+    /// </summary>
+    /// <param name="slots"></param>
+    /// <param name="deviceData"></param>
+    public static void AddBatteryToSlots(this Slot[] slots, ref DeviceData deviceData)
     {
-        _aaBatteryTemplate ??= Singleton<ItemFactoryClass>.Instance.GetPresetItem(AABatteryId);
-        _cr2032BatteryTemplate ??= Singleton<ItemFactoryClass>.Instance.GetPresetItem(CR2032BatteryId);
-        _cr123ABatteryTemplate ??= Singleton<ItemFactoryClass>.Instance.GetPresetItem(CR123ABatteryId);
-
         foreach (var slot in slots)
         {
             if (slot.ContainedItem is not null) return;
 
-            if (!slot.IsBatterySlot()) throw new ArgumentException("Slot is not a battery slot");
+            if (!slot.IsBatterySlot())
+            {
+                LoggerUtil.Warning($"CommonExtensions::AddBatteryToSlots Cannot add battery to slot, not a battery slot: {slot}");
+                return;
+            }
 
-            Item battery = null;
-            if (slot.CheckCompatibility(_aaBatteryTemplate))
-                battery = _aaBatteryTemplate.CloneItem();
-            if (slot.CheckCompatibility(_cr2032BatteryTemplate))
-                battery = _cr2032BatteryTemplate.CloneItem();
-            if (slot.CheckCompatibility(_cr123ABatteryTemplate))
-                battery = _cr123ABatteryTemplate.CloneItem();
-
-            if (battery == null) return;
+            Item battery = Singleton<ItemFactoryClass>.Instance.GetPresetItem(deviceData.Battery);
+            if (battery == null || !slot.CheckCompatibility(battery))
+            {
+                LoggerUtil.Warning($"CommonExtensions::AddBatteryToSlots Slot ({slot}) not compatible with {deviceData.Battery}");
+                return;
+            }
 
             slot.Add(battery, false);
-            DrainSpawnedBattery(battery, botPlayer);
         }
     }
 
-    private static void DrainSpawnedBattery(Item spawnedBattery, Player botPlayer)
+    /// <summary>
+    /// Drain resource component in slot's contained item, scaled by the player's level.
+    /// </summary>
+    /// <param name="player">Player to check level for</param>
+    public static void DrainResourceComponentInSlots(this Slot[] slots, Player player)
     {
-        // Battery charge depends on their max charge and bot level
-        if (!spawnedBattery.TryGetItemComponent(out ResourceComponent resourceComponent))
+        foreach (var slot in slots)
         {
-            throw new InvalidOperationException("Spawned battery for bot does not have a resource component");
-        }
+            var item = slot.ContainedItem;
+            if (item is null) continue;
 
-        // TODO: Make configurable
-        var maxValue = (int)resourceComponent.MaxResource;
-        int baseValue;
-        float levelFactor = Mathf.Clamp01(botPlayer.Profile.Info.Level / 42f /* Highest trader level requirement */);
+            if (!item.TryGetItemComponent(out ResourceComponent resourceComponent))
+            {
+                LoggerUtil.Warning($"CommonExtensions::DrainResourceComponentInSlots Item does not have a resource component: {item.ToFullString()}");
+                continue;
+            }
 
-        if (botPlayer.Side is EPlayerSide.Usec or EPlayerSide.Bear)
-        {
-            // Use player level to determine battery charge
-            baseValue = (int)(Mathf.Lerp(50f, maxValue, levelFactor));
-        }
-        else
-        {
-            // Scav
-            baseValue = (int)(Mathf.Lerp(20, 60f, levelFactor));
-        }
+            // TODO: Make configurable
+            // Battery charge depends on their max charge and bot level
+            var maxValue = (int)resourceComponent.MaxResource;
+            int baseValue;
+            float levelFactor = Mathf.Clamp01(player.Profile.Info.Level / 42f /* Highest trader level requirement */);
 
-        // Boss almost full battery
-        if (botPlayer.AIData?.BotOwner != null && botPlayer.AIData.BotOwner.Boss?.IamBoss == true)
-        {
-            baseValue = maxValue;
-        }
+            if (player.Side is not EPlayerSide.Savage)
+            {
+                // Use player level to determine battery charge
+                baseValue = (int)(Mathf.Lerp(50f, maxValue, levelFactor));
+            }
+            else
+            {
+                // Scav
+                baseValue = (int)(Mathf.Lerp(20, 60f, levelFactor));
+            }
 
-        // TODO: Revisit
-        var randomCharge = _random.Next(baseValue - 5, baseValue + 10);
-        resourceComponent.Value = Mathf.Clamp(randomCharge, 0, maxValue);
-        LoggerUtil.Debug($"Set bot's device's battery to {randomCharge}");
+            // Boss almost full battery
+            // BUG: Player.AIData is empty? See Player.set_AIData
+            if (player.AIData?.BotOwner != null && player.AIData.BotOwner.Boss?.IamBoss == true)
+            {
+                baseValue = maxValue;
+            }
+
+            // TODO: Revisit
+            var randomCharge = _random.Next(baseValue - 10, baseValue + 5);
+            resourceComponent.Value = Mathf.Clamp(randomCharge, 0, maxValue);
+            LoggerUtil.Debug($"Set {item.LocalizedShortName()}'s resource value to {randomCharge}");
+        }
     }
 }
