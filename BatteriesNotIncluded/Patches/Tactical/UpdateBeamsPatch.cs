@@ -18,6 +18,7 @@ public class UpdateBeamsPatch : ModulePatch
         if (Singleton<DeviceManager>.Instantiated)
         {
             Singleton<DeviceManager>.Instance.ManualUpdate(__instance.LightMod.Item);
+            // BUG: Above not runs when turning dead bot's device on/off, when using item context menu extended
         }
     }
 }

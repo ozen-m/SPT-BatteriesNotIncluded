@@ -144,7 +144,8 @@ public class DeviceBridgeSystem : BaseSystem
     {
         if (lightComponent.Item.Owner is not Player.PlayerInventoryController playerInvCont)
         {
-            LoggerUtil.Debug($"Could not find player when turning off light for item ${lightComponent.Item.LocalizedShortName()} {lightComponent.Item.Id}");
+            // TODO: Dead bots inventory, see ItemContextExtended
+            LoggerUtil.Debug($"Could not find player when turning off light for item {lightComponent.Item.LocalizedShortName()} {lightComponent.Item.Id}");
             return;
         }
 
@@ -176,7 +177,6 @@ public class DeviceBridgeSystem : BaseSystem
         // IsActive already false;
         FirearmLightStateStruct lightState = lightController.LightMod.GetLightState(true);
         lightController.LightMod.SetLightState(lightState);
-        BUG: Using ItemContextMenuExt to turn off headlights does not update systems
         */
         player.SendHeadlightsPacket(false);
 

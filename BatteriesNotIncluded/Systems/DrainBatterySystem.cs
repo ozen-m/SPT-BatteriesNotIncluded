@@ -1,5 +1,6 @@
 ﻿using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Utils;
+using EFT.InventoryLogic;
 using UnityEngine;
 
 namespace BatteriesNotIncluded.Systems;
@@ -11,9 +12,19 @@ public class DrainBatterySystem(int runInterval) : BaseDelayedSystem(runInterval
         var isActive = manager.IsActive[i];
         if (!isActive) return;
 
-        var resourceComponents = manager.ResourceComponentRef[i];
-        foreach (var resourceComponent in resourceComponents)
+        foreach (var slot in manager.BatterySlots[i])
         {
+            if (slot.ContainedItem is not { } item)
+            {
+                LoggerUtil.Warning($"Tried to drain battery from {slot} while slot.ContainedItem is null");
+                continue;
+            }
+            if (!item.TryGetItemComponent(out ResourceComponent resourceComponent))
+            {
+                LoggerUtil.Warning($"Tried to drain battery from {slot} while ResourceComponent is not found");
+                continue;
+            }
+
             // TODO: Drain calculation
             // TODO: Light drain based on modes: light/laser/ir?
             var currentCharge = Mathf.Max(resourceComponent.Value - 50 / 100f * manager.DrainMultiplier[i], 0f);

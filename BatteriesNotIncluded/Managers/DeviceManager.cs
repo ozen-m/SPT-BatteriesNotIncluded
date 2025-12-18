@@ -19,7 +19,6 @@ public class DeviceManager : MonoBehaviour
     public readonly List<bool> IsActive = [];
 
     public readonly List<Slot[]> BatterySlots = [];
-    public readonly List<ResourceComponent[]> ResourceComponentRef = [];
     public readonly List<GClass3379> RelatedComponentRef = [];
 
     private readonly List<ISystem> _systems = [];
@@ -124,7 +123,6 @@ public class DeviceManager : MonoBehaviour
         IsPrevOperable.Add(false);
         IsActive.Add(false);
 
-        ResourceComponentRef.Add(new ResourceComponent[batterySlots.Length]);
         var relatedComponent = GetRelatedComponentToSet(item);
         RelatedComponentRef.Add(relatedComponent);
 
@@ -366,7 +364,6 @@ public class DeviceManager : MonoBehaviour
         IsPrevOperable.SwapRemoveAt(index);
         IsActive.SwapRemoveAt(index);
 
-        ResourceComponentRef.SwapRemoveAt(index);
         RelatedComponentRef.SwapRemoveAt(index);
     }
 }

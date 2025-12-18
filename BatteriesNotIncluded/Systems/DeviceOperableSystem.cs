@@ -19,19 +19,16 @@ public class DeviceOperableSystem : BaseSystem
             if (battery is null)
             {
                 manager.IsOperable[i] = false;
-                manager.ResourceComponentRef[i][j] = null;
                 return;
             }
 
             if (!battery.TryGetItemComponent(out ResourceComponent resourceComponent))
             {
                 manager.IsOperable[i] = false;
-                manager.ResourceComponentRef[i][j] = null;
                 LoggerUtil.Warning($"Missing resource component for {battery.LocalizedShortName()} ({battery.Id})");
                 return;
             }
 
-            manager.ResourceComponentRef[i][j] = resourceComponent;
             if (resourceComponent.IsDrained())
             {
                 manager.IsOperable[i] = false;
