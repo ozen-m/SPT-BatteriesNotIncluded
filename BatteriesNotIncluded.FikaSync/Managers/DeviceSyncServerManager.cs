@@ -1,0 +1,69 @@
+﻿using System;
+using System.Collections.Generic;
+using BatteriesNotIncluded.FikaSync.Packets;
+using BatteriesNotIncluded.FikaSync.Pools;
+using BatteriesNotIncluded.Managers;
+using Fika.Core.Networking;
+using Fika.Core.Networking.LiteNetLib;
+
+namespace BatteriesNotIncluded.FikaSync.Managers;
+
+public class DeviceSyncServerManager : BaseSyncManager
+{
+    private readonly List<Action> _unsubscribeActions = [];
+
+    private DevicePacket _devicePacket = new();
+    private FikaServer _fikaServer;
+
+    public static DeviceSyncServerManager Create(DeviceManager deviceManager, FikaServer fikaServer)
+    {
+        DeviceSyncServerManager syncManager = deviceManager.gameObject.AddComponent<DeviceSyncServerManager>();
+        syncManager.DeviceManager = deviceManager;
+        syncManager.SubscribeToDeviceManager();
+        syncManager._fikaServer = fikaServer;
+
+        return syncManager;
+    }
+
+    public void OnDestroy()
+    {
+        foreach (var unsubscribe in _unsubscribeActions)
+        {
+            unsubscribe();
+        }
+        DeviceSubPacketPoolManager.Release();
+    }
+
+    private void SubscribeToDeviceManager()
+    {
+        if (DeviceManager == null) throw new InvalidOperationException("DeviceManager is not set");
+
+        _unsubscribeActions.Add(DeviceManager.SubscribeToOnSetDeviceOperable(SendDeviceOperablePacket));
+        _unsubscribeActions.Add(DeviceManager.SubscribeToOnSetDeviceActive(SendDeviceActivePacket));
+        _unsubscribeActions.Add(DeviceManager.SubscribeToOnDrainResource(SendResourceDrainPacket));
+    }
+
+    private void SendDeviceOperablePacket(int deviceIndex, bool isPrevOperable, bool isOperable)
+    {
+        _devicePacket.DeviceIndex = deviceIndex;
+        _devicePacket.Type = EDeviceSubPacketType.DeviceOperable;
+        _devicePacket.SubPacket = DeviceOperablePacket.FromValue(isPrevOperable, isOperable);
+        _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableOrdered);
+    }
+
+    private void SendDeviceActivePacket(int deviceIndex, bool isActive)
+    {
+        _devicePacket.DeviceIndex = deviceIndex;
+        _devicePacket.Type = EDeviceSubPacketType.DeviceActive;
+        _devicePacket.SubPacket = DeviceActivePacket.FromValue(isActive);
+        _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableOrdered);
+    }
+
+    private void SendResourceDrainPacket(int deviceIndex, int slotIndex, float currentCharge)
+    {
+        _devicePacket.DeviceIndex = deviceIndex;
+        _devicePacket.Type = EDeviceSubPacketType.ResourceDrain;
+        _devicePacket.SubPacket = ResourceDrainPacket.FromValue(slotIndex, currentCharge);
+        _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableUnordered);
+    }
+}

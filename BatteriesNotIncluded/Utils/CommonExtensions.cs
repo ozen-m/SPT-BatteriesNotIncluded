@@ -92,7 +92,7 @@ public static class CommonExtensions
     /// </summary>
     /// <param name="slots"></param>
     /// <param name="deviceData"></param>
-    public static void AddBatteryToSlots(this Slot[] slots, ref DeviceData deviceData)
+    public static void AddBatteryToSlots(this Slot[] slots, ref DeviceData deviceData, Player player)
     {
         foreach (var slot in slots)
         {
@@ -112,6 +112,7 @@ public static class CommonExtensions
             }
 
             slot.Add(battery, false);
+            // _ = player.InventoryController.TryRunNetworkTransaction(slot.Add(battery, true)); // For Fika, this fails?
         }
     }
 

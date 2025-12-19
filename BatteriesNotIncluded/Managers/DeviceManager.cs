@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BatteriesNotIncluded.External;
 using BatteriesNotIncluded.Models;
 using BatteriesNotIncluded.Systems;
 using BatteriesNotIncluded.Utils;
@@ -35,9 +36,14 @@ public class DeviceManager : MonoBehaviour
     private GameWorld _gameWorld;
     private bool _gameStarted;
 
-    private void Start()
+    public void Start()
     {
         _sightModVisualHandler = new SightModVisualHandler(this);
+
+        if (Fika.IsFikaClient)
+        {
+            return;
+        }
 
         _manualSystems.Add(new DeviceOperableSystem());
         _manualSystems.Add(new DeviceBridgeSystem());
@@ -51,7 +57,7 @@ public class DeviceManager : MonoBehaviour
         _gameWorld.AfterGameStarted += RunAfterGameStart;
     }
 
-    private void Update()
+    public void Update()
     {
         if (!_gameStarted) return;
 
@@ -61,7 +67,7 @@ public class DeviceManager : MonoBehaviour
         }
     }
 
-    private void ManualUpdate()
+    public void ManualUpdate()
     {
         if (!_gameStarted) return;
 
@@ -89,7 +95,7 @@ public class DeviceManager : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
+    public void OnDestroy()
     {
         _gameWorld.OnPersonAdd -= RegisterPlayerItems;
         _gameWorld.AfterGameStarted -= RunAfterGameStart;
@@ -126,10 +132,15 @@ public class DeviceManager : MonoBehaviour
         var relatedComponent = GetRelatedComponentToSet(item);
         RelatedComponentRef.Add(relatedComponent);
 
-        SubscribeToComponent(relatedComponent);
-        SubscribeToDeviceSlots(batterySlots);
-
         LoggerUtil.Debug($"Device {item.LocalizedShortName()} ({itemId}) added");
+
+        SubscribeToComponent(relatedComponent);
+        if (!Fika.IsFikaClient)
+        {
+            // No need to run manual update
+            SubscribeToDeviceSlots(batterySlots);
+        }
+
         return i;
     }
 
@@ -175,6 +186,50 @@ public class DeviceManager : MonoBehaviour
         _indexLookup.Remove(item.Id);
         RemoveAt(index);
     }
+
+    #region FIKA
+    public Action SubscribeToOnSetDeviceOperable(Action<int, bool, bool> action)
+    {
+        Action unsubscribeAction = null;
+        foreach (var system in _manualSystems)
+        {
+            if (system is not DeviceOperableSystem drainBatterySystem) continue;
+
+            drainBatterySystem.OnSetDeviceOperable += action;
+            unsubscribeAction = () => drainBatterySystem.OnSetDeviceOperable -= action;
+        }
+
+        return unsubscribeAction;
+    }
+
+    public Action SubscribeToOnSetDeviceActive(Action<int, bool> action)
+    {
+        Action unsubscribeAction = null;
+        foreach (var system in _manualSystems)
+        {
+            if (system is not DeviceBridgeSystem deviceBridgeSystem) continue;
+
+            deviceBridgeSystem.OnSetDeviceActive += action;
+            unsubscribeAction = () => deviceBridgeSystem.OnSetDeviceActive -= action;
+        }
+
+        return unsubscribeAction;
+    }
+
+    public Action SubscribeToOnDrainResource(Action<int, int, float> action)
+    {
+        Action unsubscribeAction = null;
+        foreach (var system in _systems)
+        {
+            if (system is not DrainBatterySystem drainBatterySystem) continue;
+
+            drainBatterySystem.OnDrainResource += action;
+            unsubscribeAction = () => drainBatterySystem.OnDrainResource -= action;
+        }
+
+        return unsubscribeAction;
+    }
+    #endregion
 
     private void RunAfterGameStart()
     {
@@ -230,10 +285,12 @@ public class DeviceManager : MonoBehaviour
         var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
         Add(compoundItem, batterySlots, ref deviceData);
 
+        return;
+
         if (!isPlayerItem || player.IsYourPlayer /* || TODO: Fika compatibility */) return;
 
         // Add batteries to bot devices and turn them on
-        batterySlots.AddBatteryToSlots(ref deviceData);
+        batterySlots.AddBatteryToSlots(ref deviceData, player);
         batterySlots.DrainResourceComponentInSlots(player);
         compoundItem.TurnOnDevice();
     }
@@ -336,9 +393,9 @@ public class DeviceManager : MonoBehaviour
         }
         LoggerUtil.Debug($"Cannot find item index: {item.LocalizedShortName()} ({item.Id})");
         return -1;
-#endif
-
+#else
         return GetItemIndex(item.Id);
+#endif
     }
 
     private int GetItemIndex(string itemId)
@@ -350,9 +407,9 @@ public class DeviceManager : MonoBehaviour
         }
         LoggerUtil.Debug($"Cannot find item index: ({itemId})");
         return -1;
-#endif
-
+#else
         return _indexLookup.GetValueOrDefault(itemId, -1);
+#endif
     }
 
     private void RemoveAt(int index)
