@@ -29,6 +29,7 @@ public class DeviceManagerStartPatch : ModulePatch
             {
                 var syncManager = DeviceSyncClientManager.Create(__instance);
                 client.RegisterNetReusable<DevicePacket>(syncManager.OnDevicePacketReceived);
+                client.RegisterPacket<BotBatteryPacket>(syncManager.OnBotBatteryPacketReceived);
                 break;
             }
             case FikaServer server:

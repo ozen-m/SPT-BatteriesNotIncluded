@@ -7,9 +7,10 @@ namespace BatteriesNotIncluded.FikaSync.Packets;
 
 public class DevicePacket : INetReusable
 {
+    // TODO: Switch to DeviceId
     public int DeviceIndex;
-    public EDeviceSubPacketType Type;
     public IDevicePoolSubPacket SubPacket;
+    public EDeviceSubPacketType Type;
 
     public void Execute(DeviceSyncClientManager manager, int deviceIndex)
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using BatteriesNotIncluded.FikaSync.Packets;
 using BatteriesNotIncluded.FikaSync.Pools;
 using BatteriesNotIncluded.Managers;
+using EFT.InventoryLogic;
 using Fika.Core.Networking;
 using Fika.Core.Networking.LiteNetLib;
 
@@ -41,6 +42,9 @@ public class DeviceSyncServerManager : BaseSyncManager
         _unsubscribeActions.Add(DeviceManager.SubscribeToOnSetDeviceOperable(SendDeviceOperablePacket));
         _unsubscribeActions.Add(DeviceManager.SubscribeToOnSetDeviceActive(SendDeviceActivePacket));
         _unsubscribeActions.Add(DeviceManager.SubscribeToOnDrainResource(SendResourceDrainPacket));
+
+        DeviceManager.OnAddBatteryToSlot += OnAddBatteryToSlot;
+        _unsubscribeActions.Add(() => DeviceManager.OnAddBatteryToSlot -= OnAddBatteryToSlot);
     }
 
     private void SendDeviceOperablePacket(int deviceIndex, bool isPrevOperable, bool isOperable)
@@ -65,5 +69,17 @@ public class DeviceSyncServerManager : BaseSyncManager
         _devicePacket.Type = EDeviceSubPacketType.ResourceDrain;
         _devicePacket.SubPacket = ResourceDrainPacket.FromValue(slotIndex, currentCharge);
         _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableUnordered);
+    }
+
+    private void OnAddBatteryToSlot(int deviceIndex, int slotIndex, Item battery)
+    {
+        BotBatteryPacket packet = new()
+        {
+            Battery = battery,
+            DeviceIndex = deviceIndex,
+            SlotIndex = slotIndex
+        };
+
+        _fikaServer.SendData(ref packet, DeliveryMethod.ReliableOrdered);
     }
 }

@@ -25,13 +25,14 @@ public class DeviceManager : MonoBehaviour
     private readonly List<ISystem> _systems = [];
     private readonly List<ISystem> _manualSystems = [];
 
+    private readonly List<Action> _unsubscribeEvents = [];
+    private readonly List<Item> _playerItemsScratch = new(128);
+
     /// <summary>
     /// Key: Device item ID, Value: index
     /// </summary>
     private readonly Dictionary<string, int> _indexLookup = [];
 
-    private readonly List<Action> _unsubscribeEvents = [];
-    private readonly List<Item> _playerItemsScratch = new(128);
     private SightModVisualHandler _sightModVisualHandler;
     private GameWorld _gameWorld;
     private bool _gameStarted;
@@ -188,6 +189,8 @@ public class DeviceManager : MonoBehaviour
     }
 
     #region FIKA
+    public event Action<int, int, Item> OnAddBatteryToSlot;
+
     public Action SubscribeToOnSetDeviceOperable(Action<int, bool, bool> action)
     {
         Action unsubscribeAction = null;
@@ -283,15 +286,20 @@ public class DeviceManager : MonoBehaviour
         if (!BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData)) return;
 
         var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
-        Add(compoundItem, batterySlots, ref deviceData);
+        var deviceIndex = Add(compoundItem, batterySlots, ref deviceData);
 
-        return;
+        if (!isPlayerItem || player.SearchController is not BotSearchControllerClass /* not AI controlled, player.IsAI not yet available */) return;
 
-        if (!isPlayerItem || player.IsYourPlayer /* || TODO: Fika compatibility */) return;
+        for (var i = 0; i < batterySlots.Length; i++)
+        {
+            var slot = batterySlots[i];
+            var battery = slot.CreateBatteryForSlot(ref deviceData);
+            battery.DrainBattery(player);
+            if (!slot.AddBatteryToSlot(battery)) continue;
 
-        // Add batteries to bot devices and turn them on
-        batterySlots.AddBatteryToSlots(ref deviceData, player);
-        batterySlots.DrainResourceComponentInSlots(player);
+            OnAddBatteryToSlot?.Invoke(deviceIndex, i, battery);
+        }
+
         compoundItem.TurnOnDevice();
     }
 

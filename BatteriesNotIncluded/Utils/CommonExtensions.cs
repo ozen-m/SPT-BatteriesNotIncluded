@@ -84,7 +84,14 @@ public static class CommonExtensions
         if (togglableComponent.Item.Owner is not InventoryController invController) return;
         if (togglableComponent.On) return;
 
-        _ = invController.TryRunNetworkTransaction(togglableComponent.Set(true, true));
+        var toggleOperation = togglableComponent.Set(true, true);
+        if (toggleOperation.Failed)
+        {
+            LoggerUtil.Warning($"Failed to toggle device: {item}");
+            return;
+        }
+
+        invController.RunNetworkTransaction(toggleOperation.Value);
     }
 
     /// <summary>
@@ -92,75 +99,87 @@ public static class CommonExtensions
     /// </summary>
     /// <param name="slots"></param>
     /// <param name="deviceData"></param>
-    public static void AddBatteryToSlots(this Slot[] slots, ref DeviceData deviceData, Player player)
+    public static Item CreateBatteryForSlot(this Slot slot, ref DeviceData deviceData)
     {
-        foreach (var slot in slots)
+        if (slot.ContainedItem is not null) return null;
+
+        if (!slot.IsBatterySlot())
         {
-            if (slot.ContainedItem is not null) return;
-
-            if (!slot.IsBatterySlot())
-            {
-                LoggerUtil.Warning($"CommonExtensions::AddBatteryToSlots Cannot add battery to slot, not a battery slot: {slot}");
-                return;
-            }
-
-            Item battery = Singleton<ItemFactoryClass>.Instance.GetPresetItem(deviceData.Battery);
-            if (battery == null || !slot.CheckCompatibility(battery))
-            {
-                LoggerUtil.Warning($"CommonExtensions::AddBatteryToSlots Slot ({slot}) not compatible with {deviceData.Battery}");
-                return;
-            }
-
-            slot.Add(battery, false);
-            // _ = player.InventoryController.TryRunNetworkTransaction(slot.Add(battery, true)); // For Fika, this fails?
+            LoggerUtil.Warning($"GetBatteriesForSlots: Cannot add battery to slot, not a battery slot: {slot}");
+            return null;
         }
+
+        Item battery = Singleton<ItemFactoryClass>.Instance.GetPresetItem(deviceData.Battery);
+        if (slot.CheckCompatibility(battery)) return battery;
+
+        LoggerUtil.Warning($"GetBatteriesForSlots: Slot ({slot}) not compatible with {deviceData.Battery}");
+        return null;
     }
 
     /// <summary>
     /// Drain resource component in slot's contained item, scaled by the player's level.
     /// </summary>
     /// <param name="player">Player to check level for</param>
-    public static void DrainResourceComponentInSlots(this Slot[] slots, Player player)
+    public static void DrainBattery(this Item item, Player player)
     {
-        foreach (var slot in slots)
+        if (item is null) return;
+
+        if (!item.TryGetItemComponent(out ResourceComponent resourceComponent))
         {
-            var item = slot.ContainedItem;
-            if (item is null) continue;
-
-            if (!item.TryGetItemComponent(out ResourceComponent resourceComponent))
-            {
-                LoggerUtil.Warning($"CommonExtensions::DrainResourceComponentInSlots Item does not have a resource component: {item.ToFullString()}");
-                continue;
-            }
-
-            // TODO: Make configurable
-            // Battery charge depends on their max charge and bot level
-            var maxValue = (int)resourceComponent.MaxResource;
-            int baseValue;
-            float levelFactor = Mathf.Clamp01(player.Profile.Info.Level / 42f /* Highest trader level requirement */);
-
-            if (player.Side is not EPlayerSide.Savage)
-            {
-                // Use player level to determine battery charge
-                baseValue = (int)(Mathf.Lerp(50f, maxValue, levelFactor));
-            }
-            else
-            {
-                // Scav
-                baseValue = (int)(Mathf.Lerp(20, 60f, levelFactor));
-            }
-
-            // Boss almost full battery
-            // BUG: Player.AIData is empty? See Player.set_AIData
-            if (player.AIData?.BotOwner != null && player.AIData.BotOwner.Boss?.IamBoss == true)
-            {
-                baseValue = maxValue;
-            }
-
-            // TODO: Revisit
-            var randomCharge = _random.Next(baseValue - 10, baseValue + 5);
-            resourceComponent.Value = Mathf.Clamp(randomCharge, 0, maxValue);
-            LoggerUtil.Debug($"Set {item.LocalizedShortName()}'s resource value to {randomCharge}");
+            LoggerUtil.Warning($"Item does not have a resource component: {item.ToFullString()}");
+            return;
         }
+
+        int maxValue = 100;
+        int baseValue;
+        float levelFactor = Mathf.Clamp01(player.Profile.Info.Level / 42f /* Highest trader level requirement */);
+
+        if (player.Side is not EPlayerSide.Savage)
+        {
+            // Use player level to determine battery charge
+            baseValue = (int)(Mathf.Lerp(50f, maxValue, levelFactor));
+        }
+        else
+        {
+            // Scav
+            baseValue = (int)(Mathf.Lerp(20, 60f, levelFactor));
+        }
+
+        // Boss almost full battery
+        // BUG: Player.AIData is empty? See Player.set_AIData
+        if (player.Profile.Info.Settings.Role.IsABossOrFollower())
+        {
+            baseValue = maxValue;
+        }
+
+        var lowerLimit = baseValue - 10;
+        var upperLimit = baseValue + 5;
+
+        // TODO: Make configurable
+        // Battery charge depends on their max charge and bot level
+        maxValue = (int)resourceComponent.MaxResource;
+
+        // TODO: Revisit
+        var randomCharge = _random.Next(lowerLimit, upperLimit);
+        resourceComponent.Value = Mathf.Clamp(randomCharge, 0, maxValue);
+        LoggerUtil.Debug($"Set {item.LocalizedShortName()} ({item.Id}) resource component value to {randomCharge}");
+    }
+
+    public static bool AddBatteryToSlot(this Slot slot, Item battery)
+    {
+        if (slot is null || slot.ContainedItem is not null || battery is null) return false;
+
+        var addOp = slot.Add(battery, false);
+        if (addOp.Failed)
+        {
+            LoggerUtil.Warning($"Failed to add {battery} to {slot}: {addOp.Error}");
+        }
+
+        return true;
+    }
+
+    public static bool IsABossOrFollower(this WildSpawnType role)
+    {
+        return role.IsBossOrFollower() && (role is not (WildSpawnType.pmcBEAR or WildSpawnType.pmcUSEC or WildSpawnType.pmcBot or WildSpawnType.assaultGroup));
     }
 }
