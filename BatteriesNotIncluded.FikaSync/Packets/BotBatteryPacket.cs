@@ -7,20 +7,20 @@ namespace BatteriesNotIncluded.FikaSync.Packets;
 public struct BotBatteryPacket : INetSerializable
 {
     public Item Battery;
-    public int DeviceIndex;
+    public string DeviceId;
     public int SlotIndex;
 
     public void Deserialize(NetDataReader reader)
     {
         Battery = reader.GetItem();
-        DeviceIndex = reader.GetInt();
+        DeviceId = reader.GetString();
         SlotIndex = reader.GetInt();
     }
 
     public readonly void Serialize(NetDataWriter writer)
     {
         writer.PutItem(Battery);
-        writer.Put(DeviceIndex);
+        writer.Put(DeviceId);
         writer.Put(SlotIndex);
     }
 }

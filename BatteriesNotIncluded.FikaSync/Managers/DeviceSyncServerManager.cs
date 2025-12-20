@@ -47,36 +47,36 @@ public class DeviceSyncServerManager : BaseSyncManager
         _unsubscribeActions.Add(() => DeviceManager.OnAddBatteryToSlot -= OnAddBatteryToSlot);
     }
 
-    private void SendDeviceOperablePacket(int deviceIndex, bool isPrevOperable, bool isOperable)
+    private void SendDeviceOperablePacket(string deviceId, bool isPrevOperable, bool isOperable)
     {
-        _devicePacket.DeviceIndex = deviceIndex;
+        _devicePacket.DeviceId = deviceId;
         _devicePacket.Type = EDeviceSubPacketType.DeviceOperable;
         _devicePacket.SubPacket = DeviceOperablePacket.FromValue(isPrevOperable, isOperable);
         _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableOrdered);
     }
 
-    private void SendDeviceActivePacket(int deviceIndex, bool isActive)
+    private void SendDeviceActivePacket(string deviceId, bool isActive)
     {
-        _devicePacket.DeviceIndex = deviceIndex;
+        _devicePacket.DeviceId = deviceId;
         _devicePacket.Type = EDeviceSubPacketType.DeviceActive;
         _devicePacket.SubPacket = DeviceActivePacket.FromValue(isActive);
         _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableOrdered);
     }
 
-    private void SendResourceDrainPacket(int deviceIndex, int slotIndex, float currentCharge)
+    private void SendResourceDrainPacket(string deviceId, int slotIndex, float currentCharge)
     {
-        _devicePacket.DeviceIndex = deviceIndex;
+        _devicePacket.DeviceId = deviceId;
         _devicePacket.Type = EDeviceSubPacketType.ResourceDrain;
         _devicePacket.SubPacket = ResourceDrainPacket.FromValue(slotIndex, currentCharge);
         _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableUnordered);
     }
 
-    private void OnAddBatteryToSlot(int deviceIndex, int slotIndex, Item battery)
+    private void OnAddBatteryToSlot(string deviceId, int slotIndex, Item battery)
     {
         BotBatteryPacket packet = new()
         {
             Battery = battery,
-            DeviceIndex = deviceIndex,
+            DeviceId = deviceId,
             SlotIndex = slotIndex
         };
 

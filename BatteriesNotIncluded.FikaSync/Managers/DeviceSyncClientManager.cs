@@ -35,13 +35,15 @@ public class DeviceSyncClientManager : BaseSyncManager
 
     public void OnDevicePacketReceived(DevicePacket devicePacket)
     {
-        devicePacket.Execute(this, devicePacket.DeviceIndex);
+        var index = DeviceManager.GetItemIndex(devicePacket.DeviceId);
+        devicePacket.Execute(this, index);
     }
 
     public void OnBotBatteryPacketReceived(BotBatteryPacket packet)
     {
-        var slot = DeviceManager.BatterySlots[packet.DeviceIndex][packet.SlotIndex];
-        packet.Battery.CurrentAddress = null;
+        var deviceIndex = DeviceManager.GetItemIndex(packet.DeviceId);
+        var slot = DeviceManager.BatterySlots[deviceIndex][packet.SlotIndex];
+        packet.Battery.CurrentAddress = null; // Is this needed?
         var addOp = slot.Add(packet.Battery, false);
         if (addOp.Failed)
         {

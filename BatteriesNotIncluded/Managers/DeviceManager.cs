@@ -209,9 +209,9 @@ public class DeviceManager : MonoBehaviour
     }
 
     #region FIKA
-    public event Action<int, int, Item> OnAddBatteryToSlot;
+    public event Action<string, int, Item> OnAddBatteryToSlot;
 
-    public Action SubscribeToOnSetDeviceOperable(Action<int, bool, bool> action)
+    public Action SubscribeToOnSetDeviceOperable(Action<string, bool, bool> action)
     {
         Action unsubscribeAction = null;
         foreach (var system in _manualSystems)
@@ -225,7 +225,7 @@ public class DeviceManager : MonoBehaviour
         return unsubscribeAction;
     }
 
-    public Action SubscribeToOnSetDeviceActive(Action<int, bool> action)
+    public Action SubscribeToOnSetDeviceActive(Action<string, bool> action)
     {
         Action unsubscribeAction = null;
         foreach (var system in _manualSystems)
@@ -239,7 +239,7 @@ public class DeviceManager : MonoBehaviour
         return unsubscribeAction;
     }
 
-    public Action SubscribeToOnDrainResource(Action<int, int, float> action)
+    public Action SubscribeToOnDrainResource(Action<string, int, float> action)
     {
         Action unsubscribeAction = null;
         foreach (var system in _systems)
@@ -306,7 +306,7 @@ public class DeviceManager : MonoBehaviour
         if (!BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData)) return;
 
         var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
-        var deviceIndex = Add(compoundItem, batterySlots, ref deviceData);
+        Add(compoundItem, batterySlots, ref deviceData);
 
         if (!isPlayerItem || player.SearchController is not BotSearchControllerClass /* not AI controlled, player.IsAI not yet available */) return;
 
@@ -317,7 +317,7 @@ public class DeviceManager : MonoBehaviour
             battery.DrainBattery(player);
             if (!slot.AddBatteryToSlot(battery)) continue;
 
-            OnAddBatteryToSlot?.Invoke(deviceIndex, i, battery);
+            OnAddBatteryToSlot?.Invoke(compoundItem.Id, i, battery);
         }
 
         compoundItem.TurnOnDevice();

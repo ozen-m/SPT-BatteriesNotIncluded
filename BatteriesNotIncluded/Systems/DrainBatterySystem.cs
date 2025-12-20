@@ -11,7 +11,7 @@ public class DrainBatterySystem(int runInterval) : BaseDelayedSystem(runInterval
     /// <summary>
     /// Fika event hook: DeviceIndex, SlotIndex, CurrentCharge
     /// </summary>
-    public event Action<int, int, float> OnDrainResource;
+    public event Action<string, int, float> OnDrainResource;
 
     public override void Run(DeviceManager manager, int i)
     {
@@ -39,7 +39,7 @@ public class DrainBatterySystem(int runInterval) : BaseDelayedSystem(runInterval
 
             // Warning: spams
             LoggerUtil.Debug($"Drained item {manager.Devices[i].LocalizedShortName()} {manager.Devices[i].Id} to {resourceComponent.Value}");
-            OnDrainResource?.Invoke(i, j, currentCharge);
+            OnDrainResource?.Invoke(manager.Devices[i].Id, j, currentCharge);
 
             if (currentCharge == 0f)
             {

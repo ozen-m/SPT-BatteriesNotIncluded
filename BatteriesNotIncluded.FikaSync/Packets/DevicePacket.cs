@@ -8,7 +8,7 @@ namespace BatteriesNotIncluded.FikaSync.Packets;
 public class DevicePacket : INetReusable
 {
     // TODO: Switch to DeviceId
-    public int DeviceIndex;
+    public string DeviceId;
     public IDevicePoolSubPacket SubPacket;
     public EDeviceSubPacketType Type;
 
@@ -19,14 +19,14 @@ public class DevicePacket : INetReusable
 
     public void Serialize(NetDataWriter writer)
     {
-        writer.Put(DeviceIndex);
+        writer.Put(DeviceId);
         writer.PutEnum(Type);
         SubPacket?.Serialize(writer);
     }
 
     public void Deserialize(NetDataReader reader)
     {
-        DeviceIndex = reader.GetInt();
+        DeviceId = reader.GetString();
         Type = reader.GetEnum<EDeviceSubPacketType>();
         SubPacket = DeviceSubPacketPoolManager.Instance.GetPacket<IDevicePoolSubPacket>(Type);
         SubPacket.Deserialize(reader);
@@ -37,7 +37,7 @@ public class DevicePacket : INetReusable
         if (SubPacket == null) return;
 
         DeviceSubPacketPoolManager.Instance.ReturnPacket(Type, SubPacket);
-        DeviceIndex = -1;
+        DeviceId = null;
         Type = default;
         SubPacket = null;
     }
@@ -45,7 +45,7 @@ public class DevicePacket : INetReusable
     public void Flush()
     {
         DeviceSubPacketPoolManager.Instance.ReturnPacket(Type, SubPacket);
-        DeviceIndex = -1;
+        DeviceId = null;
         Type = default;
         SubPacket = null;
     }

@@ -10,7 +10,7 @@ public class DeviceOperableSystem : BaseSystem
     /// <summary>
     /// Fika event hook: DeviceIndex, IsPrevOperable, IsOperable 
     /// </summary>
-    public event Action<int, bool, bool> OnSetDeviceOperable;
+    public event Action<string, bool, bool> OnSetDeviceOperable;
 
     public override void Run(DeviceManager manager, int i)
     {
@@ -45,6 +45,6 @@ public class DeviceOperableSystem : BaseSystem
         }
 
         manager.IsOperable[i] = isOperable;
-        OnSetDeviceOperable?.Invoke(i, isPrevOperable, isOperable);
+        OnSetDeviceOperable?.Invoke(manager.Devices[i].Id, isPrevOperable, isOperable);
     }
 }

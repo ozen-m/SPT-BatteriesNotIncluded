@@ -14,7 +14,7 @@ public class DeviceBridgeSystem : BaseSystem
     /// <summary>
     /// Fika event hook: DeviceIndex, IsActive
     /// </summary>
-    public event Action<int, bool> OnSetDeviceActive;
+    public event Action<string, bool> OnSetDeviceActive;
 
     public override void Run(DeviceManager manager, int i)
     {
@@ -141,7 +141,7 @@ public class DeviceBridgeSystem : BaseSystem
         }
 
         manager.IsActive[i] = isActive;
-        OnSetDeviceActive?.Invoke(i, isActive);
+        OnSetDeviceActive?.Invoke(item.Id, isActive);
     }
 
     /// <summary>
