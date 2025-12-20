@@ -1,30 +1,35 @@
-﻿using BatteriesNotIncluded.FikaSync.Packets;
+﻿using System.Collections.Generic;
+using BatteriesNotIncluded.FikaSync.Packets;
+using BatteriesNotIncluded.FikaSync.Patches;
 using BatteriesNotIncluded.FikaSync.Pools;
 using BatteriesNotIncluded.FikaSync.Systems;
-using BatteriesNotIncluded.FikaSync.Utils;
 using BatteriesNotIncluded.Managers;
+using BatteriesNotIncluded.Utils;
+using EFT.InventoryLogic;
 
 namespace BatteriesNotIncluded.FikaSync.Managers;
 
 public class DeviceSyncClientManager : BaseSyncManager
 {
-    public OperableSyncSystem OperableSyncSystem;
-    public ActiveSyncSystem ActiveSyncSystem;
-    public ResourceSyncSystem ResourceSyncSystem;
+    public readonly OperableSyncSystem OperableSyncSystem = new();
+    public readonly ActiveSyncSystem ActiveSyncSystem = new();
+    public readonly ResourceSyncSystem ResourceSyncSystem = new();
+
+    private readonly List<Item> _itemsScratch = [];
 
     public static DeviceSyncClientManager Create(DeviceManager deviceManager)
     {
         DeviceSyncClientManager syncManager = deviceManager.gameObject.AddComponent<DeviceSyncClientManager>();
         syncManager.DeviceManager = deviceManager;
-        syncManager.OperableSyncSystem = new OperableSyncSystem();
-        syncManager.ActiveSyncSystem = new ActiveSyncSystem();
-        syncManager.ResourceSyncSystem = new ResourceSyncSystem();
+
+        CorpseInventoryPatch.OnCorpseNewInventory += syncManager.OnCorpseNewInventory;
 
         return syncManager;
     }
 
     public void OnDestroy()
     {
+        CorpseInventoryPatch.OnCorpseNewInventory -= OnCorpseNewInventory;
         DeviceSubPacketPoolManager.Release();
     }
 
@@ -42,5 +47,25 @@ public class DeviceSyncClientManager : BaseSyncManager
         {
             LoggerUtil.Warning($"Received packet to add bot's device battery but failed: {addOp.Error} ({packet.Battery} to {slot})");
         }
+    }
+
+    public void OnCorpseNewInventory(InventoryEquipment inventoryEquipment)
+    {
+        inventoryEquipment.GetAllItemsNonAlloc(_itemsScratch, false, false);
+        foreach (var item in _itemsScratch)
+        {
+            RegisterItem(item);
+        }
+
+        _itemsScratch.Clear();
+    }
+
+    public void RegisterItem(Item item)
+    {
+        if (item is not CompoundItem compoundItem) return;
+        if (!BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData)) return;
+
+        var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
+        DeviceManager.Add(compoundItem, batterySlots, ref deviceData);
     }
 }

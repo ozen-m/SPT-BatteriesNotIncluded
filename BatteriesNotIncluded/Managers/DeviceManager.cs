@@ -114,10 +114,10 @@ public class DeviceManager : MonoBehaviour
     public int Add(CompoundItem item, Slot[] batterySlots, ref DeviceData deviceData)
     {
         string itemId = item.Id;
-        if (_indexLookup.ContainsKey(itemId))
+        if (_indexLookup.TryGetValue(itemId, out var existingIndex))
         {
-            LoggerUtil.Warning($"Item {item.LocalizedShortName()} ({itemId}) already exists!");
-            return -1;
+            // LoggerUtil.Warning($"Item {item.LocalizedShortName()} ({itemId}) already exists, updating");
+            return UpdateDevice(existingIndex, item, batterySlots);
         }
 
         int i = Devices.Count;
@@ -143,6 +143,26 @@ public class DeviceManager : MonoBehaviour
         }
 
         return i;
+    }
+
+    public int UpdateDevice(int index, CompoundItem item, Slot[] batterySlots)
+    {
+        Devices[index] = item;
+        BatterySlots[index] = batterySlots;
+
+        var relatedComponent = GetRelatedComponentToSet(item);
+        RelatedComponentRef[index] = relatedComponent;
+
+        LoggerUtil.Debug($"Device {item.LocalizedShortName()} ({item.Id}) updated");
+
+        SubscribeToComponent(relatedComponent);
+        if (!Fika.IsFikaClient)
+        {
+            // No need to run manual update
+            SubscribeToDeviceSlots(batterySlots);
+        }
+
+        return index;
     }
 
     /// <summary>
@@ -392,7 +412,7 @@ public class DeviceManager : MonoBehaviour
         }
     }
 
-    private int GetItemIndex(Item item)
+    public int GetItemIndex(Item item)
     {
 #if DEBUG
         if (_indexLookup.TryGetValue(item.Id, out var index))
@@ -406,7 +426,7 @@ public class DeviceManager : MonoBehaviour
 #endif
     }
 
-    private int GetItemIndex(string itemId)
+    public int GetItemIndex(string itemId)
     {
 #if DEBUG
         if (_indexLookup.TryGetValue(itemId, out var index))
