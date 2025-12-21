@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace BatteriesNotIncluded.Systems;
 
-public class DrainBatterySystem(int runInterval) : BaseDelayedSystem(runInterval)
+public class BatteryDrainSystem(int runInterval) : BaseDelayedSystem(runInterval)
 {
     /// <summary>
     /// Fika event hook: DeviceIndex, SlotIndex, CurrentCharge

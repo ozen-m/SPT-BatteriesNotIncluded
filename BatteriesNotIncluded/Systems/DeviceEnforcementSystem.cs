@@ -9,34 +9,21 @@ using HarmonyLib;
 
 namespace BatteriesNotIncluded.Systems;
 
-public class DeviceBridgeSystem : BaseSystem
+public class DeviceEnforcementSystem : BaseSystem
 {
-    /// <summary>
-    /// Fika event hook: DeviceId, IsActive
-    /// </summary>
-    public event Action<string, bool> OnSetDeviceActive;
-
     public override void Run(DeviceManager manager, int i)
     {
-        if (i == -1) return;
-
-        var isPrevOperable = manager.IsPrevOperable[i];
         var isOperable = manager.IsOperable[i];
-        bool isActive;
+        var sameState = manager.IsPrevOperable[i] == isOperable;
+        if (sameState) return;
 
+        // Became inoperable/operable
         var component = manager.RelatedComponentRef[i];
         var item = component.Item;
         switch (component)
         {
             case LightComponent lightComponent:
             {
-                var isToggled = lightComponent.IsActive;
-                isActive = isOperable && isToggled;
-
-                // Became inoperable/operable
-                var shouldTransition = isPrevOperable ^ isOperable;
-                if (!shouldTransition) break;
-
                 if (!isOperable && lightComponent.IsActive)
                 {
                     // Removed batteries or battery drained
@@ -50,98 +37,74 @@ public class DeviceBridgeSystem : BaseSystem
                 //     // since tac devices cannot be "on" while not emitting lights.
                 // }
 
-                break;
+                return;
             }
             case NightVisionComponent nightVisionComponent:
             {
-                var isToggled = nightVisionComponent.Togglable.On;
-                isActive = isOperable && isToggled;
-
-                // Became inoperable/operable
-                var shouldTransition = isPrevOperable ^ isOperable;
-                if (!shouldTransition) break;
-
                 // Only control cameras for your player and device is in your equipment
                 if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
                     !playerInvCont.Player_0.IsYourPlayer ||
-                    item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */) break;
+                    item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */) return;
 
                 if (!isOperable)
                 {
                     // Removed batteries or battery drained
                     CameraUtil.SetNightVision(false);
                 }
-                else if (isToggled)
+                else if (nightVisionComponent.Togglable.On)
                 {
                     // Replaced with new batteries while toggled on
                     CameraUtil.SetNightVision(true);
                     playerInvCont.Player_0.PlayNightVisionSound();
                 }
-                break;
+                return;
             }
             case ThermalVisionComponent thermalVisionComponent:
             {
-                var isToggled = thermalVisionComponent.Togglable.On;
-                isActive = isOperable && isToggled;
-
-                // Became inoperable/operable
-                var shouldTransition = isPrevOperable ^ isOperable;
-                if (!shouldTransition) break;
-
                 // Only control cameras for your player and device is in your equipment
                 if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
                     !playerInvCont.Player_0.IsYourPlayer ||
-                    item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */) break;
+                    item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */) return;
 
                 if (!isOperable)
                 {
                     // Removed batteries or battery drained
                     CameraUtil.SetThermalVision(false);
                 }
-                else if (isToggled)
+                else if (thermalVisionComponent.Togglable.On)
                 {
                     // Replaced with new batteries while toggled on
                     CameraUtil.SetThermalVision(true);
                     playerInvCont.Player_0.PlayThermalVisionSound();
                 }
-                break;
+                return;
             }
-            case TogglableComponent togglableComponent:
+            case TogglableComponent:
             {
-                var isToggled = togglableComponent.On;
-                isActive = isOperable && isToggled;
-
-                // Became inoperable/operable
-                var shouldTransition = isPrevOperable ^ isOperable;
-                if (!shouldTransition) break;
-
                 // Only control devices for your player and device is in your equipment
                 // (only your player ever hears/sees these)
                 if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
                     !playerInvCont.Player_0.IsYourPlayer ||
-                    item.CurrentAddress is GClass3393 /* If not in active slot (a grid?) */) break;
+                    item.CurrentAddress is GClass3393 /* If not in active slot (a grid?) */) return;
 
                 switch (item)
                 {
                     case SightsItemClass:
                         manager.UpdateSightVisibility(item);
-                        break;
+                        return;
                     case HeadphonesItemClass:
                         // NOTE: UpdatePhonesReally runs twice, one on Player.OnItemAddedOrRemoved (too late)
                         //       and on ManualUpdate(Item).
                         playerInvCont.Player_0.UpdatePhonesReally();
-                        break;
+                        return;
                 }
-                break;
+                return;
             }
             default:
             {
                 throw new ArgumentException($"Component {component} is not a valid component");
             }
         }
-
-        manager.IsActive[i] = isActive;
-        OnSetDeviceActive?.Invoke(item.Id, isActive);
     }
 
     /// <summary>

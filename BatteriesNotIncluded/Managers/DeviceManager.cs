@@ -18,6 +18,7 @@ public class DeviceManager : MonoBehaviour
     public readonly List<bool> IsOperable = [];
     public readonly List<bool> IsPrevOperable = [];
     public readonly List<bool> IsActive = [];
+    public readonly List<bool> IsPrevActive = [];
 
     public readonly List<Slot[]> BatterySlots = [];
     public readonly List<GClass3379> RelatedComponentRef = [];
@@ -47,8 +48,10 @@ public class DeviceManager : MonoBehaviour
         }
 
         _manualSystems.Add(new DeviceOperableSystem());
-        _manualSystems.Add(new DeviceBridgeSystem());
-        _systems.Add(new DrainBatterySystem(1000));
+        _manualSystems.Add(new DeviceActiveSystem());
+        _manualSystems.Add(new DeviceEnforcementSystem());
+        _manualSystems.Add(new DeviceStateEventSystem());
+        _systems.Add(new BatteryDrainSystem(1000));
     }
 
     public void SubscribeToGameWorld(GameWorld gameWorld)
@@ -124,6 +127,7 @@ public class DeviceManager : MonoBehaviour
         IsOperable.Add(false);
         IsPrevOperable.Add(false);
         IsActive.Add(false);
+        IsPrevActive.Add(false);
 
         var relatedComponent = GetRelatedComponentToSet(item);
         RelatedComponentRef.Add(relatedComponent);
@@ -204,29 +208,15 @@ public class DeviceManager : MonoBehaviour
     #region FIKA
     public event Action<string, int, Item> OnAddBatteryToSlot;
 
-    public Action SubscribeToOnSetDeviceOperable(Action<string, bool, bool> action)
+    public Action SubscribeToOnDeviceStateChanged(Action<string, bool, bool> action)
     {
         Action unsubscribeAction = null;
         foreach (var system in _manualSystems)
         {
-            if (system is not DeviceOperableSystem drainBatterySystem) continue;
+            if (system is not DeviceStateEventSystem deviceStateSystem) continue;
 
-            drainBatterySystem.OnSetDeviceOperable += action;
-            unsubscribeAction = () => drainBatterySystem.OnSetDeviceOperable -= action;
-        }
-
-        return unsubscribeAction;
-    }
-
-    public Action SubscribeToOnSetDeviceActive(Action<string, bool> action)
-    {
-        Action unsubscribeAction = null;
-        foreach (var system in _manualSystems)
-        {
-            if (system is not DeviceBridgeSystem deviceBridgeSystem) continue;
-
-            deviceBridgeSystem.OnSetDeviceActive += action;
-            unsubscribeAction = () => deviceBridgeSystem.OnSetDeviceActive -= action;
+            deviceStateSystem.OnDeviceStateChanged += action;
+            unsubscribeAction = () => deviceStateSystem.OnDeviceStateChanged -= action;
         }
 
         return unsubscribeAction;
@@ -237,7 +227,7 @@ public class DeviceManager : MonoBehaviour
         Action unsubscribeAction = null;
         foreach (var system in _systems)
         {
-            if (system is not DrainBatterySystem drainBatterySystem) continue;
+            if (system is not BatteryDrainSystem drainBatterySystem) continue;
 
             drainBatterySystem.OnDrainResource += action;
             unsubscribeAction = () => drainBatterySystem.OnDrainResource -= action;
@@ -446,6 +436,7 @@ public class DeviceManager : MonoBehaviour
         IsOperable.SwapRemoveAt(index);
         IsPrevOperable.SwapRemoveAt(index);
         IsActive.SwapRemoveAt(index);
+        IsPrevActive.SwapRemoveAt(index);
 
         BatterySlots.SwapRemoveAt(index);
         RelatedComponentRef.SwapRemoveAt(index);

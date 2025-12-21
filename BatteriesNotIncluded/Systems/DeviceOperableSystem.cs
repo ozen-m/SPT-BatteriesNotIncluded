@@ -7,17 +7,11 @@ namespace BatteriesNotIncluded.Systems;
 
 public class DeviceOperableSystem : BaseSystem
 {
-    /// <summary>
-    /// Fika event hook: DeviceIndex, IsPrevOperable, IsOperable 
-    /// </summary>
-    public event Action<string, bool, bool> OnSetDeviceOperable;
-
     public override void Run(DeviceManager manager, int i)
     {
         if (i == -1) return;
 
-        var isPrevOperable = manager.IsOperable[i];
-        manager.IsPrevOperable[i] = isPrevOperable;
+        manager.IsPrevOperable[i] = manager.IsOperable[i];
 
         var isOperable = true;
         var slots = manager.BatterySlots[i];
@@ -45,6 +39,5 @@ public class DeviceOperableSystem : BaseSystem
         }
 
         manager.IsOperable[i] = isOperable;
-        OnSetDeviceOperable?.Invoke(manager.Devices[i].Id, isPrevOperable, isOperable);
     }
 }
