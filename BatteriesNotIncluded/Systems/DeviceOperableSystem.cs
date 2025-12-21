@@ -1,5 +1,4 @@
-﻿using System;
-using BatteriesNotIncluded.Managers;
+﻿using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Utils;
 using EFT.InventoryLogic;
 
@@ -9,8 +8,6 @@ public class DeviceOperableSystem : BaseSystem
 {
     public override void Run(DeviceManager manager, int i)
     {
-        if (i == -1) return;
-
         manager.IsPrevOperable[i] = manager.IsOperable[i];
 
         var isOperable = true;

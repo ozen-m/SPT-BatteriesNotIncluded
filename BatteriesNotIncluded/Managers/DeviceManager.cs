@@ -88,6 +88,8 @@ public class DeviceManager : MonoBehaviour
         if (!_gameStarted) return;
 
         var index = GetItemIndex(itemId);
+        if (index == -1) return;
+
         foreach (ISystem system in _manualSystems)
         {
             system.Run(this, index);

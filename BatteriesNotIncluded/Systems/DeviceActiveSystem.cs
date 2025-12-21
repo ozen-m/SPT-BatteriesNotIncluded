@@ -8,8 +8,6 @@ public class DeviceActiveSystem : BaseSystem
 {
     public override void Run(DeviceManager manager, int i)
     {
-        if (i == -1) return;
-
         manager.IsPrevActive[i] = manager.IsActive[i];
 
         var component = manager.RelatedComponentRef[i];
