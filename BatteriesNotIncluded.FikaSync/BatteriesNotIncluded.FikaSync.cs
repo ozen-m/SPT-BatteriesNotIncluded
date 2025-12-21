@@ -39,5 +39,3 @@ public class BatteriesNotIncludedSync : BaseUnityPlugin
         }
     }
 }
-
-// TODO: Fix fika reconnect

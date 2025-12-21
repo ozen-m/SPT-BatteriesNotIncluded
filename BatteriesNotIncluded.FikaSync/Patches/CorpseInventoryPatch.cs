@@ -8,7 +8,6 @@ namespace BatteriesNotIncluded.FikaSync.Patches;
 
 /// <summary>
 /// Inventory equipment gets changed on death.
-/// TODO: Check if you're host (not headless)
 /// </summary>
 public class CorpseInventoryPatch : ModulePatch
 {
