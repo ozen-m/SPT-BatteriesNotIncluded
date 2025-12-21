@@ -19,9 +19,17 @@ public class SightsItemCtorPatch : ModulePatch
         if (!__instance.IsBatteryOperated()) return;
         if (__instance is NightVisionItemClass or ThermalVisionItemClass) return;
 
-        // __instance.Togglable = new TogglableComponent(__instance);
-        // __instance.Components.Add(__instance.Togglable);
-        var togglable = new TogglableComponent(__instance);
-        __instance.Components.Add(togglable);
+        if (BatteriesNotIncluded.SightsTogglableField is not null)
+        {
+            // Prepatched
+            var togglable = new TogglableComponent(__instance);
+            BatteriesNotIncluded.SightsTogglableField(__instance) = togglable;
+            __instance.Components.Add(togglable);
+        }
+        else
+        {
+            var togglable = new TogglableComponent(__instance);
+            __instance.Components.Add(togglable);
+        }
     }
 }

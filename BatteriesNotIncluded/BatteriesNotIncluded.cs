@@ -14,6 +14,8 @@ using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using EFT.InventoryLogic;
+using HarmonyLib;
 using Newtonsoft.Json;
 using SPT.Common.Http;
 using SPT.Reflection.Patching;
@@ -36,6 +38,8 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     {
         LogSource = Logger;
 
+        CheckForPrepatch();
+
         DebugLogs = Config.Bind("Debug", "Logging", true, new ConfigDescription("Show debug logs", null, new ConfigurationManagerAttributes() { Order = 0 }));
 
         Fika.IsFikaPresent = Chainloader.PluginInfos.ContainsKey("com.fika.core");
@@ -44,8 +48,6 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         _patchManager.EnablePatches();
 
         _ = Task.Run(() => _ = GetDeviceDataFromServerAsync());
-
-        // TODO: Add file check for PrePatch
     }
 
     public static bool GetDeviceData(string deviceId, out DeviceData deviceData) =>
@@ -103,4 +105,20 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         // new HeadphonesCtorPatchPatch().Disable();
         new HeadphoneTemplatePatch().Disable();
     }
+
+    private static void CheckForPrepatch()
+    {
+        try
+        {
+            SightsTogglableField = AccessTools.FieldRefAccess<SightsItemClass, TogglableComponent>("Togglable");
+            HeadphonesTogglableField = AccessTools.FieldRefAccess<HeadphonesItemClass, TogglableComponent>("Togglable");
+        }
+        catch
+        {
+            // Ignored
+        }
+    }
+
+    public static AccessTools.FieldRef<SightsItemClass, TogglableComponent> SightsTogglableField;
+    public static AccessTools.FieldRef<HeadphonesItemClass, TogglableComponent> HeadphonesTogglableField;
 }
