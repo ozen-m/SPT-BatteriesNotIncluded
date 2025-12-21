@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <RootNamespace>BatteriesNotIncluded</RootNamespace>
+    <RootNamespace>BatteriesNotIncluded.FikaSync</RootNamespace>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Version>0.0.1</Version>
@@ -17,34 +17,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>$(SPTPath)BepInEx\core\0Harmony.dll</HintPath>
+    <ProjectReference Include="..\BatteriesNotIncluded\BatteriesNotIncluded.csproj" />
+    <Reference Include="Fika.Core">
+      <HintPath>$(SPTPath)BepInEx\plugins\Fika\Fika.Core.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="ItemComponent.Types">
       <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\ItemComponent.Types.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <Reference Include="ItemTemplate.Types">
-      <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\ItemTemplate.Types.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Sirenix.Serialization">
-      <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\Sirenix.Serialization.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="spt-common">
-      <HintPath>$(SPTPath)BepInEx\plugins\spt\spt-common.dll</HintPath>
-    </Reference>
     <Reference Include="spt-reflection">
       <HintPath>$(SPTPath)BepInEx\plugins\spt\spt-reflection.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\references\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="BepInEx">
@@ -59,18 +46,10 @@
       <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\UnityEngine.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <Reference Include="UnityEngine.AudioModule">
-      <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(SPTPath)EscapeFromTarkov_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Patches\Debug\" />
   </ItemGroup>
 
   <Target Name="SetOutput" AfterTargets="Build">

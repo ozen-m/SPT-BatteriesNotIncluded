@@ -16,11 +16,8 @@ public class SightsItemCtorPatch : ModulePatch
     [PatchPostfix]
     protected static void Postfix(SightsItemClass __instance)
     {
-        if (!__instance.IsBatteryOperated() ||
-            __instance is NightVisionItemClass or ThermalVisionItemClass /* Already has own togglable component */)
-        {
-            return;
-        }
+        if (!__instance.IsBatteryOperated()) return;
+        if (__instance is NightVisionItemClass or ThermalVisionItemClass) return;
 
         // __instance.Togglable = new TogglableComponent(__instance);
         // __instance.Components.Add(__instance.Togglable);

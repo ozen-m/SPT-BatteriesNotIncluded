@@ -1,28 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
+using BatteriesNotIncluded.FikaSync.Packets;
 using BatteriesNotIncluded.Managers;
-using BatteriesNotIncluded.Patches.Tactical;
+using BatteriesNotIncluded.Systems;
 using BatteriesNotIncluded.Utils;
 using EFT;
 using EFT.InventoryLogic;
-using HarmonyLib;
 
-namespace BatteriesNotIncluded.Systems;
+namespace BatteriesNotIncluded.FikaSync.Systems;
 
-public class DeviceBridgeSystem : BaseSystem
+public class ActiveSyncSystem : PacketBaseSystem<DeviceActivePacket>
 {
-    /// <summary>
-    /// Fika event hook: DeviceId, IsActive
-    /// </summary>
-    public event Action<string, bool> OnSetDeviceActive;
-
     public override void Run(DeviceManager manager, int i)
     {
-        if (i == -1) return;
+        manager.IsActive[i] = CurrentPacket.IsActive;
 
         var isPrevOperable = manager.IsPrevOperable[i];
         var isOperable = manager.IsOperable[i];
-        bool isActive;
 
         var component = manager.RelatedComponentRef[i];
         var item = component.Item;
@@ -30,9 +23,6 @@ public class DeviceBridgeSystem : BaseSystem
         {
             case LightComponent lightComponent:
             {
-                var isToggled = lightComponent.IsActive;
-                isActive = isOperable && isToggled;
-
                 // Became inoperable/operable
                 var shouldTransition = isPrevOperable ^ isOperable;
                 if (!shouldTransition) break;
@@ -41,7 +31,7 @@ public class DeviceBridgeSystem : BaseSystem
                 {
                     // Removed batteries or battery drained
                     lightComponent.IsActive = false;
-                    SetLightState(lightComponent);
+                    DeviceBridgeSystem.SetLightState(lightComponent);
                 }
                 // else if (isToggled)
                 // {
@@ -55,7 +45,6 @@ public class DeviceBridgeSystem : BaseSystem
             case NightVisionComponent nightVisionComponent:
             {
                 var isToggled = nightVisionComponent.Togglable.On;
-                isActive = isOperable && isToggled;
 
                 // Became inoperable/operable
                 var shouldTransition = isPrevOperable ^ isOperable;
@@ -82,7 +71,6 @@ public class DeviceBridgeSystem : BaseSystem
             case ThermalVisionComponent thermalVisionComponent:
             {
                 var isToggled = thermalVisionComponent.Togglable.On;
-                isActive = isOperable && isToggled;
 
                 // Became inoperable/operable
                 var shouldTransition = isPrevOperable ^ isOperable;
@@ -106,11 +94,8 @@ public class DeviceBridgeSystem : BaseSystem
                 }
                 break;
             }
-            case TogglableComponent togglableComponent:
+            case TogglableComponent:
             {
-                var isToggled = togglableComponent.On;
-                isActive = isOperable && isToggled;
-
                 // Became inoperable/operable
                 var shouldTransition = isPrevOperable ^ isOperable;
                 if (!shouldTransition) break;
@@ -139,74 +124,5 @@ public class DeviceBridgeSystem : BaseSystem
                 throw new ArgumentException($"Component {component} is not a valid component");
             }
         }
-
-        manager.IsActive[i] = isActive;
-        OnSetDeviceActive?.Invoke(item.Id, isActive);
     }
-
-    /// <summary>
-    /// Thank you IcyClawz for this code.
-    /// <br></br><see href="https://github.com/IgorEisberg/SPT-ClientMods/blob/main/ItemContextMenuExt/ItemContextMenuExt.cs#L307"/>
-    /// <br></br><see href="https://github.com/IgorEisberg/SPT-ClientMods/blob/main/LICENSE"/>
-    /// </summary>
-    public static void SetLightState(LightComponent lightComponent)
-    {
-        // Skip patch since we're the one calling
-        UpdateBeamsPatch.ToSkip = true;
-        try
-        {
-            if (lightComponent.Item.Owner is not Player.PlayerInventoryController playerInvCont)
-            {
-                // TODO: Dead bots inventory, see ItemContextExtended
-                LoggerUtil.Debug($"Could not find player when turning off light for item {lightComponent.Item.LocalizedShortName()} {lightComponent.Item.Id}");
-                return;
-            }
-
-            var player = playerInvCont.Player_0;
-
-            // LightComponent is headlight
-            var helmetLights = _helmetLightControllersField(player) as List<TacticalComboVisualController>;
-            if (helmetLights!.Count > 0)
-            {
-                foreach (var lightController in helmetLights)
-                {
-                    if (lightController.LightMod.Item.Id != lightComponent.Item.Id) continue;
-
-                    SetHeadLightState(player);
-                    return;
-                }
-            }
-
-            // LightComponent is weapon light
-            if (player.HandsController is Player.FirearmController firearmController)
-            {
-                firearmController.SetLightsState([lightComponent.GetLightState()], true, false);
-            }
-        }
-        finally
-        {
-            UpdateBeamsPatch.ToSkip = false;
-        }
-    }
-
-    private static void SetHeadLightState(Player player)
-    {
-        // Set animation active to true to avoid animation
-        _isHeadLightsAnimationActiveField(player) = true;
-
-        /*
-        // IsActive already false;
-        FirearmLightStateStruct lightState = lightController.LightMod.GetLightState(true);
-        lightController.LightMod.SetLightState(lightState);
-        */
-
-        player.SendHeadlightsPacket(false);
-        player.SwitchHeadLightsAnimation();
-    }
-
-    private static readonly AccessTools.FieldRef<Player, IEnumerable<TacticalComboVisualController>> _helmetLightControllersField =
-        AccessTools.FieldRefAccess<Player, IEnumerable<TacticalComboVisualController>>("_helmetLightControllers");
-
-    private static readonly AccessTools.FieldRef<Player, bool> _isHeadLightsAnimationActiveField =
-        AccessTools.FieldRefAccess<Player, bool>("IsHeadLightsAnimationActive");
 }

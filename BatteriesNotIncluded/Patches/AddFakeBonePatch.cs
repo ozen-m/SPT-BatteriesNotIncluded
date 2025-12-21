@@ -7,6 +7,7 @@ namespace BatteriesNotIncluded.Patches;
 
 /// <summary>
 /// This suppresses warnings in the client logs about bones not being found in mod slots.
+/// This breaks something, disabled.
 /// </summary>
 [IgnoreAutoPatch]
 public class AddFakeBonePatch : ModulePatch
@@ -39,8 +40,7 @@ public class AddFakeBonePatch : ModulePatch
 
         var transform = gameObject.transform;
         transform.SetParent(parent, false);
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
+        transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         transform.localScale = Vector3.one;
     }
 }

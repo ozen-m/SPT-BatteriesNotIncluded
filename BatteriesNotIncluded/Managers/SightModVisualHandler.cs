@@ -61,12 +61,10 @@ public class SightModVisualHandler
         {
             _controllers.Add(controller);
             AddToLookUp(item.Id, controller);
-            LoggerUtil.Debug($"Adding sight controller for {item.LocalizedShortName()} ({item.Id})");
         }
         else
         {
             _invalidControllers.Add(controller);
-            LoggerUtil.Debug($"Adding invalid sight controller for {item.LocalizedShortName()} ({item.Id})");
         }
     }
 

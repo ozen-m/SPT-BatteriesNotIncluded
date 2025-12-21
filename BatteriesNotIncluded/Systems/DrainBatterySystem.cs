@@ -1,4 +1,5 @@
-﻿using BatteriesNotIncluded.Managers;
+﻿using System;
+using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Utils;
 using EFT.InventoryLogic;
 using UnityEngine;
@@ -7,21 +8,27 @@ namespace BatteriesNotIncluded.Systems;
 
 public class DrainBatterySystem(int runInterval) : BaseDelayedSystem(runInterval)
 {
+    /// <summary>
+    /// Fika event hook: DeviceIndex, SlotIndex, CurrentCharge
+    /// </summary>
+    public event Action<string, int, float> OnDrainResource;
+
     public override void Run(DeviceManager manager, int i)
     {
         var isActive = manager.IsActive[i];
         if (!isActive) return;
 
-        foreach (var slot in manager.BatterySlots[i])
+        var slots = manager.BatterySlots[i];
+        for (var j = 0; j < slots.Length; j++)
         {
-            if (slot.ContainedItem is not { } item)
+            if (slots[j].ContainedItem is not { } item)
             {
-                LoggerUtil.Warning($"Tried to drain battery from {slot} while slot.ContainedItem is null");
+                LoggerUtil.Warning($"Tried to drain battery from {slots[j]} while slot.ContainedItem is null");
                 continue;
             }
             if (!item.TryGetItemComponent(out ResourceComponent resourceComponent))
             {
-                LoggerUtil.Warning($"Tried to drain battery from {slot} while ResourceComponent is not found");
+                LoggerUtil.Warning($"Tried to drain battery from {slots[j]} while ResourceComponent is not found");
                 continue;
             }
 
@@ -30,8 +37,13 @@ public class DrainBatterySystem(int runInterval) : BaseDelayedSystem(runInterval
             var currentCharge = Mathf.Max(resourceComponent.Value - 50 / 100f * manager.DrainMultiplier[i], 0f);
             resourceComponent.Value = currentCharge;
 
+            // Probably not needed, but nice to have
+            // item.RaiseRefreshEvent(false, false); 
+
             // Warning: spams
             LoggerUtil.Debug($"Drained item {manager.Devices[i].LocalizedShortName()} {manager.Devices[i].Id} to {resourceComponent.Value}");
+
+            OnDrainResource?.Invoke(manager.Devices[i].Id, j, currentCharge);
 
             if (currentCharge == 0f)
             {

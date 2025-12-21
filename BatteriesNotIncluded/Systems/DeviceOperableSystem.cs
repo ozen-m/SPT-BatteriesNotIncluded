@@ -1,4 +1,5 @@
-﻿using BatteriesNotIncluded.Managers;
+﻿using System;
+using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Utils;
 using EFT.InventoryLogic;
 
@@ -6,36 +7,44 @@ namespace BatteriesNotIncluded.Systems;
 
 public class DeviceOperableSystem : BaseSystem
 {
+    /// <summary>
+    /// Fika event hook: DeviceIndex, IsPrevOperable, IsOperable 
+    /// </summary>
+    public event Action<string, bool, bool> OnSetDeviceOperable;
+
     public override void Run(DeviceManager manager, int i)
     {
         if (i == -1) return;
 
-        manager.IsPrevOperable[i] = manager.IsOperable[i];
+        var isPrevOperable = manager.IsOperable[i];
+        manager.IsPrevOperable[i] = isPrevOperable;
 
+        var isOperable = true;
         var slots = manager.BatterySlots[i];
-        for (var j = 0; j < slots.Length; j++)
+        foreach (var slot in slots)
         {
-            var battery = slots[j].ContainedItem;
+            var battery = slot.ContainedItem;
             if (battery is null)
             {
-                manager.IsOperable[i] = false;
-                return;
+                isOperable = false;
+                break;
             }
 
             if (!battery.TryGetItemComponent(out ResourceComponent resourceComponent))
             {
-                manager.IsOperable[i] = false;
+                isOperable = false;
                 LoggerUtil.Warning($"Missing resource component for {battery.LocalizedShortName()} ({battery.Id})");
-                return;
+                break;
             }
 
             if (resourceComponent.IsDrained())
             {
-                manager.IsOperable[i] = false;
-                return;
+                isOperable = false;
+                break;
             }
         }
 
-        manager.IsOperable[i] = true;
+        manager.IsOperable[i] = isOperable;
+        OnSetDeviceOperable?.Invoke(manager.Devices[i].Id, isPrevOperable, isOperable);
     }
 }
