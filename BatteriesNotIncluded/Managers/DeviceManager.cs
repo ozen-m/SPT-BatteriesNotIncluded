@@ -72,18 +72,13 @@ public class DeviceManager : MonoBehaviour
     {
         if (!_gameStarted) return;
 
-        LoggerUtil.Debug("Running Manual Update");
         foreach (ISystem system in _manualSystems)
         {
             system.Run(this);
         }
     }
 
-    public void ManualUpdate(Item item)
-    {
-        LoggerUtil.Debug($"Running Manual Update for {item.Id}");
-        ManualUpdate(item.Id);
-    }
+    public void ManualUpdate(Item item) => ManualUpdate(item.Id);
 
     public void ManualUpdate(string itemId)
     {
@@ -101,9 +96,9 @@ public class DeviceManager : MonoBehaviour
         _gameWorld.OnPersonAdd -= RegisterPlayerItems;
         _gameWorld.AfterGameStarted -= RunAfterGameStart;
 
-        foreach (Action action in _unsubscribeEvents)
+        foreach (Action unsubscribe in _unsubscribeEvents)
         {
-            action.Invoke();
+            unsubscribe();
         }
         _unsubscribeEvents.Clear();
         _sightModVisualHandler.Cleanup();
@@ -122,8 +117,8 @@ public class DeviceManager : MonoBehaviour
 
         int i = Devices.Count;
 
-        Devices.Add(item);
         _indexLookup[itemId] = i;
+        Devices.Add(item);
         DrainMultiplier.Add(deviceData.DrainRate);
         BatterySlots.Add(batterySlots);
         IsOperable.Add(false);
@@ -138,14 +133,14 @@ public class DeviceManager : MonoBehaviour
         SubscribeToComponent(relatedComponent);
         if (!Fika.IsFikaClient)
         {
-            // No need to run manual update
+            // Only the server needs to run this
             SubscribeToDeviceSlots(batterySlots);
         }
 
         return i;
     }
 
-    public int UpdateDevice(int index, CompoundItem item, Slot[] batterySlots)
+    private int UpdateDevice(int index, CompoundItem item, Slot[] batterySlots)
     {
         Devices[index] = item;
         BatterySlots[index] = batterySlots;
@@ -155,10 +150,11 @@ public class DeviceManager : MonoBehaviour
 
         LoggerUtil.Debug($"Device {item.LocalizedShortName()} ({item.Id}) updated");
 
+        // Previous subscription is a leak!
         SubscribeToComponent(relatedComponent);
         if (!Fika.IsFikaClient)
         {
-            // No need to run manual update
+            // Only the server needs to run this
             SubscribeToDeviceSlots(batterySlots);
         }
 
@@ -169,10 +165,7 @@ public class DeviceManager : MonoBehaviour
     /// Check if an item is operable.
     /// </summary>
     /// <returns>Defaults to <c>true</c> if item is not found</returns>
-    public bool GetIsOperable(Item item)
-    {
-        return GetIsOperable(item.Id);
-    }
+    public bool GetIsOperable(Item item) => GetIsOperable(item.Id);
 
     /// <summary>
     /// Check if an item is operable.
@@ -305,11 +298,17 @@ public class DeviceManager : MonoBehaviour
         if (item is not CompoundItem compoundItem) return;
         if (!BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData)) return;
 
-        var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
+        Slot[] batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
         Add(compoundItem, batterySlots, ref deviceData);
 
-        if (!isPlayerItem || player.SearchController is not BotSearchControllerClass /* not AI controlled, player.IsAI not yet available */) return;
+        if (!isPlayerItem || player.SearchController is not BotSearchControllerClass) return;
 
+        // AI controlled, player.IsAI not yet available
+        AddBatteriesToBotDevice(player, compoundItem, batterySlots, ref deviceData);
+    }
+
+    private void AddBatteriesToBotDevice(Player player, CompoundItem device, Slot[] batterySlots, ref DeviceData deviceData)
+    {
         for (var i = 0; i < batterySlots.Length; i++)
         {
             var slot = batterySlots[i];
@@ -317,10 +316,10 @@ public class DeviceManager : MonoBehaviour
             battery.DrainBattery(player);
             if (!slot.AddBatteryToSlot(battery)) continue;
 
-            OnAddBatteryToSlot?.Invoke(compoundItem.Id, i, battery);
+            OnAddBatteryToSlot?.Invoke(device.Id, i, battery);
         }
 
-        compoundItem.TurnOnDevice();
+        device.TurnOnDevice();
     }
 
     private static GClass3379 GetRelatedComponentToSet(Item item)
@@ -444,11 +443,11 @@ public class DeviceManager : MonoBehaviour
     {
         Devices.SwapRemoveAt(index);
         DrainMultiplier.SwapRemoveAt(index);
-        BatterySlots.SwapRemoveAt(index);
         IsOperable.SwapRemoveAt(index);
         IsPrevOperable.SwapRemoveAt(index);
         IsActive.SwapRemoveAt(index);
 
+        BatterySlots.SwapRemoveAt(index);
         RelatedComponentRef.SwapRemoveAt(index);
     }
 }

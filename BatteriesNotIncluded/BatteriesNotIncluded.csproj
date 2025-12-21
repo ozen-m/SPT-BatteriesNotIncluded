@@ -69,6 +69,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Patches\Debug\" />
+  </ItemGroup>
+
   <Target Name="SetOutput" AfterTargets="Build">
     <PropertyGroup>
       <DestDir>BepInEx\plugins</DestDir>

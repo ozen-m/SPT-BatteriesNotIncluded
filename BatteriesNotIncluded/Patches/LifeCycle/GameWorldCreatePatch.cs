@@ -33,7 +33,7 @@ public class GameWorldCreatePatch : ModulePatch
             return;
         }
 
-        var manager = __result.GetOrAddComponent<DeviceManager>();
+        var manager = __result.gameObject.AddComponent<DeviceManager>();
         manager.SubscribeToGameWorld(__result);
         Singleton<DeviceManager>.Create(manager);
 

@@ -2,8 +2,8 @@
 using BatteriesNotIncluded.FikaSync.Managers;
 using BatteriesNotIncluded.FikaSync.Packets;
 using BatteriesNotIncluded.FikaSync.Pools;
+using BatteriesNotIncluded.FikaSync.Utils;
 using BatteriesNotIncluded.Managers;
-using BatteriesNotIncluded.Utils;
 using Comfort.Common;
 using Fika.Core.Networking;
 using SPT.Reflection.Patching;
@@ -36,6 +36,6 @@ public class DeviceManagerStartPatch : ModulePatch
                 DeviceSyncServerManager.Create(__instance, server);
                 break;
         }
-        Utils.LoggerUtil.Info("DeviceSyncManager created");
+        LoggerUtil.Info("DeviceSyncManager created");
     }
 }

@@ -28,7 +28,7 @@ public class DeviceSyncServerManager : BaseSyncManager
 
     public void OnDestroy()
     {
-        foreach (var unsubscribe in _unsubscribeActions)
+        foreach (Action unsubscribe in _unsubscribeActions)
         {
             unsubscribe();
         }
@@ -50,24 +50,24 @@ public class DeviceSyncServerManager : BaseSyncManager
     private void SendDeviceOperablePacket(string deviceId, bool isPrevOperable, bool isOperable)
     {
         _devicePacket.DeviceId = deviceId;
-        _devicePacket.Type = EDeviceSubPacketType.DeviceOperable;
         _devicePacket.SubPacket = DeviceOperablePacket.FromValue(isPrevOperable, isOperable);
+        _devicePacket.Type = EDeviceSubPacketType.DeviceOperable;
         _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableOrdered);
     }
 
     private void SendDeviceActivePacket(string deviceId, bool isActive)
     {
         _devicePacket.DeviceId = deviceId;
-        _devicePacket.Type = EDeviceSubPacketType.DeviceActive;
         _devicePacket.SubPacket = DeviceActivePacket.FromValue(isActive);
+        _devicePacket.Type = EDeviceSubPacketType.DeviceActive;
         _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableOrdered);
     }
 
     private void SendResourceDrainPacket(string deviceId, int slotIndex, float currentCharge)
     {
         _devicePacket.DeviceId = deviceId;
-        _devicePacket.Type = EDeviceSubPacketType.ResourceDrain;
         _devicePacket.SubPacket = ResourceDrainPacket.FromValue(slotIndex, currentCharge);
+        _devicePacket.Type = EDeviceSubPacketType.ResourceDrain;
         _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableUnordered);
     }
 

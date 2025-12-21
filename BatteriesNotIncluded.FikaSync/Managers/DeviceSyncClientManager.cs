@@ -51,6 +51,7 @@ public class DeviceSyncClientManager : BaseSyncManager
         }
     }
 
+    // Does the server need this?
     public void OnCorpseNewInventory(InventoryEquipment inventoryEquipment)
     {
         inventoryEquipment.GetAllItemsNonAlloc(_itemsScratch, false, false);

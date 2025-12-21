@@ -12,7 +12,7 @@ namespace BatteriesNotIncluded.Systems;
 public class DeviceBridgeSystem : BaseSystem
 {
     /// <summary>
-    /// Fika event hook: DeviceIndex, IsActive
+    /// Fika event hook: DeviceId, IsActive
     /// </summary>
     public event Action<string, bool> OnSetDeviceActive;
 
@@ -22,8 +22,8 @@ public class DeviceBridgeSystem : BaseSystem
 
         var isPrevOperable = manager.IsPrevOperable[i];
         var isOperable = manager.IsOperable[i];
-
         bool isActive;
+
         var component = manager.RelatedComponentRef[i];
         var item = component.Item;
         switch (component)
@@ -191,15 +191,16 @@ public class DeviceBridgeSystem : BaseSystem
 
     private static void SetHeadLightState(Player player)
     {
+        // Set animation active to true to avoid animation
+        _isHeadLightsAnimationActiveField(player) = true;
+
         /*
         // IsActive already false;
         FirearmLightStateStruct lightState = lightController.LightMod.GetLightState(true);
         lightController.LightMod.SetLightState(lightState);
         */
-        player.SendHeadlightsPacket(false);
 
-        // Set animation active to true to avoid animation
-        _isHeadLightsAnimationActiveField(player) = true;
+        player.SendHeadlightsPacket(false);
         player.SwitchHeadLightsAnimation();
     }
 

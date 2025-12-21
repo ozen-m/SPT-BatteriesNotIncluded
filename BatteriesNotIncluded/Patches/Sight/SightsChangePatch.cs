@@ -28,8 +28,12 @@ public class SightsChangePatch : ModulePatch
             var item = sight.Mod.Item;
 #if DEBUG
             if (manager.IsItemRegistered(item.Id))
-#endif
+            {
                 manager.UpdateSightVisibility(item);
+            }
+#else
+            manager.UpdateSightVisibility(item);
+#endif
         }
     }
 }

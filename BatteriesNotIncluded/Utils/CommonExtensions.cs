@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BatteriesNotIncluded.Models;
 using Comfort.Common;
 using EFT;
@@ -11,11 +10,11 @@ namespace BatteriesNotIncluded.Utils;
 
 public static class CommonExtensions
 {
-    private const string AABatteryId = "5672cb124bdc2d1a0f8b4568";
-    private const string CR2032BatteryId = "5672cb304bdc2dc2088b456a";
-    private const string CR123ABatteryId = "590a358486f77429692b2790";
+    private static readonly MongoID _aaBatteryId = "5672cb124bdc2d1a0f8b4568";
+    private static readonly MongoID _cr2032BatteryId = "5672cb304bdc2dc2088b456a";
+    private static readonly MongoID _cr123ABatteryId = "590a358486f77429692b2790";
 
-    private static readonly HashSet<MongoID> _batteryIds = [AABatteryId, CR2032BatteryId, CR123ABatteryId];
+    private static readonly HashSet<MongoID> _batteryIds = [_aaBatteryId, _cr2032BatteryId, _cr123ABatteryId];
     private static readonly Random _random = new();
 
     public static bool IsBatteryOperated(this Item item) => item is CompoundItem compoundItem && compoundItem.IsBatteryOperated();
@@ -45,7 +44,7 @@ public static class CommonExtensions
 #if DEBUG
         foreach (var slot in batterySlots)
         {
-            if (slot is null) throw new InvalidOperationException($"Cannot get all battery slots ({slotCount}) for {device.LocalizedShortName()} ({device.Id})");
+            if (slot is null) LoggerUtil.Warning($"Cannot get all battery slots ({slotCount}) for {device.LocalizedShortName()} ({device.Id})");
         }
 #endif
         return batterySlots;
@@ -73,10 +72,14 @@ public static class CommonExtensions
     /// <summary>
     /// Player.PlayToggleSound not relying on previous state
     /// </summary>
-    public static void PlayToggleSound(this Player player, AudioClip soundToPlay, Vector3 speechLocalPosition)
-    {
-        Singleton<BetterAudio>.Instance.PlayAtPoint(player.Transform.Original.position + speechLocalPosition, soundToPlay, player.Distance, BetterAudio.AudioSourceGroupType.Character, 5);
-    }
+    public static void PlayToggleSound(this Player player, AudioClip soundToPlay, Vector3 speechLocalPosition) =>
+        Singleton<BetterAudio>.Instance.PlayAtPoint(
+            player.Transform.Original.position + speechLocalPosition,
+            soundToPlay,
+            player.Distance,
+            BetterAudio.AudioSourceGroupType.Character,
+            5
+        );
 
     public static void TurnOnDevice(this Item item)
     {
@@ -87,7 +90,7 @@ public static class CommonExtensions
         var toggleOperation = togglableComponent.Set(true, true);
         if (toggleOperation.Failed)
         {
-            LoggerUtil.Warning($"Failed to toggle device: {item}");
+            LoggerUtil.Warning($"Failed to toggle device {item}: {toggleOperation.Error}");
             return;
         }
 
@@ -130,8 +133,9 @@ public static class CommonExtensions
             return;
         }
 
-        int maxValue = 100;
+        // TODO: Make configurable
         int baseValue;
+        var maxValue = (int)resourceComponent.MaxResource;
         float levelFactor = Mathf.Clamp01(player.Profile.Info.Level / 42f /* Highest trader level requirement */);
 
         if (player.Side is not EPlayerSide.Savage)
@@ -146,7 +150,6 @@ public static class CommonExtensions
         }
 
         // Boss almost full battery
-        // BUG: Player.AIData is empty? See Player.set_AIData
         if (player.Profile.Info.Settings.Role.IsABossOrFollower())
         {
             baseValue = maxValue;
@@ -155,14 +158,10 @@ public static class CommonExtensions
         var lowerLimit = baseValue - 10;
         var upperLimit = baseValue + 5;
 
-        // TODO: Make configurable
-        // Battery charge depends on their max charge and bot level
-        maxValue = (int)resourceComponent.MaxResource;
-
         // TODO: Revisit
         var randomCharge = _random.Next(lowerLimit, upperLimit);
         resourceComponent.Value = Mathf.Clamp(randomCharge, 0, maxValue);
-        LoggerUtil.Debug($"Set {item.LocalizedShortName()} ({item.Id}) resource component value to {randomCharge}");
+        LoggerUtil.Debug($"Set battery {item.LocalizedShortName()} ({item.Id}) resource component value to {randomCharge}");
     }
 
     public static bool AddBatteryToSlot(this Slot slot, Item battery)
@@ -178,7 +177,7 @@ public static class CommonExtensions
         return true;
     }
 
-    public static bool IsABossOrFollower(this WildSpawnType role)
+    private static bool IsABossOrFollower(this WildSpawnType role)
     {
         return role.IsBossOrFollower() && (role is not (WildSpawnType.pmcBEAR or WildSpawnType.pmcUSEC or WildSpawnType.pmcBot or WildSpawnType.assaultGroup));
     }
