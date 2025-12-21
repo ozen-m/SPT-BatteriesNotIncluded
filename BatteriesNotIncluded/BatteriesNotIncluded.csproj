@@ -78,7 +78,7 @@
       <DestDir>BepInEx\plugins</DestDir>
     </PropertyGroup>
     <ItemGroup>
-      <OutputDLL Include="$(TargetPath)" />
+      <ModRoot Include="$(TargetPath)" />
       <PDB Include="$(TargetDir)$(TargetName).pdb" Condition="'$(Configuration)' != 'Release'" />
     </ItemGroup>
   </Target>

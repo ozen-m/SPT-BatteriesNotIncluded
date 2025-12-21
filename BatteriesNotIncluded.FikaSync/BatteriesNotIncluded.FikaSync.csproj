@@ -19,7 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BatteriesNotIncluded\BatteriesNotIncluded.csproj" />
     <Reference Include="Fika.Core">
-      <HintPath>$(SPTPath)BepInEx\plugins\Fika\Fika.Core.dll</HintPath>
+      <HintPath>..\references\Fika.Core.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="ItemComponent.Types">
@@ -57,7 +57,7 @@
       <DestDir>BepInEx\plugins</DestDir>
     </PropertyGroup>
     <ItemGroup>
-      <OutputDLL Include="$(TargetPath)" />
+      <ModRoot Include="$(TargetPath)" />
       <PDB Include="$(TargetDir)$(TargetName).pdb" Condition="'$(Configuration)' != 'Release'" />
     </ItemGroup>
   </Target>
