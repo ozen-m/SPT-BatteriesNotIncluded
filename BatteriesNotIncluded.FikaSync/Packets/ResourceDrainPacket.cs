@@ -50,6 +50,6 @@ public class ResourceDrainPacket : IDevicePoolSubPacket
 
     public void Execute(FikaPlayer player = null)
     {
-        // Do nothing
+        throw new System.NotImplementedException();
     }
 }

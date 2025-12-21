@@ -14,6 +14,7 @@ public class DeviceSyncClientManager : BaseSyncManager
     public readonly OperableSyncSystem OperableSyncSystem = new();
     public readonly ActiveSyncSystem ActiveSyncSystem = new();
     public readonly ResourceSyncSystem ResourceSyncSystem = new();
+    public readonly BotBatterySyncSystem BotBatterySyncSystem = new();
 
     private readonly List<Item> _itemsScratch = [];
 
@@ -39,20 +40,8 @@ public class DeviceSyncClientManager : BaseSyncManager
         devicePacket.Execute(this, index);
     }
 
-    public void OnBotBatteryPacketReceived(BotBatteryPacket packet)
-    {
-        var deviceIndex = DeviceManager.GetItemIndex(packet.DeviceId);
-        var slot = DeviceManager.BatterySlots[deviceIndex][packet.SlotIndex];
-        packet.Battery.CurrentAddress = null; // Is this needed?
-        var addOp = slot.Add(packet.Battery, false);
-        if (addOp.Failed)
-        {
-            LoggerUtil.Warning($"Received packet to add bot's device battery but failed: {addOp.Error} ({packet.Battery} to {slot})");
-        }
-    }
-
     // Does the server need this?
-    public void OnCorpseNewInventory(InventoryEquipment inventoryEquipment)
+    private void OnCorpseNewInventory(InventoryEquipment inventoryEquipment)
     {
         inventoryEquipment.GetAllItemsNonAlloc(_itemsScratch, false, false);
         foreach (var item in _itemsScratch)
@@ -63,7 +52,7 @@ public class DeviceSyncClientManager : BaseSyncManager
         _itemsScratch.Clear();
     }
 
-    public void RegisterItem(Item item)
+    private void RegisterItem(Item item)
     {
         if (item is not CompoundItem compoundItem) return;
         if (!BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData)) return;

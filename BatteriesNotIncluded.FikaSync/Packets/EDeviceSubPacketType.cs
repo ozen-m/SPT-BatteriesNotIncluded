@@ -15,5 +15,10 @@ public enum EDeviceSubPacketType : byte
     /// <summary>
     /// Drained battery of device
     /// </summary>
-    ResourceDrain
+    ResourceDrain,
+
+    /// <summary>
+    /// Added battery for bot's device
+    /// </summary>
+    BotBattery
 }

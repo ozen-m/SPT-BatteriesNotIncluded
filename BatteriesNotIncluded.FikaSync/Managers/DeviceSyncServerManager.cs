@@ -43,8 +43,8 @@ public class DeviceSyncServerManager : BaseSyncManager
         _unsubscribeActions.Add(DeviceManager.SubscribeToOnSetDeviceActive(SendDeviceActivePacket));
         _unsubscribeActions.Add(DeviceManager.SubscribeToOnDrainResource(SendResourceDrainPacket));
 
-        DeviceManager.OnAddBatteryToSlot += OnAddBatteryToSlot;
-        _unsubscribeActions.Add(() => DeviceManager.OnAddBatteryToSlot -= OnAddBatteryToSlot);
+        DeviceManager.OnAddBatteryToSlot += SendBotBatteryPacket;
+        _unsubscribeActions.Add(() => DeviceManager.OnAddBatteryToSlot -= SendBotBatteryPacket);
     }
 
     private void SendDeviceOperablePacket(string deviceId, bool isPrevOperable, bool isOperable)
@@ -71,15 +71,11 @@ public class DeviceSyncServerManager : BaseSyncManager
         _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableUnordered);
     }
 
-    private void OnAddBatteryToSlot(string deviceId, int slotIndex, Item battery)
+    private void SendBotBatteryPacket(string deviceId, int slotIndex, Item battery)
     {
-        BotBatteryPacket packet = new()
-        {
-            Battery = battery,
-            DeviceId = deviceId,
-            SlotIndex = slotIndex
-        };
-
-        _fikaServer.SendData(ref packet, DeliveryMethod.ReliableOrdered);
+        _devicePacket.DeviceId = deviceId;
+        _devicePacket.SubPacket = BotBatteryPacket.FromValue(battery, slotIndex);
+        _devicePacket.Type = EDeviceSubPacketType.BotBattery;
+        _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableOrdered);
     }
 }

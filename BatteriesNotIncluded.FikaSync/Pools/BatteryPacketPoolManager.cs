@@ -22,6 +22,7 @@ public class DeviceSubPacketPoolManager : BasePacketPoolManager<EDeviceSubPacket
             DeviceOperablePacket.CreateInstance, // EDeviceSubPacketType.DeviceOperable = 0
             DeviceActivePacket.CreateInstance, // EDeviceSubPacketType.DeviceActive = 1
             ResourceDrainPacket.CreateInstance, // EDeviceSubPacketType.ResourceDrain = 2
+            BotBatteryPacket.CreateInstance // EDeviceSubPacketType.BotBattery = 3
         ];
     }
 }
