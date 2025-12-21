@@ -24,6 +24,9 @@ public class ResourceSyncSystem : PacketBaseSystem<ResourceDrainPacket>
         var currentCharge = CurrentPacket.Value;
         resourceComponent.Value = currentCharge;
 
+        // Probably not needed, but nice to have
+        // item.RaiseRefreshEvent(false, false);
+
         // Warning: spams
         LoggerUtil.Debug($"Drained item {manager.Devices[i].LocalizedShortName()} {manager.Devices[i].Id} to {currentCharge}");
     }
