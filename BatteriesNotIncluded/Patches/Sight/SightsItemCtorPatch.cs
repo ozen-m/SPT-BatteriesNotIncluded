@@ -30,6 +30,9 @@ public class SightsItemCtorPatch : ModulePatch
         {
             var togglable = new TogglableComponent(__instance);
             __instance.Components.Add(togglable);
+
+            // Default to on state
+            togglable.Set(true, false, true);
         }
     }
 }

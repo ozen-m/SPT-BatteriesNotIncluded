@@ -53,6 +53,6 @@ public class BotBatteryPacket : IDevicePoolSubPacket
 
     public void Execute(FikaPlayer player = null)
     {
-        throw new NotImplementedException();
+        // Do nothing
     }
 }

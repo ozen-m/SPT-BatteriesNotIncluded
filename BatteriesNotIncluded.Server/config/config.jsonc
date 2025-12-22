@@ -1,5 +1,6 @@
 {
     "enabled": true,
+    "saveSightsState" : false, // Saves the on/off status of sight devices. WARNING: Currently breaks icons for NVGs/Thermal goggles
     "debugLogs": true,
     "batteries": {
         // CR123A
