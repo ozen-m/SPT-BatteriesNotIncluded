@@ -39,27 +39,18 @@ public class DeviceSyncServerManager : BaseSyncManager
     {
         if (DeviceManager == null) throw new InvalidOperationException("DeviceManager is not set");
 
-        _unsubscribeActions.Add(DeviceManager.SubscribeToOnSetDeviceOperable(SendDeviceOperablePacket));
-        _unsubscribeActions.Add(DeviceManager.SubscribeToOnSetDeviceActive(SendDeviceActivePacket));
+        _unsubscribeActions.Add(DeviceManager.SubscribeToOnDeviceStateChanged(SendDeviceStatePacket));
         _unsubscribeActions.Add(DeviceManager.SubscribeToOnDrainResource(SendResourceDrainPacket));
 
         DeviceManager.OnAddBatteryToSlot += SendBotBatteryPacket;
         _unsubscribeActions.Add(() => DeviceManager.OnAddBatteryToSlot -= SendBotBatteryPacket);
     }
 
-    private void SendDeviceOperablePacket(string deviceId, bool isPrevOperable, bool isOperable)
+    private void SendDeviceStatePacket(string deviceId, bool isOperable, bool isActive)
     {
         _devicePacket.DeviceId = deviceId;
-        _devicePacket.SubPacket = DeviceOperablePacket.FromValue(isPrevOperable, isOperable);
-        _devicePacket.Type = EDeviceSubPacketType.DeviceOperable;
-        _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableOrdered);
-    }
-
-    private void SendDeviceActivePacket(string deviceId, bool isActive)
-    {
-        _devicePacket.DeviceId = deviceId;
-        _devicePacket.SubPacket = DeviceActivePacket.FromValue(isActive);
-        _devicePacket.Type = EDeviceSubPacketType.DeviceActive;
+        _devicePacket.SubPacket = DeviceStatePacket.FromValue(isOperable, isActive);
+        _devicePacket.Type = EDeviceSubPacketType.DeviceState;
         _fikaServer.SendNetReusable(ref _devicePacket, DeliveryMethod.ReliableOrdered);
     }
 
