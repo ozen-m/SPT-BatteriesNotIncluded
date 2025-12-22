@@ -3,14 +3,9 @@
 public enum EDeviceSubPacketType : byte
 {
     /// <summary>
-    /// Set device operable status
+    /// Set device state
     /// </summary>
-    DeviceOperable,
-
-    /// <summary>
-    /// Set device active status
-    /// </summary>
-    DeviceActive,
+    DeviceState,
 
     /// <summary>
     /// Drained battery of device

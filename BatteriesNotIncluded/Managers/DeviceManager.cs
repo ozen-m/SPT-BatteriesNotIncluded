@@ -49,8 +49,8 @@ public class DeviceManager : MonoBehaviour
 
         _manualSystems.Add(new DeviceOperableSystem());
         _manualSystems.Add(new DeviceActiveSystem());
-        _manualSystems.Add(new DeviceEnforcementSystem());
         _manualSystems.Add(new DeviceStateEventSystem());
+        _manualSystems.Add(new DeviceEnforcementSystem());
         _systems.Add(new BatteryDrainSystem(1000));
     }
 
@@ -188,7 +188,8 @@ public class DeviceManager : MonoBehaviour
         var index = GetItemIndex(item);
         if (index == -1) return;
 
-        _sightModVisualHandler.UpdateSightVisibility(item.Id, IsActive[index]);
+        var togglable = RelatedComponentRef[index] as TogglableComponent;
+        _sightModVisualHandler.UpdateSightVisibility(item.Id, togglable!.On && IsActive[index]);
     }
 
     public bool IsItemRegistered(Item item) => IsItemRegistered(item.Id);
@@ -410,7 +411,7 @@ public class DeviceManager : MonoBehaviour
         {
             return index;
         }
-        LoggerUtil.Debug($"Cannot find item index: {item.LocalizedShortName()} ({item.Id})");
+        LoggerUtil.Debug($"Cannot find item index: {item.LocalizedShortName()} (id: {item.Id}) (template: {item.StringTemplateId})");
         return -1;
 #else
         return GetItemIndex(item.Id);

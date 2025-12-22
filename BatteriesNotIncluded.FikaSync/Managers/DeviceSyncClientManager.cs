@@ -4,6 +4,7 @@ using BatteriesNotIncluded.FikaSync.Patches;
 using BatteriesNotIncluded.FikaSync.Pools;
 using BatteriesNotIncluded.FikaSync.Systems;
 using BatteriesNotIncluded.Managers;
+using BatteriesNotIncluded.Systems;
 using BatteriesNotIncluded.Utils;
 using EFT.InventoryLogic;
 
@@ -11,8 +12,8 @@ namespace BatteriesNotIncluded.FikaSync.Managers;
 
 public class DeviceSyncClientManager : BaseSyncManager
 {
-    public readonly OperableSyncSystem OperableSyncSystem = new();
-    public readonly ActiveSyncSystem ActiveSyncSystem = new();
+    public readonly DeviceStateSyncSystem DeviceStateSyncSystem = new();
+    public readonly DeviceEnforcementSystem DeviceEnforcementSystem = new();
     public readonly ResourceSyncSystem ResourceSyncSystem = new();
     public readonly BotBatterySyncSystem BotBatterySyncSystem = new();
 
@@ -37,6 +38,8 @@ public class DeviceSyncClientManager : BaseSyncManager
     public void OnDevicePacketReceived(DevicePacket devicePacket)
     {
         var index = DeviceManager.GetItemIndex(devicePacket.DeviceId);
+        if (index == -1) return;
+
         devicePacket.Execute(this, index);
     }
 
