@@ -18,16 +18,15 @@ public class TooltipPatch : ModulePatch
     protected static void Postfix(GridItemView __instance, ref string __result)
     {
         if (!BatteriesNotIncluded.ShowRemainingBattery.Value) return;
-        if (!Singleton<DeviceManager>.Instantiated) return;
-        if (__instance.Item is not CompoundItem compoundItem) return;
-        if (!BatteriesNotIncluded.GetDeviceData(compoundItem.StringTemplateId, out var data)) return;
-        if (!Singleton<DeviceManager>.Instance.GetIsOperable(compoundItem)) return;
+        if (!BatteriesNotIncluded.GetDeviceData(__instance.Item.StringTemplateId, out var data)) return;
 
-        float min = float.MaxValue;
-        foreach (var slot in compoundItem.Slots)
+        var count = 0;
+        var min = float.MaxValue;
+        foreach (var slot in ((CompoundItem)__instance.Item).Slots)
         {
             if (slot.ContainedItem is null || !slot.ContainedItem.TryGetItemComponent(out ResourceComponent resource)) continue;
 
+            count++;
             var val = resource.Value;
             if (val < min)
             {
@@ -35,7 +34,7 @@ public class TooltipPatch : ModulePatch
             }
         }
 
-        if (min > 0f)
+        if (count == data.SlotCount && min > 0f)
         {
             __result = $"{__result} (~{(int)(min / data.DrainPerSecond / 60f)}m left)";
         }
