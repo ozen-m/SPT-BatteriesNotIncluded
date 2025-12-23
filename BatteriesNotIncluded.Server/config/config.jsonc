@@ -1,9 +1,26 @@
 {
     "enabled": true,
-    "saveSightsState": false, // Saves the on/off status of sight devices. WARNING: Currently breaks icons for NVGs/Thermal goggles
-    "globalDrainMultiplier": 1.0, // A higher value results in a faster drain
-    "minGameRuntime" : 900, // Minimum game runtime for devices in seconds, default is 900 seconds (15 minutes). This is equivalent to real 1 hour runtime.
-    "maxGameRuntime" : 9000, // Maximum game runtime for devices in seconds, default is 9,000 seconds (2.5 hours). This is equivalent to real 100,000 hours runtime.
+    // Saves the on/off status of sight devices. WARNING: Currently breaks icons for NVGs/Thermal goggles
+    "saveSightsState": false,
+    // A higher value results in a faster drain
+    "globalDrainMultiplier": 1.0,
+    // Minimum game runtime for devices in seconds, default is 900 seconds (15 minutes). This is equivalent to real 1 hour runtime.
+    "minGameRuntime": 900,
+    // Maximum game runtime for devices in seconds, default is 9,000 seconds (2.5 hours). This is equivalent to real 100,000 hours runtime.
+    "maxGameRuntime": 9000,
+    // Spawned battery charge for bots
+    "botBatteries": {
+        // Pmc bots
+        "pmcBot": {
+            "max": 100,
+            "min": 50
+        },
+        // Scav bots
+        "assault": {
+            "max": 20,
+            "min": 60
+        }
+    },
     "debugLogs": true,
     "batteries": {
         // AA

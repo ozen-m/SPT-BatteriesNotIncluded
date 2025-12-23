@@ -17,4 +17,9 @@ public class BatteriesCallbacks(HttpResponseUtil httpResponseUtil, ModConfigCont
             .ToDictionary();
         return new ValueTask<string>(httpResponseUtil.NoBody(payload));
     }
+    
+    public ValueTask<string> GetBotBatteriesAsync(string url, EmptyRequestData info, MongoId sessionID)
+    {
+        return new ValueTask<string>(httpResponseUtil.NoBody(modConfigContainer.ModConfig.BotBatteries));
+    }
 }

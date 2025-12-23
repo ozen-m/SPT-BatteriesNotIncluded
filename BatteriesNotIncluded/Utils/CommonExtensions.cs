@@ -133,35 +133,35 @@ public static class CommonExtensions
             return;
         }
 
-        // TODO: Make configurable
         int baseValue;
         var maxValue = (int)resourceComponent.MaxResource;
         float levelFactor = Mathf.Clamp01(player.Profile.Info.Level / 42f /* Highest trader level requirement */);
 
-        if (player.Side is not EPlayerSide.Savage)
+        // Bosses will get almost full battery
+        if (player.Profile.Info.Settings.Role.IsABossOrFollower())
         {
-            // Use player level to determine battery charge
-            baseValue = (int)(Mathf.Lerp(50f, maxValue, levelFactor));
+            baseValue = maxValue;
+        }
+        else if (player.Side is not EPlayerSide.Savage)
+        {
+            // Pmc, use player's level to determine battery charge
+            var range = BatteriesNotIncluded.GetBotRange(WildSpawnType.pmcBot);
+            baseValue = (int)(Mathf.Lerp(range.Min, range.Max, levelFactor));
         }
         else
         {
             // Scav
-            baseValue = (int)(Mathf.Lerp(20, 60f, levelFactor));
-        }
-
-        // Boss almost full battery
-        if (player.Profile.Info.Settings.Role.IsABossOrFollower())
-        {
-            baseValue = maxValue;
+            var range = BatteriesNotIncluded.GetBotRange(WildSpawnType.assault);
+            baseValue = (int)(Mathf.Lerp(range.Min, range.Max, levelFactor));
         }
 
         var lowerLimit = baseValue - 10;
         var upperLimit = baseValue + 5;
 
-        // TODO: Revisit
         var randomCharge = _random.Next(lowerLimit, upperLimit);
-        resourceComponent.Value = Mathf.Clamp(randomCharge, 0, maxValue);
-        LoggerUtil.Debug($"Set battery {item.LocalizedShortName()} ({item.Id}) resource component value to {randomCharge}");
+        const int minValue = 10; // Give them at least 10 charge
+        resourceComponent.Value = Mathf.Clamp(randomCharge, minValue, maxValue);
+        LoggerUtil.Debug($"Set battery {item.LocalizedShortName()} charge to {resourceComponent.Value}");
     }
 
     public static bool AddBatteryToSlot(this Slot slot, Item battery)

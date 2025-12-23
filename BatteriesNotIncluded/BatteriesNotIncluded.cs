@@ -14,6 +14,7 @@ using BepInEx;
 using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using EFT;
 using EFT.InventoryLogic;
 using HarmonyLib;
 using Newtonsoft.Json;
@@ -33,6 +34,8 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     public static ConfigEntry<bool> DebugLogs;
 
     private static Dictionary<string, DeviceData> _deviceData = [];
+    private static Dictionary<WildSpawnType, RangedInt> _botBatteries = [];
+
     private PatchManager _patchManager;
 
     protected void Awake()
@@ -49,25 +52,31 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         _patchManager = new PatchManager(this, true);
         _patchManager.EnablePatches();
 
-        _ = Task.Run(() => _ = GetDeviceDataFromServerAsync());
+        _ = Task.Run(() => _ = GetConfigFromServerAsync());
     }
 
     public static bool GetDeviceData(string deviceId, out DeviceData deviceData) =>
         _deviceData.TryGetValue(deviceId, out deviceData);
 
-    private static async Task GetDeviceDataFromServerAsync()
+    public static RangedInt GetBotRange(WildSpawnType wildSpawnType) =>
+        _botBatteries.GetValueOrDefault(wildSpawnType, _defaultRange);
+
+    private static async Task GetConfigFromServerAsync()
     {
-        string errorMsg = "Could not get device data from server. Disabling mod Batteries Not Included";
+        string errorMsg = "Could not get configuration from server. Disabling mod Batteries Not Included";
         bool error = false;
         try
         {
-            string json = await RequestHandler.GetJsonAsync("/BatteriesNotIncluded/GetDeviceData");
-            if (string.IsNullOrWhiteSpace(json))
+            string deviceData = await RequestHandler.GetJsonAsync("/BatteriesNotIncluded/GetDeviceData");
+            string botBatteries = await RequestHandler.GetJsonAsync("/BatteriesNotIncluded/GetBotBatteries");
+            if (string.IsNullOrWhiteSpace(deviceData) || string.IsNullOrWhiteSpace(botBatteries))
             {
                 error = true;
             }
-            _deviceData = JsonConvert.DeserializeObject<Dictionary<string, DeviceData>>(json!);
-            if (_deviceData.IsNullOrEmpty())
+
+            _deviceData = JsonConvert.DeserializeObject<Dictionary<string, DeviceData>>(deviceData!);
+            _botBatteries = JsonConvert.DeserializeObject<Dictionary<WildSpawnType, RangedInt>>(botBatteries!);
+            if (_deviceData.IsNullOrEmpty() || _botBatteries.IsNullOrEmpty())
             {
                 error = true;
             }
@@ -123,4 +132,5 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
     public static AccessTools.FieldRef<SightsItemClass, TogglableComponent> SightsTogglableField;
     public static AccessTools.FieldRef<HeadphonesItemClass, TogglableComponent> HeadphonesTogglableField;
+    private static readonly RangedInt _defaultRange = new(40, 60);
 }
