@@ -29,6 +29,7 @@ namespace BatteriesNotIncluded;
 public class BatteriesNotIncluded : BaseUnityPlugin
 {
     public static ManualLogSource LogSource;
+    public static ConfigEntry<bool> ShowRemainingBattery;
     public static ConfigEntry<bool> DebugLogs;
 
     private static Dictionary<string, DeviceData> _deviceData = [];
@@ -40,6 +41,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
         CheckForPrepatch();
 
+        ShowRemainingBattery = Config.Bind("General", "Remaining Battery Tooltip", true, new ConfigDescription("Show remaining battery when hovering over a device", null, new ConfigurationManagerAttributes() { Order = 1 }));
         DebugLogs = Config.Bind("Debug", "Logging", true, new ConfigDescription("Show debug logs", null, new ConfigurationManagerAttributes() { Order = 0 }));
 
         Fika.IsFikaPresent = Chainloader.PluginInfos.ContainsKey("com.fika.core");
