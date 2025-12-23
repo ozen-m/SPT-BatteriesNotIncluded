@@ -21,6 +21,7 @@ public class ModConfigContainer
         try
         {
             ModConfig = modHelper.GetJsonDataFromFile<ModConfig>(ConfigPath, "config.jsonc");
+            ModConfig.GlobalDrainMult = Math.Max(ModConfig.GlobalDrainMult, double.Epsilon);
         }
         catch (Exception ex)
         {

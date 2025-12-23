@@ -9,6 +9,15 @@ public record ModConfig
 {
     [JsonPropertyName("enabled")]
     public bool Enabled { get; set; } = false;
+    
+    [JsonPropertyName("minGameRuntime")]
+    public double MinGameRuntime { get; set; } = 900d;
+    
+    [JsonPropertyName("maxGameRuntime")]
+    public double MaxGameRuntime { get; set; } = 9_000d;
+    
+    [JsonPropertyName("globalDrainMultiplier")]
+    public double GlobalDrainMult { get; set; } = 1d;
 
     [JsonPropertyName("debugLogs")]
     public bool DebugLogs { get; set; } = false;

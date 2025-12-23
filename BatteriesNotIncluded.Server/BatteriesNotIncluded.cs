@@ -22,10 +22,10 @@ public class BatteriesNotIncluded(
 ) : IOnLoad
 {
     private static readonly MongoId _aaBatteryId = "5672cb124bdc2d1a0f8b4568";
-    private static readonly MongoId _dBatteryId = "5672cb304bdc2dc2088b456a"; // CR2032
-    private static readonly MongoId _rechargeableBatteryId = "590a358486f77429692b2790"; // CR123A
+    private static readonly MongoId _cr2032BatteryId = "5672cb304bdc2dc2088b456a";
+    private static readonly MongoId _cr123ABatteryId = "590a358486f77429692b2790";
 
-    private static readonly MongoId[] _batteryIds = [_aaBatteryId, _dBatteryId, _rechargeableBatteryId];
+    private static readonly MongoId[] _batteryIds = [_aaBatteryId, _cr2032BatteryId, _cr123ABatteryId];
 
     private Dictionary<string, LazyLoad<Dictionary<string, string>>> _globalLocales;
 
@@ -51,11 +51,11 @@ public class BatteriesNotIncluded(
             template.Properties!.MaxResource = 100;
             template.Properties.Resource = 100;
             template.Properties.ItemSound = "food_tin_can";
-            if (batteryId == _dBatteryId)
+            if (batteryId == _cr2032BatteryId)
             {
                 template.Properties.Prefab!.Path = "batteries/cr2032.bundle";
             }
-            else if (batteryId == _rechargeableBatteryId)
+            else if (batteryId == _cr123ABatteryId)
             {
                 template.Properties.Prefab!.Path = "batteries/cr123.bundle";
             }
@@ -90,7 +90,7 @@ public class BatteriesNotIncluded(
         var batteryType = deviceData.Battery;
         if (batteryType == MongoId.Empty()) return;
 
-        AddBatteryToItemDescription(template.Id, batteryType, deviceData.SlotCount);
+        AddBatteryToItemDescription(template.Id, batteryType, deviceData.SlotCount, deviceData.GameRuntimeSecs);
 
         Slot[] newSlots = new Slot[deviceData.SlotCount];
         for (var i = 0; i < newSlots.Length; i++)
@@ -122,7 +122,7 @@ public class BatteriesNotIncluded(
             : newSlots;
 
         Interlocked.Increment(ref counter);
-        // loggerUtil.Debug($"{itemHelper.GetItemName(template.Id)} ({template.Id}) added slot with compatible battery {itemHelper.GetItemName(batteryType.Value)}");
+        loggerUtil.Debug($"{itemHelper.GetItemName(template.Id)} ({template.Id}) added slot with compatible battery {itemHelper.GetItemName(batteryType)} ({(int)(deviceData.GameRuntimeSecs / 60d)}m)");
     }
 
     private DeviceData GetDeviceData(MongoId deviceId)
@@ -131,22 +131,32 @@ public class BatteriesNotIncluded(
         {
             if (!deviceDatas.TryGetValue(deviceId, out DeviceData deviceData)) continue;
 
+            const double maxResourceValue = 100f; // Ideally should come from the battery template
+            var gameRuntimeSecs = RuntimeToSeconds(deviceData.RealRuntimeHr) / modConfigContainer.ModConfig.GlobalDrainMult;
             deviceData.Battery = batteryType;
+            deviceData.GameRuntimeSecs = gameRuntimeSecs;
+            deviceData.DrainPerSecond = maxResourceValue / gameRuntimeSecs;
+
             return deviceData;
         }
         var defaultData = DeviceData.Default;
-        modConfigContainer.ModConfig.Batteries[_dBatteryId].Add(deviceId, defaultData);
+        modConfigContainer.ModConfig.Batteries[_cr2032BatteryId].Add(deviceId, defaultData);
         loggerUtil.Warning($"{deviceId}) has no defined battery, defaulting to CR2032");
         return defaultData;
     }
 
-    private void AddBatteryToItemDescription(MongoId deviceId, MongoId batteryId, int slots)
+    private void AddBatteryToItemDescription(MongoId deviceId, MongoId batteryId, int slots, double runtimeSeconds)
     {
+        TimeSpan t = TimeSpan.FromSeconds(runtimeSeconds);
+        int hours = (int)t.TotalHours;
+        int minutes = t.Minutes;
+        string runtime = hours > 0 ? $"{hours}h {minutes:D2}m" : $"{minutes:D2}m";
+
         foreach (var (_, lazyLoadLocale) in _globalLocales)
         {
             lazyLoadLocale.AddTransformer((localeData) =>
             {
-                localeData[$"{deviceId} Description"] = $"Uses {slots}x {localeData[$"{batteryId} Name"]}\n\n{localeData[$"{deviceId} Description"]}";
+                localeData[$"{deviceId} Description"] = $"Uses {slots}x {localeData[$"{batteryId} Name"]}\nHas a runtime of {runtime}\n\n{localeData[$"{deviceId} Description"]}";
 
                 return localeData;
             });
@@ -249,8 +259,7 @@ public class BatteriesNotIncluded(
                 // We don't have a locale file for current language, use english
                 lazyLoadLocale.AddTransformer((localeData) =>
                 {
-                    var en = locales["en"];
-                    foreach (var (key, value) in en)
+                    foreach (var (key, value) in locales["en"])
                     {
                         localeData[key] = value;
                     }
@@ -263,7 +272,28 @@ public class BatteriesNotIncluded(
         }
     }
 
-    private readonly MongoId[] _batteryConsumers =
+    private static readonly double _logMin = Math.Log10(1d);
+
+    private static readonly double _logRange = Math.Log10(100_000d) - _logMin;
+
+    /// <summary>
+    /// Normalized log interpolation.
+    /// Map minimum: 1 hour runtime to <see cref="ModConfig.MinGameRuntime"/>;
+    ///     maximum: 100,000 hours runtime to <see cref="ModConfig.MaxGameRuntime"/>.
+    /// </summary>
+    /// <param name="runtimeHours">Device battery life in hours</param>
+    /// <returns>Real runtime hours mapped to game seconds</returns>
+    private double RuntimeToSeconds(double runtimeHours)
+    {
+        runtimeHours = Math.Clamp(runtimeHours, 1d, 100_000d);
+        double tMin = modConfigContainer.ModConfig.MinGameRuntime;
+        double tMax = modConfigContainer.ModConfig.MaxGameRuntime;
+
+        double factor = (Math.Log10(runtimeHours) - _logMin) / _logRange;
+        return (int)(tMin + (tMax - tMin) * factor);
+    }
+
+    private static readonly MongoId[] _batteryConsumers =
     [
         BaseClasses.NIGHT_VISION, // Headwear
         BaseClasses.THERMAL_VISION, // Headwear

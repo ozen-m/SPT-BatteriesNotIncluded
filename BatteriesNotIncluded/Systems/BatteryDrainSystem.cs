@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace BatteriesNotIncluded.Systems;
 
-public class BatteryDrainSystem(int runInterval) : BaseDelayedSystem(runInterval)
+public class BatteryDrainSystem(float runInterval) : BaseDelayedSystem(runInterval)
 {
     /// <summary>
     /// Fika event hook: DeviceIndex, SlotIndex, CurrentCharge
@@ -32,16 +32,17 @@ public class BatteryDrainSystem(int runInterval) : BaseDelayedSystem(runInterval
                 continue;
             }
 
-            // TODO: Drain calculation
             // TODO: Light drain based on modes: light/laser/ir?
-            var currentCharge = Mathf.Max(resourceComponent.Value - 50 / 100f * manager.DrainMultiplier[i], 0f);
+            var currentCharge = Mathf.Max(resourceComponent.Value - (RunInterval / 1000f * manager.DrainPerSecond[i]), 0f);
             resourceComponent.Value = currentCharge;
 
             // Probably not needed, but nice to have
             // item.RaiseRefreshEvent(false, false); 
 
+#if DEBUG
             // Warning: spams
             LoggerUtil.Debug($"Drained item {manager.Devices[i].LocalizedShortName()} {manager.Devices[i].Id} to {resourceComponent.Value}");
+#endif
 
             OnDrainResource?.Invoke(manager.Devices[i].Id, j, currentCharge);
 

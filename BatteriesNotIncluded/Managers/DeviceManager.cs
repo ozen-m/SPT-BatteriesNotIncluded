@@ -14,7 +14,7 @@ namespace BatteriesNotIncluded.Managers;
 public class DeviceManager : MonoBehaviour
 {
     public readonly List<Item> Devices = [];
-    public readonly List<float> DrainMultiplier = [];
+    public readonly List<float> DrainPerSecond = [];
     public readonly List<bool> IsOperable = [];
     public readonly List<bool> IsPrevOperable = [];
     public readonly List<bool> IsActive = [];
@@ -51,7 +51,7 @@ public class DeviceManager : MonoBehaviour
         _manualSystems.Add(new DeviceActiveSystem());
         _manualSystems.Add(new DeviceStateEventSystem());
         _manualSystems.Add(new DeviceEnforcementSystem());
-        _systems.Add(new BatteryDrainSystem(1000));
+        _systems.Add(new BatteryDrainSystem(1000f));
     }
 
     public void SubscribeToGameWorld(GameWorld gameWorld)
@@ -124,13 +124,13 @@ public class DeviceManager : MonoBehaviour
 
         _indexLookup[itemId] = i;
         Devices.Add(item);
-        DrainMultiplier.Add(deviceData.DrainRate);
-        BatterySlots.Add(batterySlots);
-        IsOperable.Add(false);
-        IsPrevOperable.Add(false);
-        IsActive.Add(false);
-        IsPrevActive.Add(false);
+        DrainPerSecond.Add(deviceData.DrainPerSecond);
+        IsOperable.Add(true);
+        IsPrevOperable.Add(true);
+        IsActive.Add(true);
+        IsPrevActive.Add(true);
 
+        BatterySlots.Add(batterySlots);
         var relatedComponent = GetRelatedComponentToSet(item);
         RelatedComponentRef.Add(relatedComponent);
 
@@ -189,6 +189,9 @@ public class DeviceManager : MonoBehaviour
         if (index == -1) return;
 
         var togglable = RelatedComponentRef[index] as TogglableComponent;
+#if DEBUG
+        if (togglable is null) LoggerUtil.Error($"Cannot get TogglableComponent of sight {item.ToFullString()}");
+#endif
         _sightModVisualHandler.UpdateSightVisibility(item.Id, togglable!.On && IsActive[index]);
     }
 
@@ -435,7 +438,7 @@ public class DeviceManager : MonoBehaviour
     private void RemoveAt(int index)
     {
         Devices.SwapRemoveAt(index);
-        DrainMultiplier.SwapRemoveAt(index);
+        DrainPerSecond.SwapRemoveAt(index);
         IsOperable.SwapRemoveAt(index);
         IsPrevOperable.SwapRemoveAt(index);
         IsActive.SwapRemoveAt(index);

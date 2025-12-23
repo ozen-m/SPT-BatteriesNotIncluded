@@ -7,9 +7,9 @@ public struct DeviceData
     [JsonProperty("batteryId")]
     public string Battery { get; set; }
 
-    [JsonProperty("slotCount")]
+    [JsonProperty("slots")]
     public int SlotCount { get; set; }
 
-    [JsonProperty("drainRate")]
-    public float DrainRate { get; set; }
+    [JsonProperty("drainPerSecond")]
+    public float DrainPerSecond { get; set; }
 }

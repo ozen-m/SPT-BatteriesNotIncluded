@@ -8,11 +8,17 @@ public record DeviceData
     [JsonPropertyName("batteryId")]
     public MongoId Battery { get; set; } = new("5672cb304bdc2dc2088b456a");
     
-    [JsonPropertyName("slotCount")]
+    [JsonPropertyName("slots")]
     public int SlotCount { get; set; } = 1;
     
-    [JsonPropertyName("drainRate")]
-    public float DrainRate { get; set; } = 1f;
+    [JsonPropertyName("runtime")]
+    public double RealRuntimeHr { get; set; } = 100_000d;
+    
+    [JsonPropertyName("gameRuntime")]
+    public double GameRuntimeSecs { get; set; } = 9000d;
+    
+    [JsonPropertyName("drainPerSecond")]
+    public double DrainPerSecond { get; set; } = 0.01d;
 
     public static DeviceData Default => new();
 }

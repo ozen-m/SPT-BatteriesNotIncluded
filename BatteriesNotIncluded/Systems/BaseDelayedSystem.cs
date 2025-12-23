@@ -3,8 +3,9 @@ using BatteriesNotIncluded.Managers;
 
 namespace BatteriesNotIncluded.Systems;
 
-public abstract class BaseDelayedSystem(int _runInterval) : ISystem
+public abstract class BaseDelayedSystem(float runInterval) : ISystem
 {
+    protected readonly float RunInterval = runInterval;
     private readonly Stopwatch _runTimer = Stopwatch.StartNew();
 
     public virtual void Run(DeviceManager manager)
@@ -27,7 +28,7 @@ public abstract class BaseDelayedSystem(int _runInterval) : ISystem
 
     private bool CanRun()
     {
-        if (_runTimer.ElapsedMilliseconds <= _runInterval) return false;
+        if (_runTimer.ElapsedMilliseconds < RunInterval) return false;
 
         _runTimer.Restart();
         return true;
