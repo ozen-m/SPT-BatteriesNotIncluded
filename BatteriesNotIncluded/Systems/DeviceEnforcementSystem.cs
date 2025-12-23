@@ -121,7 +121,9 @@ public class DeviceEnforcementSystem : BaseSystem
             if (lightComponent.Item.Owner is not Player.PlayerInventoryController playerInvCont)
             {
                 // TODO: Dead bots inventory, see ItemContextExtended
+#if DEBUG
                 LoggerUtil.Debug($"Could not find player when turning off light for item {lightComponent.Item.LocalizedShortName()} {lightComponent.Item.Id}");
+#endif
                 return;
             }
 

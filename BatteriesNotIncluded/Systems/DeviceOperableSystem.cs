@@ -10,31 +10,31 @@ public class DeviceOperableSystem : BaseSystem
     {
         manager.IsPrevOperable[i] = manager.IsOperable[i];
 
-        var isOperable = true;
         var slots = manager.BatterySlots[i];
+        manager.IsOperable[i] = GetIsOperable(slots);
+    }
+
+    public static bool GetIsOperable(Slot[] slots)
+    {
         foreach (var slot in slots)
         {
             var battery = slot.ContainedItem;
             if (battery is null)
             {
-                isOperable = false;
-                break;
+                return false;
             }
 
             if (!battery.TryGetItemComponent(out ResourceComponent resourceComponent))
             {
-                isOperable = false;
                 LoggerUtil.Warning($"Missing resource component for {battery.LocalizedShortName()} ({battery.Id})");
-                break;
+                return false;
             }
 
             if (resourceComponent.IsDrained())
             {
-                isOperable = false;
-                break;
+                return false;
             }
         }
-
-        manager.IsOperable[i] = isOperable;
+        return true;
     }
 }

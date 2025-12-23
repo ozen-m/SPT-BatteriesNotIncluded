@@ -11,6 +11,11 @@ public class DeviceActiveSystem : BaseSystem
         manager.IsPrevActive[i] = manager.IsActive[i];
 
         var component = manager.RelatedComponentRef[i];
+        manager.IsActive[i] = manager.IsOperable[i] && GetIsToggled(component);
+    }
+
+    public static bool GetIsToggled(GClass3379 component)
+    {
         bool isToggled = component switch
         {
             LightComponent lightComponent => lightComponent.IsActive,
@@ -19,7 +24,6 @@ public class DeviceActiveSystem : BaseSystem
             TogglableComponent togglableComponent => togglableComponent.On,
             _ => throw new ArgumentException($"Component {component} is not a valid component")
         };
-
-        manager.IsActive[i] = manager.IsOperable[i] && isToggled;
+        return isToggled;
     }
 }

@@ -73,8 +73,6 @@ public class DeviceManager : MonoBehaviour
 
     public void ManualUpdate()
     {
-        if (!_gameStarted) return;
-
         foreach (ISystem system in _manualSystems)
         {
             system.Run(this);
@@ -85,8 +83,6 @@ public class DeviceManager : MonoBehaviour
 
     public void ManualUpdate(string itemId)
     {
-        if (!_gameStarted) return;
-
         var index = GetItemIndex(itemId);
         if (index == -1) return;
 
@@ -125,16 +121,21 @@ public class DeviceManager : MonoBehaviour
         _indexLookup[itemId] = i;
         Devices.Add(item);
         DrainPerSecond.Add(deviceData.DrainPerSecond);
-        IsOperable.Add(true);
-        IsPrevOperable.Add(true);
-        IsActive.Add(true);
-        IsPrevActive.Add(true);
+
+        var relatedComponent = GetRelatedComponentToSet(item);
+        var isToggled = DeviceActiveSystem.GetIsToggled(relatedComponent);
+
+        IsOperable.Add(isToggled);
+        IsPrevOperable.Add(isToggled);
+        IsActive.Add(isToggled);
+        IsPrevActive.Add(isToggled);
 
         BatterySlots.Add(batterySlots);
-        var relatedComponent = GetRelatedComponentToSet(item);
         RelatedComponentRef.Add(relatedComponent);
 
         LoggerUtil.Debug($"Device {item.LocalizedShortName()} ({itemId}) added");
+
+        ManualUpdate(item);
 
         SubscribeToComponent(relatedComponent);
         if (!Fika.IsFikaClient)
@@ -248,10 +249,6 @@ public class DeviceManager : MonoBehaviour
         _gameStarted = true;
         _sightModVisualHandler.RemoveDestroyedControllers();
         RegisterWorldLootItems();
-
-        // Run twice to set IsPrevOperable correctly in DeviceOperableSystem
-        ManualUpdate();
-        ManualUpdate();
     }
 
     private void RegisterPlayerItems(IPlayer iPlayer)
@@ -295,12 +292,14 @@ public class DeviceManager : MonoBehaviour
         if (!BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData)) return;
 
         Slot[] batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
+
+        if (isPlayerItem && player.SearchController is BotSearchControllerClass)
+        {
+            // AI controlled, player.IsAI not yet available
+            AddBatteriesToBotDevice(player, compoundItem, batterySlots, ref deviceData);
+        }
+
         Add(compoundItem, batterySlots, ref deviceData);
-
-        if (!isPlayerItem || player.SearchController is not BotSearchControllerClass) return;
-
-        // AI controlled, player.IsAI not yet available
-        AddBatteriesToBotDevice(player, compoundItem, batterySlots, ref deviceData);
     }
 
     private void AddBatteriesToBotDevice(Player player, CompoundItem device, Slot[] batterySlots, ref DeviceData deviceData)
