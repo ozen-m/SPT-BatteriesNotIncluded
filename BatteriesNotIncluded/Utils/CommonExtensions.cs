@@ -98,18 +98,21 @@ public static class CommonExtensions
     }
 
     /// <summary>
-    /// Add battery to slots using DeviceData's batteryId
+    /// Add battery to slot using DeviceData's batteryId
     /// </summary>
     /// <param name="slots"></param>
     /// <param name="deviceData"></param>
     public static Item CreateBatteryForSlot(this Slot slot, ref DeviceData deviceData)
     {
-        if (slot.ContainedItem is not null) return null;
-
         if (!slot.IsBatterySlot())
         {
             LoggerUtil.Warning($"GetBatteriesForSlots: Cannot add battery to slot, not a battery slot: {slot}");
             return null;
+        }
+
+        if (slot.ContainedItem is not null && slot.ContainedItem.IsBattery())
+        {
+            return slot.ContainedItem;
         }
 
         Item battery = Singleton<ItemFactoryClass>.Instance.GetPresetItem(deviceData.Battery);
@@ -161,7 +164,7 @@ public static class CommonExtensions
         var randomCharge = _random.Next(lowerLimit, upperLimit);
         const int minValue = 10; // Give them at least 10 charge
         resourceComponent.Value = Mathf.Clamp(randomCharge, minValue, maxValue);
-        LoggerUtil.Debug($"Set battery {item.LocalizedShortName()} charge to {resourceComponent.Value}");
+        LoggerUtil.Debug($"Set battery {item} charge to {resourceComponent.Value}");
     }
 
     public static bool AddBatteryToSlot(this Slot slot, Item battery)
@@ -169,9 +172,10 @@ public static class CommonExtensions
         if (slot is null || slot.ContainedItem is not null || battery is null) return false;
 
         var addOp = slot.Add(battery, false);
-        if (addOp.Failed)
+        if (addOp is { Failed: true, Error: not Slot.GClass1578 } /* Inventory Errors/Slot not empty */)
         {
             LoggerUtil.Warning($"Failed to add {battery} to {slot}: {addOp.Error}");
+            return false;
         }
 
         return true;
