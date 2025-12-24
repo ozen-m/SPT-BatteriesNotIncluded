@@ -16,6 +16,8 @@ public class SetLightsStatePatch : ModulePatch
     [PatchPrefix]
     protected static void Prefix(FirearmLightStateStruct[] lightsStates)
     {
+        if (!Singleton<DeviceManager>.Instantiated) return;
+
         var manager = Singleton<DeviceManager>.Instance;
         for (var i = 0; i < lightsStates.Length; i++)
         {

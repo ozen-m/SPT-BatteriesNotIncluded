@@ -28,7 +28,6 @@ public class AddFakeBonePatch : ModulePatch
 
     private static void CreateFakeBone(Transform parent)
     {
-        // Is this expensive?
         // TODO: Get slot count and add all slots
         var anchor = parent.Find("mod_equipment_000");
         if (anchor != null)

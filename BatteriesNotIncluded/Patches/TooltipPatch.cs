@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using BatteriesNotIncluded.Managers;
-using Comfort.Common;
 using EFT.InventoryLogic;
 using EFT.UI.DragAndDrop;
 using SPT.Reflection.Patching;

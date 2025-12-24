@@ -90,7 +90,7 @@ public static class CommonExtensions
         var toggleOperation = togglableComponent.Set(true, true);
         if (toggleOperation.Failed)
         {
-            LoggerUtil.Warning($"Failed to toggle device {item}: {toggleOperation.Error}");
+            LoggerUtil.Warning($"Failed to turn on device {item.ToFullString()}: {toggleOperation.Error}");
             return;
         }
 
@@ -149,13 +149,13 @@ public static class CommonExtensions
         {
             // Pmc, use player's level to determine battery charge
             var range = BatteriesNotIncluded.GetBotRange(WildSpawnType.pmcBot);
-            baseValue = (int)(Mathf.Lerp(range.Min, range.Max, levelFactor));
+            baseValue = (int)Mathf.Lerp(range.Min, range.Max, levelFactor);
         }
         else
         {
             // Scav
             var range = BatteriesNotIncluded.GetBotRange(WildSpawnType.assault);
-            baseValue = (int)(Mathf.Lerp(range.Min, range.Max, levelFactor));
+            baseValue = (int)Mathf.Lerp(range.Min, range.Max, levelFactor);
         }
 
         var lowerLimit = baseValue - 10;

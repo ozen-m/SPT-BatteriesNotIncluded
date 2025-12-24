@@ -20,6 +20,8 @@ public class SightsChangePatch : ModulePatch
     [PatchPostfix]
     protected static void Postfix(ProceduralWeaponAnimation __instance, List<ProceduralWeaponAnimation.SightNBone> ____optics)
     {
+        if (!Singleton<DeviceManager>.Instantiated) return;
+
         var manager = Singleton<DeviceManager>.Instance;
         foreach (var sight in __instance.ScopeAimTransforms)
         {

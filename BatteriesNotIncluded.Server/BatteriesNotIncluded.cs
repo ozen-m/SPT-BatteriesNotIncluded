@@ -12,7 +12,7 @@ using Path = System.IO.Path;
 
 namespace BatteriesNotIncluded;
 
-[Injectable(TypePriority = OnLoadOrder.PostSptModLoader)] // TODO: Determine LoadOrder
+[Injectable(TypePriority = OnLoadOrder.TraderRegistration)]
 public class BatteriesNotIncluded(
     ModConfigContainer modConfigContainer,
     LoggerUtil loggerUtil,
@@ -21,12 +21,6 @@ public class BatteriesNotIncluded(
     ItemHelper itemHelper
 ) : IOnLoad
 {
-    private static readonly MongoId _aaBatteryId = "5672cb124bdc2d1a0f8b4568";
-    private static readonly MongoId _cr2032BatteryId = "5672cb304bdc2dc2088b456a";
-    private static readonly MongoId _cr123ABatteryId = "590a358486f77429692b2790";
-
-    private static readonly MongoId[] _batteryIds = [_aaBatteryId, _cr2032BatteryId, _cr123ABatteryId];
-
     private Dictionary<string, LazyLoad<Dictionary<string, string>>> _globalLocales;
 
     public Task OnLoad()
@@ -61,10 +55,10 @@ public class BatteriesNotIncluded(
             }
         }
 
-        var itemsToUseBatteries = items
+        var deviceTemplates = items
             .Values
             .Where(i => itemHelper.IsOfBaseclasses(i.Id, _batteryConsumers));
-        AddBatterySlots(itemsToUseBatteries);
+        AddBatterySlots(deviceTemplates);
 
         AddToModPool();
 
@@ -92,7 +86,7 @@ public class BatteriesNotIncluded(
 
         AddBatteryToItemDescription(template.Id, batteryType, deviceData.SlotCount, deviceData.GameRuntimeSecs);
 
-        Slot[] newSlots = new Slot[deviceData.SlotCount];
+        var newSlots = new Slot[deviceData.SlotCount];
         for (var i = 0; i < newSlots.Length; i++)
         {
             newSlots[i] = new Slot()
@@ -127,9 +121,9 @@ public class BatteriesNotIncluded(
 
     private DeviceData GetDeviceData(MongoId deviceId)
     {
-        foreach ((MongoId batteryType, Dictionary<MongoId, DeviceData> deviceDatas) in modConfigContainer.ModConfig.Batteries)
+        foreach (var (batteryType, deviceDatas) in modConfigContainer.ModConfig.Batteries)
         {
-            if (!deviceDatas.TryGetValue(deviceId, out DeviceData deviceData)) continue;
+            if (!deviceDatas.TryGetValue(deviceId, out var deviceData)) continue;
 
             const double maxResourceValue = 100f; // Ideally should come from the battery template
             var gameRuntimeSecs = RuntimeToSeconds(deviceData.RealRuntimeHr) / modConfigContainer.ModConfig.GlobalDrainMult;
@@ -139,6 +133,7 @@ public class BatteriesNotIncluded(
 
             return deviceData;
         }
+
         var defaultData = DeviceData.Default;
         modConfigContainer.ModConfig.Batteries[_cr2032BatteryId].Add(deviceId, defaultData);
         loggerUtil.Warning($"{deviceId}) has no defined battery, defaulting to CR2032");
@@ -147,10 +142,10 @@ public class BatteriesNotIncluded(
 
     private void AddBatteryToItemDescription(MongoId deviceId, MongoId batteryId, int slots, double runtimeSeconds)
     {
-        TimeSpan t = TimeSpan.FromSeconds(runtimeSeconds);
-        int hours = (int)t.TotalHours;
-        int minutes = t.Minutes;
-        string runtime = hours > 0 ? $"{hours}h {minutes:D2}m" : $"{minutes:D2}m";
+        var t = TimeSpan.FromSeconds(runtimeSeconds);
+        var hours = (int)t.TotalHours;
+        var minutes = t.Minutes;
+        var runtime = hours > 0 ? $"{hours}h {minutes:D2}m" : $"{minutes:D2}m";
 
         foreach (var (_, lazyLoadLocale) in _globalLocales)
         {
@@ -169,11 +164,11 @@ public class BatteriesNotIncluded(
     /// </summary>
     private void AddToModPool()
     {
-        foreach ((MongoId batteryId, Dictionary<MongoId, DeviceData> deviceDatas) in modConfigContainer.ModConfig.Batteries)
+        foreach (var (batteryId, deviceDatas) in modConfigContainer.ModConfig.Batteries)
         {
             if (batteryId == MongoId.Empty()) continue;
 
-            foreach ((MongoId deviceId, DeviceData deviceData) in deviceDatas)
+            foreach (var (deviceId, deviceData) in deviceDatas)
             {
                 AddBatteriesToModPool(deviceId, batteryId, deviceData.SlotCount);
             }
@@ -184,9 +179,9 @@ public class BatteriesNotIncluded(
     private void AddBatteriesToModPool(MongoId itemId, MongoId batteryId, int slots)
     {
         var botTypes = databaseService.GetBots().Types;
-        foreach (var (_, value) in botTypes)
+        foreach (var (_, botType) in botTypes)
         {
-            if (value!.BotInventory.Mods.TryGetValue(itemId, out var botMods))
+            if (botType!.BotInventory.Mods.TryGetValue(itemId, out var botMods))
             {
                 for (var i = 0; i < slots; i++)
                 {
@@ -200,7 +195,7 @@ public class BatteriesNotIncluded(
             }
             else
             {
-                var newBotMod = value.BotInventory.Mods[itemId] = [];
+                var newBotMod = botType.BotInventory.Mods[itemId] = [];
                 HashSet<MongoId> botMod = [batteryId];
                 for (var i = 0; i < slots; i++)
                 {
@@ -273,12 +268,12 @@ public class BatteriesNotIncluded(
     }
 
     private static readonly double _logMin = Math.Log10(1d);
-
     private static readonly double _logRange = Math.Log10(100_000d) - _logMin;
 
     /// <summary>
     /// Normalized log interpolation.
     /// Map minimum: 1 hour runtime to <see cref="ModConfig.MinGameRuntime"/>;
+    ///     maximum: 100,000 hours runtime to <see cref="ModConfig.MaxGameRuntime"/>.
     ///     maximum: 100,000 hours runtime to <see cref="ModConfig.MaxGameRuntime"/>.
     /// </summary>
     /// <param name="runtimeHours">Device battery life in hours</param>
@@ -292,6 +287,17 @@ public class BatteriesNotIncluded(
         double factor = (Math.Log10(runtimeHours) - _logMin) / _logRange;
         return (int)(tMin + (tMax - tMin) * factor);
     }
+
+    private static readonly MongoId _aaBatteryId = ItemTpl.BARTER_AA_BATTERY;
+    private static readonly MongoId _cr2032BatteryId = ItemTpl.BARTER_D_SIZE_BATTERY;
+    private static readonly MongoId _cr123ABatteryId = ItemTpl.BARTER_RECHARGEABLE_BATTERY;
+
+    private static readonly MongoId[] _batteryIds =
+    [
+        _aaBatteryId,
+        _cr2032BatteryId,
+        _cr123ABatteryId
+    ];
 
     private static readonly MongoId[] _batteryConsumers =
     [

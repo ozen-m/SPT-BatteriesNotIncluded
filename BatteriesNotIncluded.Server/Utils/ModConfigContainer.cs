@@ -10,7 +10,7 @@ namespace BatteriesNotIncluded.Utils;
 public class ModConfigContainer
 {
     public ModConfig ModConfig { get; }
-    
+
     public string ConfigPath { get; }
 
     public ModConfigContainer(ISptLogger<BatteriesNotIncluded> logger, ModHelper modHelper)

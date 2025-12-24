@@ -19,6 +19,7 @@ public class HeadphoneTemplatePatch : ModulePatch
     [PatchPrefix]
     protected static bool Prefix(HeadphonesItemClass __instance, ref HeadphonesTemplateClass __result)
     {
+        if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!__instance.TryGetItemComponent(out TogglableComponent togglableComponent)) return true;
 
         var manager = Singleton<DeviceManager>.Instance;

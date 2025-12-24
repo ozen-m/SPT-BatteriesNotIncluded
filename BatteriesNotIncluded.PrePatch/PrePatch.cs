@@ -25,9 +25,11 @@ public static class BatteriesNotIncludedPrePatch
             logSource.LogError($"Could not find plugin in path: {pluginPath}. Mod is not installed properly.");
             return;
         }
+        
+        // Won't work for clients without the server files
         var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         var configPath = Path.Combine(assemblyPath, "..", "..", "SPT", "user", "mods", "ozen-BatteriesNotIncluded", "config", "config.jsonc");
-        var config = JsonConvert.DeserializeObject<ModConfig>(File.ReadAllText(configPath));
+        var config = JsonConvert.DeserializeObject<ModConfig>(File.ReadAllText(configPath)) ?? new ModConfig();
 
         // Togglable Component
         var togglableComponentType = assembly.MainModule.GetType("EFT.InventoryLogic.TogglableComponent");

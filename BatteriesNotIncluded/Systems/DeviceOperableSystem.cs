@@ -11,10 +11,10 @@ public class DeviceOperableSystem : BaseSystem
         manager.IsPrevOperable[i] = manager.IsOperable[i];
 
         var slots = manager.BatterySlots[i];
-        manager.IsOperable[i] = GetIsOperable(slots);
+        manager.IsOperable[i] = IsDeviceOperable(slots);
     }
 
-    public static bool GetIsOperable(Slot[] slots)
+    public static bool IsDeviceOperable(Slot[] slots)
     {
         foreach (var slot in slots)
         {

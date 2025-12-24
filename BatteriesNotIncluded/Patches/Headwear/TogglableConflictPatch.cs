@@ -19,17 +19,17 @@ public class TogglableConflictPatch : ModulePatch
     protected static bool Prefix(Player __instance)
     {
         if (__instance.InventoryController.Inventory.Equipment.GetSlot(EquipmentSlot.Headwear).ContainedItem is not CompoundItem containedItem)
+        {
             return false;
+        }
 
         var togglableComponents = containedItem.GetItemComponentsInChildren<TogglableComponent>();
+        foreach (var togglableComponent in togglableComponents)
         {
-            foreach (var togglableComponent in togglableComponents)
-            {
-                if (togglableComponent.Item is HeadphonesItemClass) continue;
+            if (togglableComponent.Item is HeadphonesItemClass) continue;
 
-                _ = __instance.InventoryController.TryRunNetworkTransaction(togglableComponent.Set(!togglableComponent.On, true));
-                return false;
-            }
+            _ = __instance.InventoryController.TryRunNetworkTransaction(togglableComponent.Set(!togglableComponent.On, true));
+            return false;
         }
         return false;
     }

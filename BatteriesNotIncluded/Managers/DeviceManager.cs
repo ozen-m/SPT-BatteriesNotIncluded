@@ -112,7 +112,6 @@ public class DeviceManager : MonoBehaviour
         string itemId = item.Id;
         if (_indexLookup.TryGetValue(itemId, out var existingIndex))
         {
-            // LoggerUtil.Warning($"Item {item.LocalizedShortName()} ({itemId}) already exists, updating");
             return UpdateDevice(existingIndex, item, batterySlots);
         }
 
@@ -123,7 +122,7 @@ public class DeviceManager : MonoBehaviour
         DrainPerSecond.Add(deviceData.DrainPerSecond);
 
         var relatedComponent = GetRelatedComponentToSet(item);
-        var isToggled = DeviceActiveSystem.GetIsToggled(relatedComponent);
+        var isToggled = DeviceActiveSystem.IsDeviceToggled(relatedComponent);
 
         IsOperable.Add(isToggled);
         IsPrevOperable.Add(isToggled);
@@ -289,7 +288,7 @@ public class DeviceManager : MonoBehaviour
     private void RegisterItem(Item item, bool isPlayerItem, Player player)
     {
         if (item is not CompoundItem compoundItem) return;
-        if (!BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData)) return;
+        if (!BatteriesNotIncluded.GetDeviceData(compoundItem.StringTemplateId, out var deviceData)) return;
 
         Slot[] batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
 

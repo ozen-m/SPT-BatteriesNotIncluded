@@ -21,14 +21,14 @@ public class BotBatterySyncSystem : PacketBaseSystem<BotBatteryPacket>
             // Handle case where battery is already existing
             case { Failed: true, Error: Slot.GClass1578 }:
             {
-                if (slot.ContainedItem!.TryGetItemComponent<ResourceComponent>(out var resourceComponent))
-                {
-                    resourceComponent.Value = CurrentPacket.Battery.GetItemComponent<ResourceComponent>()!.Value;
-                }
+                if (!slot.ContainedItem!.TryGetItemComponent<ResourceComponent>(out var resourceComponent)) return;
+
+                resourceComponent.Value = CurrentPacket.Battery.GetItemComponent<ResourceComponent>()!.Value;
+                LoggerUtil.Info($"Set existing battery {slot.ContainedItem} charge to {resourceComponent.Value}");
                 return;
             }
             default:
-                LoggerUtil.Debug($"Set battery {CurrentPacket.Battery} charge to {CurrentPacket.Battery.GetItemComponent<ResourceComponent>()!.Value}");
+                LoggerUtil.Info($"Set battery {slot.ContainedItem} charge to {slot.ContainedItem!.GetItemComponent<ResourceComponent>()?.Value}");
                 return;
         }
     }

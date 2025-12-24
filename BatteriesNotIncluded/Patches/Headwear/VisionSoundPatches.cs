@@ -23,6 +23,7 @@ public class PlayNightVisionSoundPatch : ModulePatch
     [PatchPrefix]
     protected static bool Prefix(Player __instance, AudioClip ___NightVisionOn, AudioClip ___NightVisionOff, Vector3 ___SpeechLocalPosition)
     {
+        if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!__instance.IsYourPlayer) return true;
 
         var manager = Singleton<DeviceManager>.Instance;
@@ -43,6 +44,7 @@ public class PlayThermalVisionSoundPatch : ModulePatch
     [PatchPrefix]
     protected static bool Prefix(Player __instance, AudioClip ___ThermalVisionOn, AudioClip ___ThermalVisionOff, Vector3 ___SpeechLocalPosition)
     {
+        if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!__instance.IsYourPlayer) return true;
 
         var manager = Singleton<DeviceManager>.Instance;

@@ -16,8 +16,8 @@ public class GetHeadLightStatePatch : ModulePatch
     [PatchPostfix]
     protected static void Postfix(LightComponent __instance, bool toggleActive, bool switchMod, ref FirearmLightStateStruct __result)
     {
+        if (!Singleton<DeviceManager>.Instantiated) return;
         if (!toggleActive) return;
-
         if (!__result.IsActive) return;
 
         // If player wants light on but has no/drained batteries, don't allow

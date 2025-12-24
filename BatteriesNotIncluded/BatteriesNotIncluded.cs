@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BatteriesNotIncluded.External;
 using BatteriesNotIncluded.Models;
+using BatteriesNotIncluded.Patches;
 using BatteriesNotIncluded.Patches.Earpiece;
 using BatteriesNotIncluded.Patches.Headwear;
 using BatteriesNotIncluded.Patches.LifeCycle;
@@ -44,8 +45,8 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
         CheckForPrepatch();
 
-        ShowRemainingBattery = Config.Bind("General", "Remaining Battery Tooltip", true, new ConfigDescription("Show remaining battery when hovering over a device", null, new ConfigurationManagerAttributes() { Order = 1 }));
-        DebugLogs = Config.Bind("Debug", "Logging", true, new ConfigDescription("Show debug logs", null, new ConfigurationManagerAttributes() { Order = 0 }));
+        ShowRemainingBattery = Config.Bind("General", "Remaining Battery Tooltip", true, new ConfigDescription("Show remaining runtime when hovering over a device", null, new ConfigurationManagerAttributes() { Order = 1 }));
+        DebugLogs = Config.Bind("Debug", "Logging", true /* TODO: disable on release */, new ConfigDescription("Show debug logs", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 0 }));
 
         Fika.IsFikaPresent = Chainloader.PluginInfos.ContainsKey("com.fika.core");
 
@@ -63,7 +64,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
     private static async Task GetConfigFromServerAsync()
     {
-        string errorMsg = "Could not get configuration from server. Disabling mod Batteries Not Included";
+        string errorMsg = "Could not get configuration from the server. Disabling mod Batteries Not Included";
         bool error = false;
         try
         {
@@ -100,6 +101,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
     public static void DisablePatches()
     {
+        new TooltipPatch().Disable();
         new GetHeadLightStatePatch().Disable();
         new SetLightsStatePatch().Disable();
         new UpdateBeamsPatch().Disable();

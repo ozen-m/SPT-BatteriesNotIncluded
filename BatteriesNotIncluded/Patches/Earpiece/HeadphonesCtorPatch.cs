@@ -32,6 +32,9 @@ public class HeadphonesCtorPatchPatch : ModulePatch
         {
             var togglable = new TogglableComponent(__instance);
             __instance.Components.Add(togglable);
+
+            // Default to on state
+            togglable.Set(true, false, true);
         }
     }
 }

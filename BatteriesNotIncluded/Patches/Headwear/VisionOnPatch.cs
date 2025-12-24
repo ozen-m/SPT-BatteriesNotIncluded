@@ -22,6 +22,7 @@ public class NightVisionOnPatch : ModulePatch
     [PatchPrefix]
     protected static bool Prefix(NightVision __instance, bool on)
     {
+        if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!on) return true;
 
         NightVisionComponent component = GamePlayerOwner.MyPlayer.NightVisionObserver.Component;

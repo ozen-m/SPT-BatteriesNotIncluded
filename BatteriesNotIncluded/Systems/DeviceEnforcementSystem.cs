@@ -30,13 +30,14 @@ public class DeviceEnforcementSystem : BaseSystem
                     lightComponent.IsActive = false;
                     SetLightState(lightComponent);
                 }
-                // else if (isToggled)
-                // {
-                //     // Replaced with new batteries while toggled on.
-                //     // Different approach when it comes to tac devices (see SetLightsStatePatch)
-                //     // since tac devices cannot be "on" while not emitting lights.
-                // }
-
+                /*
+                 else if (isToggled)
+                {
+                    // Replaced with new batteries while toggled on.
+                    // Different approach when it comes to tac devices (see SetLightsStatePatch)
+                    // since tac devices cannot be "on" while not emitting lights.
+                }
+                */
                 return;
             }
             case NightVisionComponent nightVisionComponent:

@@ -11,10 +11,10 @@ public class DeviceActiveSystem : BaseSystem
         manager.IsPrevActive[i] = manager.IsActive[i];
 
         var component = manager.RelatedComponentRef[i];
-        manager.IsActive[i] = manager.IsOperable[i] && GetIsToggled(component);
+        manager.IsActive[i] = manager.IsOperable[i] && IsDeviceToggled(component);
     }
 
-    public static bool GetIsToggled(GClass3379 component)
+    public static bool IsDeviceToggled(GClass3379 component)
     {
         bool isToggled = component switch
         {

@@ -33,7 +33,7 @@ public class SightModVisualHandler
     }
 
     /// <summary>
-    ///  Remove null controllers, used OnGameStart.
+    /// Remove null controllers, used OnGameStart.
     /// I'm assuming these are templates of controllers added before the start of the game.
     /// </summary>
     public void RemoveDestroyedControllers()

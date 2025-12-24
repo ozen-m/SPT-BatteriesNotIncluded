@@ -41,7 +41,6 @@ public class DeviceSyncServerManager : BaseSyncManager
 
         _unsubscribeActions.Add(DeviceManager.SubscribeToOnDeviceStateChanged(SendDeviceStatePacket));
         _unsubscribeActions.Add(DeviceManager.SubscribeToOnDrainResource(SendResourceDrainPacket));
-
         DeviceManager.OnAddBatteryToSlot += SendBotBatteryPacket;
         _unsubscribeActions.Add(() => DeviceManager.OnAddBatteryToSlot -= SendBotBatteryPacket);
     }
