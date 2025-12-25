@@ -2,6 +2,7 @@
 using BatteriesNotIncluded.Models;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Utils;
 
 namespace BatteriesNotIncluded.Utils;
@@ -28,6 +29,25 @@ public class ModConfigContainer
             ModConfig = new ModConfig();
             logger.Error(ex.ToString());
             logger.Error("[Batteries Not Included] Exception while trying to load configuration file, disabling mod.");
+        }
+
+        try
+        {
+            if (!ModConfig.Enabled) return;
+
+            var customDevices = modHelper.GetJsonDataFromFile<Dictionary<MongoId, Dictionary<MongoId, DeviceData>>>(ConfigPath, "customDevices.jsonc");
+            foreach (var (batteryId, deviceDatas) in customDevices)
+            {
+                foreach (var (deviceId, deviceData) in deviceDatas)
+                {
+                    ModConfig.DeviceBatteryData[batteryId][deviceId] = deviceData;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.Warning(ex.Message);
+            logger.Warning("[Batteries Not Included] Exception while trying to mod compatibility file.");
         }
     }
 }

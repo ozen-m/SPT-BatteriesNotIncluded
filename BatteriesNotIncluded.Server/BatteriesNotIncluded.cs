@@ -121,7 +121,7 @@ public class BatteriesNotIncluded(
 
     private DeviceData GetDeviceData(MongoId deviceId)
     {
-        foreach (var (batteryType, deviceDatas) in modConfigContainer.ModConfig.Batteries)
+        foreach (var (batteryType, deviceDatas) in modConfigContainer.ModConfig.DeviceBatteryData)
         {
             if (!deviceDatas.TryGetValue(deviceId, out var deviceData)) continue;
 
@@ -135,7 +135,7 @@ public class BatteriesNotIncluded(
         }
 
         var defaultData = DeviceData.Default;
-        modConfigContainer.ModConfig.Batteries[_cr2032BatteryId].Add(deviceId, defaultData);
+        modConfigContainer.ModConfig.DeviceBatteryData[_cr2032BatteryId].Add(deviceId, defaultData);
         loggerUtil.Warning($"{deviceId}) has no defined battery, defaulting to CR2032");
         return defaultData;
     }
@@ -164,7 +164,7 @@ public class BatteriesNotIncluded(
     /// </summary>
     private void AddToModPool()
     {
-        foreach (var (batteryId, deviceDatas) in modConfigContainer.ModConfig.Batteries)
+        foreach (var (batteryId, deviceDatas) in modConfigContainer.ModConfig.DeviceBatteryData)
         {
             if (batteryId == MongoId.Empty()) continue;
 

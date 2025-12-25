@@ -26,6 +26,6 @@ public record ModConfig
     [JsonPropertyName("debugLogs")]
     public bool DebugLogs { get; set; } = true; // TODO: Set false on release
 
-    [JsonPropertyName("batteries")]
-    public Dictionary<MongoId, Dictionary<MongoId, DeviceData>> Batteries { get; set; } = [];
+    [JsonPropertyName("deviceBatteryData")]
+    public Dictionary<MongoId, Dictionary<MongoId, DeviceData>> DeviceBatteryData { get; set; } = [];
 }
