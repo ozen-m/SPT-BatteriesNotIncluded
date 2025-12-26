@@ -25,10 +25,12 @@ public class PlayNightVisionSoundPatch : ModulePatch
     {
         if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!__instance.IsYourPlayer) return true;
+        
+        NightVisionComponent component = __instance.NightVisionObserver.Component;
+        if (component?.Item is null) return true;
 
         var manager = Singleton<DeviceManager>.Instance;
-        NightVisionComponent component = __instance.NightVisionObserver.Component;
-        var shouldPlayOnSound = component != null && (component.Togglable == null || component.Togglable.On && manager.GetIsOperable(component.Item));
+        var shouldPlayOnSound = component.Togglable == null || component.Togglable.On && manager.GetIsOperable(component.Item);
         __instance.PlayToggleSound(shouldPlayOnSound ? ___NightVisionOn : ___NightVisionOff, ___SpeechLocalPosition);
         return false;
     }
@@ -47,9 +49,11 @@ public class PlayThermalVisionSoundPatch : ModulePatch
         if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!__instance.IsYourPlayer) return true;
 
-        var manager = Singleton<DeviceManager>.Instance;
         ThermalVisionComponent component = __instance.ThermalVisionObserver.Component;
-        var shouldPlayOnSound = component != null && (component.Togglable == null || component.Togglable.On && manager.GetIsOperable(component.Item));
+        if (component?.Item is null) return true;
+        
+        var manager = Singleton<DeviceManager>.Instance;
+        var shouldPlayOnSound = component.Togglable == null || component.Togglable.On && manager.GetIsOperable(component.Item);
         __instance.PlayToggleSound(shouldPlayOnSound ? ___ThermalVisionOn : ___ThermalVisionOff, ___SpeechLocalPosition);
         return false;
     }

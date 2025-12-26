@@ -26,7 +26,9 @@ public class NightVisionOnPatch : ModulePatch
         if (!on) return true;
 
         NightVisionComponent component = GamePlayerOwner.MyPlayer.NightVisionObserver.Component;
-        if (component is not null && !Singleton<DeviceManager>.Instance.GetIsOperable(component.Item))
+        if (component?.Item is null) return true;
+
+        if (!Singleton<DeviceManager>.Instance.GetIsOperable(component.Item))
         {
             // Skip turning on components, but enable mask
             __instance.TextureMask.TryToEnable(__instance, true);
@@ -50,10 +52,13 @@ public class ThermalVisionOnPatch : ModulePatch
     [PatchPrefix]
     protected static bool Prefix(ThermalVision __instance, bool on)
     {
+        if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!on) return true;
 
         ThermalVisionComponent component = GamePlayerOwner.MyPlayer.ThermalVisionObserver.Component;
-        if (component is not null && !Singleton<DeviceManager>.Instance.GetIsOperable(component.Item))
+        if (component?.Item is null) return true;
+
+        if (!Singleton<DeviceManager>.Instance.GetIsOperable(component.Item))
         {
             // Skip turning on components, but enable mask
             __instance.TextureMask.TryToEnable(__instance, true);
