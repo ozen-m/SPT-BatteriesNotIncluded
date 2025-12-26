@@ -3,13 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BatteriesNotIncluded.External;
 using BatteriesNotIncluded.Models;
-using BatteriesNotIncluded.Patches;
-using BatteriesNotIncluded.Patches.Earpiece;
-using BatteriesNotIncluded.Patches.Headwear;
-using BatteriesNotIncluded.Patches.LifeCycle;
-using BatteriesNotIncluded.Patches.Sight;
-using BatteriesNotIncluded.Patches.Tactical;
-using BatteriesNotIncluded.Patches.Tactical.Bot;
 using BatteriesNotIncluded.Utils;
 using BepInEx;
 using BepInEx.Bootstrap;
@@ -62,6 +55,8 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     public static RangedInt GetBotRange(WildSpawnType wildSpawnType) =>
         _botBatteries.GetValueOrDefault(wildSpawnType, _defaultRange);
 
+    public static void DisablePatches() => _patchManager.DisablePatches();
+
     private static async Task GetConfigFromServerAsync()
     {
         string errorMsg = "Could not get configuration files from the server. Disabled mod Batteries Not Included.";
@@ -96,28 +91,6 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         }
 
         LoggerUtil.Info($"Successfully fetched {_deviceData.Count} battery operated devices!");
-    }
-
-    public static void DisablePatches()
-    {
-        // _patchManager.DisablePatches();
-
-        new TooltipPatch().Disable();
-        new GetHeadLightStatePatch().Disable();
-        new SetLightsStatePatch().Disable();
-        new UpdateBeamsPatch().Disable();
-        new TurnOnPatch().Disable();
-        new CaptureSightControllerPatch().Disable();
-        new SightsChangePatch().Disable();
-        new SightsItemCtorPatch().Disable();
-        new GameWorldCreatePatch().Disable();
-        new TogglableConflictPatch().Disable();
-        new NightVisionOnPatch().Disable();
-        new ThermalVisionOnPatch().Disable();
-        new PlayNightVisionSoundPatch().Disable();
-        new PlayThermalVisionSoundPatch().Disable();
-        new HeadphonesCtorPatchPatch().Disable();
-        new HeadphoneTemplatePatch().Disable();
     }
 
     private static void CheckForPrepatch()
