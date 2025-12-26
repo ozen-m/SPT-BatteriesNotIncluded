@@ -5,6 +5,7 @@ using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
+using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
 using SPTarkov.Server.Core.Utils.Json;
@@ -61,6 +62,7 @@ public class BatteriesNotIncluded(
         AddBatterySlots(deviceTemplates);
 
         AddToModPool();
+        AddJaegerTrades();
 
         loggerUtil.Success("loaded successfully!");
         return Task.CompletedTask;
@@ -203,6 +205,95 @@ public class BatteriesNotIncluded(
                 }
             }
         }
+    }
+
+    private void AddJaegerTrades()
+    {
+        var jaeger = databaseService.GetTrader(Traders.JAEGER)!;
+
+        // CR2032 Trade
+        var cr2032TradeId = new MongoId("694e8f4d475bbd094c3533ed");
+        jaeger.Assort.Items.Add(new Item
+        {
+            Id = cr2032TradeId,
+            Template = _cr2032BatteryId,
+            ParentId = "hideout",
+            SlotId = "hideout",
+            Upd = new Upd
+            {
+                StackObjectsCount = 9999999d,
+                BuyRestrictionMax = 4,
+                BuyRestrictionCurrent = 0
+            }
+        });
+        List<List<BarterScheme>> cr2032Barter =
+        [
+            [
+                new BarterScheme
+                {
+                    Count = 3d,
+                    Template = _cr2032BatteryId
+                }
+            ]
+        ];
+        jaeger.Assort.BarterScheme[cr2032TradeId] = cr2032Barter;
+        jaeger.Assort.LoyalLevelItems[cr2032TradeId] = 1;
+
+        // CR123A Trade
+        var cr123ATradeId = new MongoId("694e91d1ebb9883e123533ee");
+        jaeger.Assort.Items.Add(new Item
+        {
+            Id = cr123ATradeId,
+            Template = _cr123ABatteryId,
+            ParentId = "hideout",
+            SlotId = "hideout",
+            Upd = new Upd
+            {
+                StackObjectsCount = 9999999d,
+                BuyRestrictionMax = 4,
+                BuyRestrictionCurrent = 0
+            }
+        });
+        List<List<BarterScheme>> cr123ABarter =
+        [
+            [
+                new BarterScheme
+                {
+                    Count = 4d,
+                    Template = _cr123ABatteryId
+                }
+            ]
+        ];
+        jaeger.Assort.BarterScheme[cr123ATradeId] = cr123ABarter;
+        jaeger.Assort.LoyalLevelItems[cr123ATradeId] = 1;
+
+        // AA Trade
+        var aaTradeId = new MongoId("694e91d46640bf29153533ef");
+        jaeger.Assort.Items.Add(new Item
+        {
+            Id = aaTradeId,
+            Template = _aaBatteryId,
+            ParentId = "hideout",
+            SlotId = "hideout",
+            Upd = new Upd
+            {
+                StackObjectsCount = 9999999d,
+                BuyRestrictionMax = 4,
+                BuyRestrictionCurrent = 0
+            }
+        });
+        List<List<BarterScheme>> aaBarter =
+        [
+            [
+                new BarterScheme
+                {
+                    Count = 3d,
+                    Template = _aaBatteryId
+                }
+            ]
+        ];
+        jaeger.Assort.BarterScheme[aaTradeId] = aaBarter;
+        jaeger.Assort.LoyalLevelItems[aaTradeId] = 1;
     }
 
     private void LoadLocales(string localesPath)
