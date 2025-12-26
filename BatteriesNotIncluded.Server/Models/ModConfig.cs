@@ -24,7 +24,7 @@ public record ModConfig
     public Dictionary<WildSpawnType, MinMax<int>> BotBatteries { get; set; } = [];
 
     [JsonPropertyName("debugLogs")]
-    public bool DebugLogs { get; set; } = true; // TODO: Set false on release
+    public bool DebugLogs { get; set; } = false;
 
     [JsonPropertyName("deviceBatteryData")]
     public Dictionary<MongoId, Dictionary<MongoId, DeviceData>> DeviceBatteryData { get; set; } = [];

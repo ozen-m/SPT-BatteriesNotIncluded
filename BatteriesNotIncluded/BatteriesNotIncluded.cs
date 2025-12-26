@@ -37,7 +37,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     private static Dictionary<string, DeviceData> _deviceData = [];
     private static Dictionary<WildSpawnType, RangedInt> _botBatteries = [];
 
-    private PatchManager _patchManager;
+    private static PatchManager _patchManager;
 
     protected void Awake()
     {
@@ -46,7 +46,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         CheckForPrepatch();
 
         ShowRemainingBattery = Config.Bind("General", "Remaining Battery Tooltip", true, new ConfigDescription("Show remaining runtime when hovering over a device", null, new ConfigurationManagerAttributes() { Order = 1 }));
-        DebugLogs = Config.Bind("Debug", "Logging", true /* TODO: disable on release */, new ConfigDescription("Show debug logs", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 0 }));
+        DebugLogs = Config.Bind("Debug", "Logging", false, new ConfigDescription("Show debug logs", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 0 }));
 
         Fika.IsFikaPresent = Chainloader.PluginInfos.ContainsKey("com.fika.core");
 
@@ -64,7 +64,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
     private static async Task GetConfigFromServerAsync()
     {
-        string errorMsg = "Could not get configuration from the server. Disabling mod Batteries Not Included";
+        string errorMsg = "Could not get configuration files from the server. Disabled mod Batteries Not Included.";
         bool error = false;
         try
         {
@@ -82,15 +82,14 @@ public class BatteriesNotIncluded : BaseUnityPlugin
                 error = true;
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            errorMsg = $"{ex}\n{errorMsg}";
+            errorMsg = $"{errorMsg}";
             error = true;
         }
 
         if (error)
         {
-            // _patchManager.DisablePatches(); // SPT Bug?
             DisablePatches();
             LoggerUtil.Error(errorMsg);
             return;
@@ -101,6 +100,8 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
     public static void DisablePatches()
     {
+        // _patchManager.DisablePatches();
+
         new TooltipPatch().Disable();
         new GetHeadLightStatePatch().Disable();
         new SetLightsStatePatch().Disable();
@@ -108,14 +109,14 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         new TurnOnPatch().Disable();
         new CaptureSightControllerPatch().Disable();
         new SightsChangePatch().Disable();
-        // new SightsItemCtorPatch().Disable();
+        new SightsItemCtorPatch().Disable();
         new GameWorldCreatePatch().Disable();
         new TogglableConflictPatch().Disable();
         new NightVisionOnPatch().Disable();
         new ThermalVisionOnPatch().Disable();
         new PlayNightVisionSoundPatch().Disable();
         new PlayThermalVisionSoundPatch().Disable();
-        // new HeadphonesCtorPatchPatch().Disable();
+        new HeadphonesCtorPatchPatch().Disable();
         new HeadphoneTemplatePatch().Disable();
     }
 

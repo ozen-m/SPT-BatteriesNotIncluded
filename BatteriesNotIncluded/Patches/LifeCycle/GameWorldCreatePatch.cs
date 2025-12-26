@@ -28,8 +28,8 @@ public class GameWorldCreatePatch : ModulePatch
         Fika.IsFikaSyncPresent = Chainloader.PluginInfos.ContainsKey("com.ozen.batteriesnotincluded.fikasync");
         if (Fika.IsFikaPresent && !Fika.IsFikaSyncPresent)
         {
-            LoggerUtil.Error("Fika is present but the sync addon is not, please install the sync addon. Disabling mod Batteries Not Included");
             BatteriesNotIncluded.DisablePatches();
+            LoggerUtil.Error("Fika is present but the sync addon is missing, please install the sync addon. Disabled mod Batteries Not Included.");
             return;
         }
 
