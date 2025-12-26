@@ -1,86 +1,113 @@
-﻿{
-    // Included mods:
-    // - Artem
-    // - Epic's All in One
-    // - Eco's Attachment Emporium
-    // - C11 - True North
-    // - Canted Aim
-    // - Peltor TEP-300
+﻿// Included mods:
+// - Artem
+// - Epic's All in One
+// - Eco's Attachment Emporium
+// - C11 - True North
+// - Canted Aim
+// - Peltor TEP-300
+// - WTT - Armory
+// - WTT - Content Backport
 
-    "590a358486f77429692b2790": {
-        "66326bfd46817c660d015146": {"slots": 4, "runtime": 14},
-        "66326bfd46817c660d01512e": {"slots": 5, "runtime": 14},
-        "66326bfd46817c660d015148": {"slots": 6, "runtime": 14},
-        "7ca248803b89788492384ba2": {"runtime": 1000},
-        "41e97223a2ad6374a096ae14": {"runtime": 1000},
-        "2e31bdb165e6f6f7ac19b0d8": {"runtime": 1800},
-        "8d9e9ff3020f92eb5fc46680": {"runtime": 1800},
-        "35adebfd2014a2861056138b": {"runtime": 1800},
-        "0377e32842c4024a423c472e": {"runtime": 100000},
-        "81fb194d053a4ccedce3782d": {"runtime": 100000},
-        "22345a1c542354f86796efda": {"runtime": 1500},
-        "a5c171496c1870f205a3c972": {"runtime": 1500},
-        "253279f21f3222961c5dfa8d": {"runtime": 9},
-        "c569fa63e462980552ecdc77": {"runtime": 9},
-        "1de63dfb52c91ccb9dd2c83a": {"runtime": 3.5},
-        "b1c1a92264b2e9c5dc64506e": {"slots": 2, "runtime": 3},
-        "c0e0bac29a8c50eff201f00e": {"runtime": 3},
-        "51ef8504f4a2e4d2029ff682": {"runtime": 3},
-        "a681a1c93529b1fb2118488a": {"runtime": 3},
-        "673dee1aa998f18003f111f5": {"runtime": 3},
-        "bb4bb5d7e4f3ad7a1f19571e": {"runtime": 3},
-        "e727709694036c1f49f234e6": {"runtime": 3},
-        "d62cced77df83a0683e38fbc": {"runtime": 4},
-        "d4f59f06b5099086743e3b62": {"runtime": 4},
-        "8fb322f5202cf87746ec83b4": {"runtime": 4},
-        "68d7db2929420f94ff04cb15": {"runtime": 6},
-        "690f48891a9f90e0500b1f51": {"runtime": 1},
-        "690f48891a9f90e0500b1f53": {"runtime": 1}
-    },
+{
+    // Devices that use AA Battery.
     "5672cb124bdc2d1a0f8b4568": {
+        // Device item ID
+        "0257250579c25ee07a7fd721": {
+            // Number of battery slots the device needs to operate. Will default to 1 if omitted.
+            "slots": 1,
+            // Battery life of device with real time hours of continuous use.
+            "runtime": 5
+        },
+        "026dfdb287f69c3025f0f728": {"runtime": 50000},
+        "03f6c86c56945862820e1006": {"runtime": 80000},
+        "0ce051265bcb619558b2ef9a": {"runtime": 5},
+        "252d9d1d2552909d0a76033c": {"slots": 2, "runtime": 120},
+        "2589a5a2424122404cf3a94c": {"runtime": 50000},
+        "5ae3d18efa17cbd51e898ced": {"runtime": 200},
+        "5b6e75274d865619855c447a": {"slots": 2, "runtime": 120},
+        "66bf757f27d0b097db0ace48": {"slots": 2, "runtime": 250},
         "66bf757f27d0b097db0ace49": {"slots": 2, "runtime": 250},
-        "66bf757f27d0b097db0ace48": {"slots": 3, "runtime": 250},
-        "674f340a7dba6c637c00a76c": {"slots": 2, "runtime": 100},
-        "66bf757f27d0b097db0ace4a": {"slots": 3, "runtime": 250},
+        "66bf757f27d0b097db0ace4a": {"slots": 2, "runtime": 250},
         "674e4ef58257d9804d145885": {"slots": 2, "runtime": 100},
+        "674f340a7dba6c637c00a76c": {"slots": 2, "runtime": 100},
         "674f35e08578c7579fcb9970": {"slots": 2, "runtime": 100},
         "674f627197d32e9e3b16d465": {"slots": 2, "runtime": 100},
         "67548853f1ba8ca2b34fa4d0": {"runtime": 16},
         "6754946b62f4db9c0404bd2b": {"runtime": 16},
-        "2589a5a2424122404cf3a94c": {"runtime": 50000},
-        "026dfdb287f69c3025f0f728": {"runtime": 50000},
-        "cd54f04eb7f0410772acbf35": {"slots": 2, "runtime": 120},
-        "252d9d1d2552909d0a76033c": {"slots": 2, "runtime": 120},
-        "7e6c09774462ad3ef5025f08": {"slots": 2, "runtime": 120},
-        "5b6e75274d865619855c447a": {"slots": 2, "runtime": 120},
+        "689b889473ebd6871805edd6": {"runtime": 16},
+        "68bf405779c8186398099017": {"runtime": 53},
+        "69092d17ce2a0e0cfe00d860": {"runtime": 53},
+        "6917c23f71eb4b42ea95584b": {"slots": 2, "runtime": 200},
+        "693bb59250fafa102607aeb7": {"slots": 2, "runtime": 350},
         "77f31a56076dc8e398797a7c": {"runtime": 5},
-        "0257250579c25ee07a7fd721": {"runtime": 5},
-        "0ce051265bcb619558b2ef9a": {"runtime": 5},
-        "e99dbf09963efebab19a118b": {"runtime": 5},
-        "6917c23f71eb4b42ea95584b": {"slots": 2, "runtime": 200}
+        "7e6c09774462ad3ef5025f08": {"slots": 2, "runtime": 120},
+        "cd54f04eb7f0410772acbf35": {"slots": 2, "runtime": 120},
+        "e99dbf09963efebab19a118b": {"runtime": 5}
     },
+    // CR2032
     "5672cb304bdc2dc2088b456a": {
-        "08940f5c853aa6acf4049bc2": {"runtime": 50000},
         "013a6d4ff28f8e4331898d68": {"runtime": 1500},
+        "08940f5c853aa6acf4049bc2": {"runtime": 50000},
         "20c6ee849ac15cb4e31472c9": {"slots": 2, "runtime": 850},
-        "dd7caf9bd203b146528c8da4": {"runtime": 50000},
         "36c4b709b7b9465d6e875d35": {"runtime": 50000},
         "3f18b9a4a43e2c071b08179a": {"runtime": 2500},
-        "69092d17ce2a0e0cfe00d860": {"runtime": 53}
+        "68a5ac69b55a6b93c20a2bc7": {"runtime": 4000},
+        "688b44cb28bf8d85cd0ff108": {"runtime": 3000},
+        "688b4bd81cef2a61d0052738": {"runtime": 3000},
+        "69413241b1ce1e5fbb09ed0a": {"slots": 2, "runtime": 400},
+        "dd7caf9bd203b146528c8da4": {"runtime": 50000}
     },
+    // CR123A
+    "590a358486f77429692b2790": {
+        "0377e32842c4024a423c472e": {"runtime": 100000},
+        "1de63dfb52c91ccb9dd2c83a": {"runtime": 3.5},
+        "22345a1c542354f86796efda": {"runtime": 1500},
+        "253279f21f3222961c5dfa8d": {"runtime": 9},
+        "2e31bdb165e6f6f7ac19b0d8": {"runtime": 1800},
+        "35adebfd2014a2861056138b": {"runtime": 1800},
+        "41e97223a2ad6374a096ae14": {"runtime": 1000},
+        "51ef8504f4a2e4d2029ff682": {"runtime": 3},
+        "66326bfd46817c660d01512e": {"slots": 4, "runtime": 14},
+        "66326bfd46817c660d015146": {"slots": 4, "runtime": 14},
+        "66326bfd46817c660d015148": {"slots": 4, "runtime": 14},
+        "673dee1aa998f18003f111f5": {"runtime": 3},
+        "68a5ab09c44fa287ba0a97b5": {"runtime": 13000},
+        "68b9cf84c826940d2b684dad": {"slots": 2, "runtime": 0.5},
+        "68bedc0365e7dcf94f0cb0fc": {"runtime": 6},
+        "68d739c05eadd47b0e4617a7": {"runtime": 4},
+        "68d7db2929420f94ff04cb15": {"runtime": 6},
+        "689c887cd18a3665b8045743": {"slots": 2, "runtime": 1.25},
+        "690f48891a9f90e0500b1f51": {"runtime": 1},
+        "690f48891a9f90e0500b1f53": {"runtime": 1},
+        "7ca248803b89788492384ba2": {"runtime": 1000},
+        "81fb194d053a4ccedce3782d": {"runtime": 100000},
+        "8d9e9ff3020f92eb5fc46680": {"runtime": 1800},
+        "a5c171496c1870f205a3c972": {"runtime": 1500},
+        "a681a1c93529b1fb2118488a": {"runtime": 3},
+        "b1c1a92264b2e9c5dc64506e": {"slots": 2, "runtime": 3},
+        "bb4bb5d7e4f3ad7a1f19571e": {"runtime": 3},
+        "c0e0bac29a8c50eff201f00e": {"runtime": 3},
+        "c569fa63e462980552ecdc77": {"runtime": 9},
+        "d4f59f06b5099086743e3b62": {"runtime": 4},
+        "d62cced77df83a0683e38fbc": {"runtime": 4},
+        "e727709694036c1f49f234e6": {"runtime": 3},
+        "8fb322f5202cf87746ec83b4": {"runtime": 4}
+    },
+    // Devices that do not need batteries to operate
     "000000000000000000000000": {
-        "c26f2af872656829feb27c08": {},
-        "877f002b7dadc7ae31d1fda1": {},
-        "6917c1976cf46fb7b4ffd866": {},
-        "6917bfb870f5e5d6aea8165d": {},
-        "69069986473b8fd5e80545f3": {},
+        "688a0b38467521f9080693a3": {},
         "68c6e7ae55918f7c4f044d53": {},
-        "68c734bdcac1ff3d420fceb5": {},
-        "68c734bdcac1ff3d420fceb4": {},
         "68c6e7ae55918f7c4f044d54": {},
-        "68c72885cac1ff3d420fceb2": {},
         "68c72885cac1ff3d420fceb1": {},
+        "68c72885cac1ff3d420fceb2": {},
+        "68c734bdcac1ff3d420fceb4": {},
+        "68c734bdcac1ff3d420fceb5": {},
+        "69069986473b8fd5e80545f3": {},
+        "6917bfb870f5e5d6aea8165d": {},
+        "6917c1976cf46fb7b4ffd866": {},
         "692af926d829da17240a60d4": {},
-        "68d7db2929420f94ff04cb16": {}
+        "877f002b7dadc7ae31d1fda1": {},
+        "68d7db2929420f94ff04cb16": {},
+        "c26f2af872656829feb27c08": {}
     }
 }

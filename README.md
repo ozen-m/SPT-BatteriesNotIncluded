@@ -28,19 +28,22 @@ Thank you [DrakiaXYZ](https://forge.sp-tarkov.com/user/27605/drakiaxyz) for the 
 ### Configuration
 #### Server Side
 In the `config.jsonc` file:
-- `globalDrainMultiplier` - A global drain multiplier applied at the end. A higher value results in a faster drain. Default is `1.0`
+- `globalDrainMultiplier` - A global drain multiplier applied. A higher value results in a faster drain. Default is `1.0`
 - `minGameRuntime` - Minimum game runtime for devices in seconds. This is equivalent to real 1 hour runtime. Default is `900 seconds (15 minutes)`
 - `maxGameRuntime` - Minimum game runtime for devices in seconds. This is equivalent to real 100,000 hours runtime. Default is `9,000 seconds (2.5 hours)`
 - `botBatteries` - Adjust battery charge spawned for bots. Default for PMCs min: `50`; max: `100`, Scavs min: `20`; max: `60`
+- `debugLogs` - Enable debug logging. Default is `false`.
 - `saveSightsState` - Ability to save sights toggle state. Default is `false`, sights are automatically turned on when spawning. **_WARNING_**: _Currently breaks icons for NVGs/Thermal goggles, and will require clearing of temp files through the launcher when changed_
-- `batteries` - Specifies which battery a device uses, along with how many batteries are needed to operate, and the battery life of the device in hours. See `config.jsonc` for examples
+
+In the `customDevices.jsonc` file:
+- This file is used for adding device properties for custom items from mods - Specifies which battery a device uses, with how many batteries are needed to operate, and the battery life of the device in hours. See file itself for examples
 
 #### Client Side
 In the BepInEx configuration manager (<kbd>F12</kbd>)
 - `Remaining Battery Tooltip` - Shows the remaining runtime when hovering over a device. Default is `true`
 
 ### Compatibility
-- Mods that add custom devices are compatible. These will default to use CR2032 batteries, unless added to the `config.jsonc`. I will try as much to support all custom devices and fill in the required properties.
+- Mods that add custom devices are compatible. These will default to use CR2032 batteries, if not found in the `customDevices.jsonc` configuration file. I will try as much to support all custom devices and fill in the required properties.
 - [Project Fika](https://forge.sp-tarkov.com/mod/2326/project-fika) is compatible with the use of the sync addon
 
 ### Support
@@ -51,6 +54,7 @@ If you find any bugs, issues, feature suggestions, or have balancing suggestions
 
 #### Future Plans
 - Tactical device drain based on current mode: light/laser/IR
+- Disable only the reticle for optic sights
 
 </details>
 
@@ -58,8 +62,8 @@ If you find any bugs, issues, feature suggestions, or have balancing suggestions
 <details>
   <summary>Credits</summary>
 
-- Thanks to [Jiro](https://forge.sp-tarkov.com/user/32217/jiro) for the existing bundles and especially the original mod!
-- Thanks to [Birgere](https://forge.sp-tarkov.com/user/59606/birgere) for allowing me to work on this and for his version of the mod, which made porting and introducing changes easier!
+- Thanks to [Jiro](https://forge.sp-tarkov.com/user/32217/jiro) for the existing bundles and especially for creating the original mod!
+- Thanks to [Birgere](https://forge.sp-tarkov.com/user/59606/birgere) for allowing me to work on this, and for his version of the mod, which made porting and introducing changes easier!
 </details>
 
 _**Disclaimer:** I will not be held responsible for any injuries caused by fully depleted batteries, including but not limited to - loss of optics, illumination, night vision, or active hearing. Please carry extra batteries._

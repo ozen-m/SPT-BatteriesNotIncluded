@@ -9,7 +9,7 @@ using SPT.Reflection.Patching;
 
 namespace BatteriesNotIncluded.FikaSync;
 
-[BepInPlugin("com.ozen.batteriesnotincluded.fikasync", "Batteries Not Included Fika Sync", "0.0.1")]
+[BepInPlugin("com.ozen.batteriesnotincluded.fikasync", "Batteries Not Included Fika Sync", "1.0.0")]
 [BepInDependency("com.ozen.batteriesnotincluded")]
 [BepInDependency("com.fika.core")]
 public class BatteriesNotIncludedSync : BaseUnityPlugin

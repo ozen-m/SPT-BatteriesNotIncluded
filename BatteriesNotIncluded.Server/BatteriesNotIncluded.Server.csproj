@@ -5,7 +5,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <Version>0.0.1</Version>
+    <Version>1.0.0</Version>
     <Authors>ozen</Authors>
     <RepositoryUrl>https://github.com/ozen-m/SPT-BatteriesNotIncluded</RepositoryUrl>
     <AssemblyName>$(Authors)-$(RootNamespace)</AssemblyName>
@@ -38,7 +38,6 @@
     <ItemGroup>
       <ModRoot Include="$(TargetPath)" />
       <Config Include="$(TargetDir)config\**\*" />
-      <Config Include="$(TargetDir)config\config.jsonc" />
       <Bundles Include="$(TargetDir)bundles\**\*" />
       <ModRoot Include="$(TargetDir)bundles.json" />
       <PDB Include="$(TargetDir)$(TargetName).pdb" Condition="'$(Configuration)' != 'Release'" />

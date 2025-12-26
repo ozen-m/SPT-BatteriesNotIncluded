@@ -136,7 +136,7 @@ public class BatteriesNotIncluded(
 
         var defaultData = DeviceData.Default;
         modConfigContainer.ModConfig.DeviceBatteryData[_cr2032BatteryId].Add(deviceId, defaultData);
-        loggerUtil.Warning($"{deviceId}) has no defined battery, defaulting to CR2032");
+        loggerUtil.Warning($"{itemHelper.GetItemName(deviceId)} ({deviceId}) has no defined battery, defaulting to CR2032");
         return defaultData;
     }
 
