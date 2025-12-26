@@ -19,6 +19,9 @@
             "min": 60
         }
     },
+    // Allow batteries in the SICC Case
+    "siccContainerBatteries": true,
+
     // ADVANCED
     // Enable debug logging
     "debugLogs": false,

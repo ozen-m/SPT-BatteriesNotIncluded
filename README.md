@@ -9,7 +9,7 @@ Devices now require batteries!
 - Dedicated Battery Slots: All Headsets, Holographic/Reflex Sights, NVDs, and Tactical Devices, now feature dedicated battery slots
 - Batteries: CR123A Battery which replaces the Rechargeable Battery, CR2032 Battery which replaces D Size Battery, and AA Battery
 - Active Drain: Power is consumed when the device is switched *ON*
-- Battery Depletion: Battery is drained based on the device's manufacturer stated estimated battery life (if found) which is mapped to gameplay runtime. Defaults to a minimum of 15 minutes and to a maximum of 2.5 hours.
+- Battery Depletion: Battery is drained based on the device's manufacturer stated estimated battery life (if found) which is mapped to gameplay runtime
 - Togglable Mechanic: Adds a new togglable component to devices for headsets and sights
 - Device Description: Item description lists the required and number of batteries needed for the device to function; also indicated is the runtime of the device with a full charge
 - Bot Batteries: Bots spawn with batteries for their devices, with a random charge that depends on the bot's level if they're a PMC, a Scav, or a Boss
@@ -30,13 +30,14 @@ Thank you [DrakiaXYZ](https://forge.sp-tarkov.com/user/27605/drakiaxyz) for the 
 In the `config.jsonc` file:
 - `globalDrainMultiplier` - A global drain multiplier applied. A higher value results in a faster drain. Default is `1.0`
 - `minGameRuntime` - Minimum game runtime for devices in seconds. This is equivalent to real 1 hour runtime. Default is `900 seconds (15 minutes)`
-- `maxGameRuntime` - Minimum game runtime for devices in seconds. This is equivalent to real 100,000 hours runtime. Default is `9,000 seconds (2.5 hours)`
+- `maxGameRuntime` - Maximum game runtime for devices in seconds. This is equivalent to real 100,000 hours runtime. Default is `9,000 seconds (2.5 hours)`
 - `botBatteries` - Adjust battery charge spawned for bots. Default for PMCs min: `50`; max: `100`, Scavs min: `20`; max: `60`
+- `siccContainerBatteries` - Allow batteries in the SICC Case if enabled. Default is `true`.
 - `debugLogs` - Enable debug logging. Default is `false`.
 - `saveSightsState` - Ability to save sights toggle state. Default is `false`, sights are automatically turned on when spawning. **_WARNING_**: _Currently breaks icons for NVGs/Thermal goggles, and will require clearing of temp files through the launcher when changed_
 
 In the `customDevices.jsonc` file:
-- This file is used for adding device properties for custom items from mods - Specifies which battery a device uses, with how many batteries are needed to operate, and the battery life of the device in hours. See file itself for examples
+- This file is used for adding device properties for custom items from mods - Specifies which battery a device uses, with how many batteries are needed to operate, and the battery life of the device in hours. See _file itself_ for examples
 
 #### Client Side
 In the BepInEx configuration manager (<kbd>F12</kbd>)
@@ -66,4 +67,4 @@ If you find any bugs, issues, feature suggestions, or have balancing suggestions
 - Thanks to [Birgere](https://forge.sp-tarkov.com/user/59606/birgere) for allowing me to work on this, and for his version of the mod, which made porting and introducing changes easier!
 </details>
 
-_**Disclaimer:** I will not be held responsible for any injuries caused by fully depleted batteries, including but not limited to - loss of optics, illumination, night vision, or active hearing. Please carry extra batteries._
+_**Disclaimer:** I will not be held responsible for any injuries resulting from the loss of optics, illumination, night vision, or active hearing. Please carry extra batteries._

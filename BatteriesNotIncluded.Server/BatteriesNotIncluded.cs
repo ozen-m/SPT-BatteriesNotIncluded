@@ -63,6 +63,7 @@ public class BatteriesNotIncluded(
 
         AddToModPool();
         AddJaegerTrades();
+        AddBatteriesToSicc(items.GetValueOrDefault(ItemTpl.CONTAINER_SICC));
 
         loggerUtil.Success("loaded successfully!");
         return Task.CompletedTask;
@@ -294,6 +295,14 @@ public class BatteriesNotIncluded(
         ];
         jaeger.Assort.BarterScheme[aaTradeId] = aaBarter;
         jaeger.Assort.LoyalLevelItems[aaTradeId] = 1;
+    }
+
+    private void AddBatteriesToSicc(TemplateItem item)
+    {
+        if (!modConfigContainer.ModConfig.SiccContainerBatteries) return;
+        if (item.Id != ItemTpl.CONTAINER_SICC) return;
+
+        item.Properties?.Grids?.FirstOrDefault()?.Properties?.Filters?.FirstOrDefault()?.Filter?.UnionWith(_batteryIds);
     }
 
     private void LoadLocales(string localesPath)
