@@ -6,6 +6,7 @@ using BepInEx.Bootstrap;
 using Comfort.Common;
 using EFT;
 using SPT.Reflection.Patching;
+using UnityEngine;
 
 namespace BatteriesNotIncluded.Patches.LifeCycle;
 
@@ -21,8 +22,9 @@ public class GameWorldCreatePatch : ModulePatch
     {
         if (Singleton<DeviceManager>.Instantiated)
         {
-            LoggerUtil.Error("DeviceManager already instantiated");
-            return;
+            // Probably only caused by the hideout
+            LoggerUtil.Info("DeviceManager already instantiated, destroying.");
+            Object.DestroyImmediate(Singleton<DeviceManager>.Instance);
         }
 
         Fika.IsFikaSyncPresent = Chainloader.PluginInfos.ContainsKey("com.ozen.batteriesnotincluded.fikasync");
