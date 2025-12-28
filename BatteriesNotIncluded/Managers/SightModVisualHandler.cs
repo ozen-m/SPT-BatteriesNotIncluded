@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using BatteriesNotIncluded.Patches.Sight;
 using BatteriesNotIncluded.Utils;
+using EFT.CameraControl;
 using HarmonyLib;
+using UnityEngine;
 
 namespace BatteriesNotIncluded.Managers;
 
@@ -10,6 +12,7 @@ public class SightModVisualHandler
     private readonly DeviceManager _deviceManager;
     private readonly HashSet<SightModVisualControllers> _controllers = [];
     private readonly HashSet<SightModVisualControllers> _invalidControllers = [];
+    private readonly Dictionary<OpticSight, Texture> _opticSightTextureCache = [];
 
     /// <summary>
     /// Key: Device item ID, Value: List of controllers (can be multiple, say UI window renders)
@@ -19,7 +22,7 @@ public class SightModVisualHandler
     public SightModVisualHandler(DeviceManager manager)
     {
         _deviceManager = manager;
-        CaptureSightControllerPatch.OnUpdateSightMode += AddController;
+        CaptureSightControllerPatch.OnSetSightMode += AddController;
     }
 
     public void UpdateSightVisibility(string itemId, bool shouldBeActive)
@@ -49,7 +52,7 @@ public class SightModVisualHandler
 
     public void Cleanup()
     {
-        CaptureSightControllerPatch.OnUpdateSightMode -= AddController;
+        CaptureSightControllerPatch.OnSetSightMode -= AddController;
     }
 
     private void AddController(SightModVisualControllers controller)
@@ -81,7 +84,7 @@ public class SightModVisualHandler
     private bool IsExisting(SightModVisualControllers controller) =>
         _controllers.Contains(controller) || _invalidControllers.Contains(controller);
 
-    private static void UpdateSightVisibilityInternal(SightModVisualControllers controller, bool shouldBeActive)
+    private void UpdateSightVisibilityInternal(SightModVisualControllers controller, bool shouldBeActive)
     {
         var scopePrefabCache = _scopePrefabCacheField(controller);
         var scopeModeInfos = _scopeModeInfosField(scopePrefabCache);
@@ -92,16 +95,31 @@ public class SightModVisualHandler
             {
                 collimatorSight.gameObject.SetActive(shouldBeActive);
             }
+
             var opticSight = scopeModeInfo.OpticSight;
             if (opticSight != null)
             {
-                // opticSight.enabled = shouldBeActive;
-                opticSight.LensFade(!shouldBeActive);
+                // If it's a thermal/nvg sight, the whole sight.
+                if (controller.SightMod.Item is SpecialScopeItemClass)
+                {
+                    opticSight.LensFade(!shouldBeActive);
+                    continue;
+                }
 
-                // TODO: Find a way to only disable the reticle
+                // Cache the reticle texture since we're setting it to null if optic is disabled.
+                if (!_opticSightTextureCache.TryGetValue(opticSight, out var texture))
+                {
+                    texture = opticSight.LensRenderer.sharedMaterial.GetTexture(_markTex);
+                    _opticSightTextureCache.Add(opticSight, texture);
+                }
+
+                // Only the reticle
+                opticSight.LensRenderer.sharedMaterial.SetTexture(_markTex, shouldBeActive ? texture : null);
             }
         }
     }
+
+    private static readonly int _markTex = Shader.PropertyToID("_MarkTex");
 
     private static readonly AccessTools.FieldRef<SightModVisualControllers, ScopePrefabCache> _scopePrefabCacheField =
         AccessTools.FieldRefAccess<SightModVisualControllers, ScopePrefabCache>("scopePrefabCache_0");

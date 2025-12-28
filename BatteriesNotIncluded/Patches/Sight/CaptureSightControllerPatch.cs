@@ -9,7 +9,7 @@ namespace BatteriesNotIncluded.Patches.Sight;
 /// </summary>
 public class CaptureSightControllerPatch : ModulePatch
 {
-    public static event Action<SightModVisualControllers> OnUpdateSightMode;
+    public static event Action<SightModVisualControllers> OnSetSightMode;
 
     protected override MethodBase GetTargetMethod()
     {
@@ -21,6 +21,6 @@ public class CaptureSightControllerPatch : ModulePatch
     [PatchPostfix]
     protected static void Postfix(SightModVisualControllers __instance)
     {
-        OnUpdateSightMode?.Invoke(__instance);
+        OnSetSightMode?.Invoke(__instance);
     }
 }
