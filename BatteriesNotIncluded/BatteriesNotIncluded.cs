@@ -19,7 +19,7 @@ using SPT.Reflection.Patching;
 
 namespace BatteriesNotIncluded;
 
-[BepInPlugin("com.ozen.batteriesnotincluded", "Batteries Not Included", "1.0.0")]
+[BepInPlugin("com.ozen.batteriesnotincluded", "Batteries Not Included", "1.0.1")]
 [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
 public class BatteriesNotIncluded : BaseUnityPlugin
 {
@@ -59,7 +59,6 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
     private static async Task GetConfigFromServerAsync()
     {
-        string errorMsg = "Could not get configuration files from the server. Disabled mod Batteries Not Included.";
         bool error = false;
         try
         {
@@ -79,14 +78,13 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         }
         catch (Exception)
         {
-            errorMsg = $"{errorMsg}";
             error = true;
         }
 
         if (error)
         {
             DisablePatches();
-            LoggerUtil.Error(errorMsg);
+            LoggerUtil.Error("Could not get configuration files from the server. Disabled mod Batteries Not Included.");
             return;
         }
 

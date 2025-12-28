@@ -12,7 +12,7 @@ public class BatteriesCallbacks(HttpResponseUtil httpResponseUtil, ModConfigCont
     public ValueTask<string> GetDeviceDataAsync(string url, EmptyRequestData info, MongoId sessionID)
     {
         var payload = modConfigContainer.ModConfig.DeviceBatteryData
-            .Where(d => d.Key != "000000000000000000000000")
+            .Where(d => d.Key != MongoId.Empty())
             .SelectMany(devices => devices.Value)
             .ToDictionary();
         return new ValueTask<string>(httpResponseUtil.NoBody(payload));

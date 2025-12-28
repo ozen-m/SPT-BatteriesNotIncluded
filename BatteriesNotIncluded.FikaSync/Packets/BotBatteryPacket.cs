@@ -1,5 +1,4 @@
-﻿using System;
-using BatteriesNotIncluded.FikaSync.Managers;
+﻿using BatteriesNotIncluded.FikaSync.Managers;
 using BatteriesNotIncluded.FikaSync.Pools;
 using EFT.InventoryLogic;
 using Fika.Core.Main.Players;
