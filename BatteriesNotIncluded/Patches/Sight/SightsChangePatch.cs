@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 using BatteriesNotIncluded.Managers;
 using Comfort.Common;
 using EFT.Animations;
@@ -18,9 +17,10 @@ public class SightsChangePatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(ProceduralWeaponAnimation __instance, List<ProceduralWeaponAnimation.SightNBone> ____optics)
+    protected static void Postfix(ProceduralWeaponAnimation __instance)
     {
         if (!Singleton<DeviceManager>.Instantiated) return;
+        if (!__instance.FirstPersonPointOfView) return;
 
         var manager = Singleton<DeviceManager>.Instance;
         foreach (var sight in __instance.ScopeAimTransforms)
