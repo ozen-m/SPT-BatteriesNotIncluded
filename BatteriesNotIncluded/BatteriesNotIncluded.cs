@@ -101,17 +101,8 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         {
             // Ignored
         }
-        try
-        {
-            SightsTogglableField = AccessTools.FieldRefAccess<SightsItemClass, TogglableComponent>("Togglable");
-        }
-        catch
-        {
-            // Ignored
-        }
     }
 
     public static AccessTools.FieldRef<HeadphonesItemClass, TogglableComponent> HeadphonesTogglableField;
-    public static AccessTools.FieldRef<SightsItemClass, TogglableComponent> SightsTogglableField;
     private static readonly RangedInt _defaultRange = new(40, 60);
 }

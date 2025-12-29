@@ -15,8 +15,6 @@ public static class BatteriesNotIncludedPrePatch
 
     public static void Patch(AssemblyDefinition assembly)
     {
-        // TODO: Find a way to not break NVG/Thermal icons
-
         var patcherPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         var pluginPath = Path.Combine(patcherPath!, "..", "plugins", "ozen-BatteriesNotIncluded.dll");
         var logSource = Logger.CreateLogSource("Batteries Not Included");
@@ -24,19 +22,6 @@ public static class BatteriesNotIncludedPrePatch
         {
             logSource.LogError($"Could not find plugin in path: {pluginPath}. Mod is not installed properly.");
             return;
-        }
-
-        ModConfig config;
-        try
-        {
-            // Won't work for clients without the server files
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var configPath = Path.Combine(assemblyPath, "..", "..", "SPT", "user", "mods", "ozen-BatteriesNotIncluded", "config", "config.jsonc");
-            config = JsonConvert.DeserializeObject<ModConfig>(File.ReadAllText(configPath)) ?? new ModConfig();
-        }
-        catch
-        {
-            config = new ModConfig();
         }
 
         // Togglable Component
@@ -56,20 +41,6 @@ public static class BatteriesNotIncludedPrePatch
         var headphonesAttribute = new CustomAttribute(componentAttributeCtor);
         headphonesTogglableField.CustomAttributes.Add(headphonesAttribute);
         headphonesItemType.Fields.Add(headphonesTogglableField);
-
-        if (config.SaveSightsState)
-        {
-            // Sights
-            var sightsItemType = assembly.MainModule.GetType("SightsItemClass");
-            var sightsTogglableField = new FieldDefinition(
-                "Togglable",
-                FieldAttributes.Public,
-                togglableComponentType
-            );
-            var sightsAttribute = new CustomAttribute(componentAttributeCtor);
-            sightsItemType.Fields.Add(sightsTogglableField);
-            sightsTogglableField.CustomAttributes.Add(sightsAttribute);
-        }
 
         logSource.LogInfo($"PrePatch complete.");
     }

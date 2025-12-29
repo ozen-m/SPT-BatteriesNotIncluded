@@ -25,8 +25,6 @@
     // ADVANCED
     // Enable debug logging
     "debugLogs": false,
-    // Saves the on/off status of sight devices. WARNING: Currently breaks icons for NVGs/Thermal goggles, and will need clearing of temp files when changed
-    "saveSightsState": false,
     "deviceBatteryData": {
         // AA
         "5672cb124bdc2d1a0f8b4568": {

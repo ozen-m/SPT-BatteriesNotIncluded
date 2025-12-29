@@ -34,7 +34,6 @@ In the `config.jsonc` file:
 - `botBatteries` - Adjust battery charge spawned for bots. Default for PMCs min: `50`; max: `100`, Scavs min: `20`; max: `60`
 - `siccContainerBatteries` - Allow batteries in the SICC Case if enabled. Default is `true`.
 - `debugLogs` - Enable debug logging. Default is `false`.
-- `saveSightsState` - Ability to save sights toggle state. Default is `false`, sights are automatically turned on when spawning. **_WARNING_**: _Currently breaks icons for NVGs/Thermal goggles, and will require clearing of temp files through the launcher when changed_
 
 In the `customDevices.jsonc` file:
 - This file is used for adding device properties for custom items from mods - Specifies which battery a device uses, with how many batteries are needed to operate, and the battery life of the device in hours. See _file itself_ for examples
