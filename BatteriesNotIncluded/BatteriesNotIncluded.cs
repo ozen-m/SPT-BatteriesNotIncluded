@@ -27,7 +27,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     public static ConfigEntry<bool> ShowRemainingBattery;
     public static ConfigEntry<bool> DebugLogs;
 
-    private static Dictionary<string, DeviceData> _deviceData = [];
+    private static Dictionary<string, DeviceData> _deviceBatteryData = [];
     private static Dictionary<WildSpawnType, RangedInt> _botBatteries = [];
 
     private static PatchManager _patchManager;
@@ -49,8 +49,8 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         _ = Task.Run(() => _ = GetConfigFromServerAsync());
     }
 
-    public static bool GetDeviceData(string deviceId, out DeviceData deviceData) =>
-        _deviceData.TryGetValue(deviceId, out deviceData);
+    public static bool GetDeviceData(string templateId, out DeviceData deviceData) =>
+        _deviceBatteryData.TryGetValue(templateId, out deviceData);
 
     public static RangedInt GetBotRange(WildSpawnType wildSpawnType) =>
         _botBatteries.GetValueOrDefault(wildSpawnType, _defaultRange);
@@ -62,16 +62,17 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         bool error = false;
         try
         {
-            string deviceData = await RequestHandler.GetJsonAsync("/BatteriesNotIncluded/GetDeviceData");
-            string botBatteries = await RequestHandler.GetJsonAsync("/BatteriesNotIncluded/GetBotBatteries");
-            if (string.IsNullOrWhiteSpace(deviceData) || string.IsNullOrWhiteSpace(botBatteries))
+            string json = await RequestHandler.GetJsonAsync("/BatteriesNotIncluded/GetConfig");
+            if (string.IsNullOrWhiteSpace(json))
             {
                 error = true;
             }
 
-            _deviceData = JsonConvert.DeserializeObject<Dictionary<string, DeviceData>>(deviceData!);
-            _botBatteries = JsonConvert.DeserializeObject<Dictionary<WildSpawnType, RangedInt>>(botBatteries!);
-            if (_deviceData.IsNullOrEmpty() || _botBatteries.IsNullOrEmpty())
+            var modConfig = JsonConvert.DeserializeObject<ModConfig>(json!);
+            _deviceBatteryData = modConfig.DeviceBatteryData;
+            _botBatteries = modConfig.BotBatteries;
+
+            if (_deviceBatteryData.IsNullOrEmpty() || _botBatteries.IsNullOrEmpty())
             {
                 error = true;
             }
@@ -88,7 +89,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
             return;
         }
 
-        LoggerUtil.Info($"Successfully fetched {_deviceData.Count} battery operated devices!");
+        LoggerUtil.Info($"Successfully fetched {_deviceBatteryData.Count} battery operated devices!");
     }
 
     private static void CheckForPrepatch()

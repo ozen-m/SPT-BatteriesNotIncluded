@@ -12,12 +12,8 @@ public class BatteriesRouter(BatteriesCallbacks batteriesCallbacks, JsonUtil jso
         jsonUtil,
         [
             new RouteAction<EmptyRequestData>(
-                "/BatteriesNotIncluded/GetDeviceData",
-                async (url, info, sessionId, output) => await batteriesCallbacks.GetDeviceDataAsync(url, info, sessionId)
-            ),
-            new RouteAction<EmptyRequestData>(
-                "/BatteriesNotIncluded/GetBotBatteries",
-                async (url, info, sessionId, output) => await batteriesCallbacks.GetBotBatteriesAsync(url, info, sessionId)
+                "/BatteriesNotIncluded/GetConfig",
+                async (url, info, sessionId, output) => await batteriesCallbacks.GetConfigAsync(url, info, sessionId)
             )
         ])
 {

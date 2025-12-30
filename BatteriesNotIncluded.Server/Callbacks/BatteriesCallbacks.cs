@@ -9,17 +9,16 @@ namespace BatteriesNotIncluded.Callbacks;
 [Injectable]
 public class BatteriesCallbacks(HttpResponseUtil httpResponseUtil, ModConfigContainer modConfigContainer)
 {
-    public ValueTask<string> GetDeviceDataAsync(string url, EmptyRequestData info, MongoId sessionID)
+    public ValueTask<string> GetConfigAsync(string url, EmptyRequestData info, MongoId sessionID)
     {
-        var payload = modConfigContainer.ModConfig.DeviceBatteryData
-            .Where(d => d.Key != MongoId.Empty())
-            .SelectMany(devices => devices.Value)
-            .ToDictionary();
+        var payload = new
+        {
+            DeviceBatteryData = modConfigContainer.ModConfig.DeviceBatteryData
+                .Where(d => d.Key != MongoId.Empty())
+                .SelectMany(devices => devices.Value)
+                .ToDictionary(),
+            botBatteries = modConfigContainer.ModConfig.BotBatteries,
+        };
         return new ValueTask<string>(httpResponseUtil.NoBody(payload));
-    }
-
-    public ValueTask<string> GetBotBatteriesAsync(string url, EmptyRequestData info, MongoId sessionID)
-    {
-        return new ValueTask<string>(httpResponseUtil.NoBody(modConfigContainer.ModConfig.BotBatteries));
     }
 }
