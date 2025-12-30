@@ -19,21 +19,22 @@ public class BatteriesNotIncluded(
     LoggerUtil loggerUtil,
     JsonUtil jsonUtil,
     DatabaseService databaseService,
-    ItemHelper itemHelper
+    ItemHelper itemHelper,
+    ServerLocalisationService localeService
 ) : IOnLoad
 {
     private Dictionary<string, LazyLoad<Dictionary<string, string>>> _globalLocales;
 
     public Task OnLoad()
     {
-        if (!modConfigContainer.ModConfig.Enabled)
-        {
-            loggerUtil.Warning("is disabled");
-            return Task.CompletedTask;
-        }
-
         var localesPath = Path.Combine(modConfigContainer.ConfigPath, "locales");
         LoadLocales(localesPath);
+
+        if (!modConfigContainer.ModConfig.Enabled)
+        {
+            loggerUtil.Warning(localeService.GetText("load-disabled"));
+            return Task.CompletedTask;
+        }
 
         Dictionary<MongoId, TemplateItem> items = databaseService.GetItems();
         foreach (var batteryId in _batteryIds)
@@ -63,10 +64,10 @@ public class BatteriesNotIncluded(
 
         ConvertTacticalDevicesDrain();
         AddToModPool();
-        AddJaegerTrades();
+        AddBarterTrades();
         AddBatteriesToSicc(items.GetValueOrDefault(ItemTpl.CONTAINER_SICC));
 
-        loggerUtil.Success("loaded successfully!");
+        loggerUtil.Success(localeService.GetText("load-success"));
         return Task.CompletedTask;
     }
 
@@ -79,7 +80,7 @@ public class BatteriesNotIncluded(
             .ForAll(i => ProcessTemplate(i, ref counter));
 
         _globalLocales = null;
-        loggerUtil.Info($"Added battery slots to {counter} items");
+        loggerUtil.Info(localeService.GetText("process-total_devices", counter));
     }
 
     private void ProcessTemplate(TemplateItem template, ref int counter)
@@ -120,7 +121,14 @@ public class BatteriesNotIncluded(
             : newSlots;
 
         Interlocked.Increment(ref counter);
-        loggerUtil.Debug($"{itemHelper.GetItemName(template.Id)} ({template.Id}) added slot with compatible battery {itemHelper.GetItemName(batteryType)} ({(int)(deviceData.GameRuntimeSecs / 60d)}m)");
+        loggerUtil.Debug(localeService.GetText("process-add_battery_slot", new
+        {
+            deviceName = itemHelper.GetItemName(template.Id),
+            deviceId = template.Id,
+            slotCount = deviceData.SlotCount,
+            batteryName = itemHelper.GetItemName(batteryType),
+            runtime = (int)(deviceData.GameRuntimeSecs / 60d)
+        }));
     }
 
     private DeviceData GetDeviceData(MongoId deviceId)
@@ -140,7 +148,11 @@ public class BatteriesNotIncluded(
 
         var defaultData = DeviceData.Default;
         modConfigContainer.ModConfig.DeviceBatteryData[_cr2032BatteryId].Add(deviceId, defaultData);
-        loggerUtil.Warning($"{itemHelper.GetItemName(deviceId)} ({deviceId}) has no defined battery, defaulting to CR2032");
+        loggerUtil.Warning(localeService.GetText("process-default_battery", new
+        {
+            deviceName = itemHelper.GetItemName(deviceId),
+            deviceId
+        }));
         return defaultData;
     }
 
@@ -155,7 +167,9 @@ public class BatteriesNotIncluded(
         {
             lazyLoadLocale.AddTransformer((localeData) =>
             {
-                localeData[$"{deviceId} Description"] = $"Uses {slots}x {localeData[$"{batteryId} Name"]}\nHas a runtime of {runtime}\n\n{localeData[$"{deviceId} Description"]}";
+                var slotsLocalized = ReplacePlaceholder(localeData["description-slots"], slots);
+                var runtimeLocalized = ReplacePlaceholder(localeData["description-runtime"], runtime);
+                localeData[$"{deviceId} Description"] = $"{slotsLocalized} {localeData[$"{batteryId} Name"]}\n{runtimeLocalized}\n\n{localeData[$"{deviceId} Description"]}";
 
                 return localeData;
             });
@@ -186,7 +200,7 @@ public class BatteriesNotIncluded(
                 AddBatteriesToModPool(deviceId, batteryId, deviceData.SlotCount);
             }
         }
-        loggerUtil.Info($"Added batteries to mod pools");
+        loggerUtil.Debug(localeService.GetText("process-mod_pools"));
     }
 
     private void AddBatteriesToModPool(MongoId itemId, MongoId batteryId, int slots)
@@ -218,7 +232,7 @@ public class BatteriesNotIncluded(
         }
     }
 
-    private void AddJaegerTrades()
+    private void AddBarterTrades()
     {
         var jaeger = databaseService.GetTrader(Traders.JAEGER)!;
 
@@ -305,6 +319,8 @@ public class BatteriesNotIncluded(
         ];
         jaeger.Assort.BarterScheme[aaTradeId] = aaBarter;
         jaeger.Assort.LoyalLevelItems[aaTradeId] = 1;
+
+        loggerUtil.Debug(localeService.GetText("process-barter_trades"));
     }
 
     private void AddBatteriesToSicc(TemplateItem item)
@@ -313,6 +329,8 @@ public class BatteriesNotIncluded(
         if (item.Id != ItemTpl.CONTAINER_SICC) return;
 
         item.Properties?.Grids?.FirstOrDefault()?.Properties?.Filters?.FirstOrDefault()?.Filter?.UnionWith(_batteryIds);
+
+        loggerUtil.Debug(localeService.GetText("process-sicc_container"));
     }
 
     private void LoadLocales(string localesPath)
@@ -353,8 +371,6 @@ public class BatteriesNotIncluded(
                     {
                         localeData[key] = value;
                     }
-                    localeData["TURNOFF"] = "TURN OFF"; // FLIP UP
-                    localeData["TURNON"] = "TURN ON"; // FLIP DOWN
 
                     return localeData;
                 });
@@ -368,13 +384,20 @@ public class BatteriesNotIncluded(
                     {
                         localeData[key] = value;
                     }
-                    localeData["TURNOFF"] = "TURN OFF"; // FLIP UP
-                    localeData["TURNON"] = "TURN ON"; // FLIP DOWN
 
                     return localeData;
                 });
             }
         }
+    }
+
+    /// <summary>
+    ///  SPT Code: <see cref="ServerLocalisationService.GetLocalised"/>
+    /// </summary>
+    private static string ReplacePlaceholder<T>(string text, T value)
+        where T : IConvertible
+    {
+        return text.Replace("%s", value?.ToString() ?? string.Empty);
     }
 
     private static readonly double _logMin = Math.Log10(1d);

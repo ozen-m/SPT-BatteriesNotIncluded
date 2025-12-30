@@ -1,8 +1,20 @@
 {
   "590a358486f77429692b2790 Name": "CR123A Battery",
   "590a358486f77429692b2790 ShortName": "CR123A",
-  "590a358486f77429692b2790 Description": "A compact, high-energy lithium battery commonly used in small electronic devices, tactical devices, and weapon sights. Known for long shelf life and reliable performance under high-drain conditions.",
+  "590a358486f77429692b2790 Description": "A compact, high-energy lithium battery commonly used in small electronic devices, tactical devices, and military-grade sights. Known for its long shelf life and reliable performance.",
   "5672cb304bdc2dc2088b456a Name": "CR2032 Battery",
   "5672cb304bdc2dc2088b456a ShortName": "CR2032",
-  "5672cb304bdc2dc2088b456a Description": "A small, coin-cell lithium battery commonly used in general electronics like watches, calculators, and key fobs. In military applications, it powers devices such as tactical devices, and military-grade sights, providing reliable, long-lasting energy in a compact form factor."
+  "5672cb304bdc2dc2088b456a Description": "A small, coin-cell lithium battery commonly used in general electronics like watches, and calculators. In military applications, it powers devices such as tactical devices, and military-grade sights, providing reliable, long-lasting energy in a compact form factor.",
+  "TURNOFF": "TURN OFF",
+  "TURNON": "TURN ON",
+  "load-disabled": "is disabled",
+  "load-success": "loaded successfully!",
+  "description-slots": "Uses %sx",
+  "description-runtime": "Has a runtime of %s",
+  "process-total_devices": "Added battery slots to %s items",
+  "process-add_battery_slot": "{{deviceName}} ({{deviceId}}) added slots ({{slotCount}}) with compatible battery {{batteryName}} ({{runtime}}m)",
+  "process-default_battery": "{{deviceName}} ({{deviceId}}) has no defined battery, defaulting to CR2032 Battery",
+  "process-mod_pools": "Added batteries to mod pools",
+  "process-barter_trades": "Added battery barter trades",
+  "process-sicc_container": "Added batteries to SICC Container filters"
 }
