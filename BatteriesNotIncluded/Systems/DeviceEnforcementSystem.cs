@@ -28,7 +28,7 @@ public class DeviceEnforcementSystem : BaseSystem
                 {
                     // Removed batteries or battery drained
                     lightComponent.IsActive = false;
-                    SetLightState(lightComponent);
+                    SetLightState(lightComponent, manager);
                 }
                 /*
                  else if (isToggled)
@@ -108,12 +108,7 @@ public class DeviceEnforcementSystem : BaseSystem
         }
     }
 
-    /// <summary>
-    /// Thank you IcyClawz for this code.
-    /// <br></br><see href="https://github.com/IgorEisberg/SPT-ClientMods/blob/main/ItemContextMenuExt/ItemContextMenuExt.cs#L307"/>
-    /// <br></br><see href="https://github.com/IgorEisberg/SPT-ClientMods/blob/main/LICENSE"/>
-    /// </summary>
-    public static void SetLightState(LightComponent lightComponent)
+    public static void SetLightState(LightComponent lightComponent, DeviceManager manager)
     {
         // Skip patch since we're the one calling
         UpdateBeamsPatch.ToSkip = true;
@@ -121,10 +116,8 @@ public class DeviceEnforcementSystem : BaseSystem
         {
             if (lightComponent.Item.Owner is not Player.PlayerInventoryController playerInvCont)
             {
-                // TODO: Dead bots inventory, see ItemContextExtended
-#if DEBUG
-                LoggerUtil.Debug($"Could not find player when turning off light for item {lightComponent.Item.LocalizedShortName()} {lightComponent.Item.Id}");
-#endif
+                // Fallback to internal UpdateBeams
+                manager.TurnOffLightVisibility(lightComponent.Item);
                 return;
             }
 
@@ -147,7 +140,11 @@ public class DeviceEnforcementSystem : BaseSystem
             if (player.HandsController is Player.FirearmController firearmController)
             {
                 firearmController.SetLightsState([lightComponent.GetLightState()], true, false);
+                return;
             }
+
+            // Fallback to internal UpdateBeams
+            manager.TurnOffLightVisibility(lightComponent.Item);
         }
         finally
         {

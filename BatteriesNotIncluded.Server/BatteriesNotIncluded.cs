@@ -61,6 +61,7 @@ public class BatteriesNotIncluded(
             .Where(i => itemHelper.IsOfBaseclasses(i.Id, _batteryConsumers));
         AddBatterySlots(deviceTemplates);
 
+        ConvertTacticalDevicesDrain();
         AddToModPool();
         AddJaegerTrades();
         AddBatteriesToSicc(items.GetValueOrDefault(ItemTpl.CONTAINER_SICC));
@@ -104,7 +105,7 @@ public class BatteriesNotIncluded(
                         new SlotFilter()
                         {
                             Shift = 0d,
-                            Filter = [batteryType],
+                            Filter = [batteryType]
                             // TODO: Multiple battery filters?
                         }
                     ]
@@ -158,6 +159,15 @@ public class BatteriesNotIncluded(
 
                 return localeData;
             });
+        }
+    }
+
+    private void ConvertTacticalDevicesDrain()
+    {
+        foreach (var (mode, hours) in modConfigContainer.ModConfig.TacticalDevicesDrain)
+        {
+            var seconds = RuntimeToSeconds(hours);
+            modConfigContainer.ModConfig.TacticalDevicesDrain[mode] = 100d / seconds;
         }
     }
 

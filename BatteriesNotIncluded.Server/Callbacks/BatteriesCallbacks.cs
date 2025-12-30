@@ -11,6 +11,11 @@ public class BatteriesCallbacks(HttpResponseUtil httpResponseUtil, ModConfigCont
 {
     public ValueTask<string> GetConfigAsync(string url, EmptyRequestData info, MongoId sessionID)
     {
+        if (!modConfigContainer.ModConfig.Enabled)
+        {
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
+        }
+
         var payload = new
         {
             DeviceBatteryData = modConfigContainer.ModConfig.DeviceBatteryData
@@ -18,6 +23,7 @@ public class BatteriesCallbacks(HttpResponseUtil httpResponseUtil, ModConfigCont
                 .SelectMany(devices => devices.Value)
                 .ToDictionary(),
             botBatteries = modConfigContainer.ModConfig.BotBatteries,
+            tacticalDevicesDrain = modConfigContainer.ModConfig.TacticalDevicesDrain
         };
         return new ValueTask<string>(httpResponseUtil.NoBody(payload));
     }

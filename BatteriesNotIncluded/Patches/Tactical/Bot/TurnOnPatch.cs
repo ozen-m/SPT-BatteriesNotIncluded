@@ -6,7 +6,7 @@ using SPT.Reflection.Patching;
 namespace BatteriesNotIncluded.Patches.Tactical.Bot;
 
 /// <summary>
-/// Patch BotLight so that the bot would not continously try to turn on devices with drained batteries
+/// Patch BotLight so that the bot would not continuously try to turn on devices with drained batteries
 /// </summary>
 public class TurnOnPatch : ModulePatch
 {

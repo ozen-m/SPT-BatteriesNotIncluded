@@ -29,6 +29,9 @@ public record ModConfig
     [JsonPropertyName("debugLogs")]
     public bool DebugLogs { get; set; } = false;
 
+    [JsonPropertyName("tacticalDevicesRuntime")]
+    public Dictionary<DeviceMode, double> TacticalDevicesDrain { get; set; } = [];
+
     [JsonPropertyName("deviceBatteryData")]
     public Dictionary<MongoId, Dictionary<MongoId, DeviceData>> DeviceBatteryData { get; set; } = [];
 }

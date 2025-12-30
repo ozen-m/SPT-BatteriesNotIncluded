@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using BatteriesNotIncluded.Managers;
+using Comfort.Common;
 using EFT.InventoryLogic;
 using EFT.UI.DragAndDrop;
 using SPT.Reflection.Patching;
@@ -18,6 +20,23 @@ public class TooltipPatch : ModulePatch
         if (!BatteriesNotIncluded.ShowRemainingBattery.Value) return;
         if (!BatteriesNotIncluded.GetDeviceData(__instance.Item.StringTemplateId, out var data)) return;
 
+        float drainPerSecond;
+        if (__instance.Item is TacticalComboItemClass)
+        {
+            // Tactical devices drain is mode dependent
+            if (!Singleton<DeviceManager>.Instantiated) return;
+
+            var manager = Singleton<DeviceManager>.Instance;
+            var index = manager.GetItemIndex(__instance.Item.Id);
+            if (index == -1) return;
+
+            drainPerSecond = manager.DrainPerSecond[index];
+        }
+        else
+        {
+            drainPerSecond = data.DrainPerSecond;
+        }
+
         var count = 0;
         var min = float.MaxValue;
         foreach (var slot in ((CompoundItem)__instance.Item).Slots)
@@ -34,7 +53,7 @@ public class TooltipPatch : ModulePatch
 
         if (count == data.SlotCount && min > 0f)
         {
-            __result = $"{__result} (~{(int)(min / data.DrainPerSecond / 60f)}m left)";
+            __result = $"{__result} (~{(int)(min / drainPerSecond / 60f)}m left)";
         }
     }
 }

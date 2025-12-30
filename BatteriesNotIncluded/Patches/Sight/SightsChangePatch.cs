@@ -27,15 +27,7 @@ public class SightsChangePatch : ModulePatch
         {
             if (sight.ScopePrefabCache == null) continue;
 
-            var item = sight.Mod.Item;
-#if DEBUG
-            if (manager.IsItemRegistered(item.Id))
-            {
-                manager.UpdateSightVisibility(item);
-            }
-#else
-            manager.UpdateSightVisibility(item);
-#endif
+            manager.UpdateSightVisibility(sight.Mod.Item);
         }
     }
 }

@@ -25,6 +25,16 @@
     // ADVANCED
     // Enable debug logging
     "debugLogs": false,
+    // Tactical devices runtime in real hours
+    "tacticalDevicesRuntime": {
+        "Flashlight": 1.5,
+        "VisibleLaser": 50.0,
+        "Flashlight, VisibleLaser": 1.0,
+        "IRFlood": 8.0,
+        "IRLaser": 50.0,
+        "IRFlood, IRLaser": 6.0,
+        "None": 2.0 // Fallback, this means the device is on but couldn't find which mode
+    },
     "deviceBatteryData": {
         // AA
         "5672cb124bdc2d1a0f8b4568": {

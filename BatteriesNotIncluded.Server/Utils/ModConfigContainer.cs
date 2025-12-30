@@ -47,7 +47,7 @@ public class ModConfigContainer
         catch (Exception ex)
         {
             logger.Warning(ex.Message);
-            logger.Warning("[Batteries Not Included] Exception while trying to mod compatibility file.");
+            logger.Warning("[Batteries Not Included] Exception while trying to process mod compatibility file.");
         }
     }
 }

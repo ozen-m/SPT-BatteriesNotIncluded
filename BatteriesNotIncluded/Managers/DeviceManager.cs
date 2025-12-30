@@ -35,12 +35,14 @@ public class DeviceManager : MonoBehaviour
     private readonly Dictionary<string, int> _indexLookup = [];
 
     private SightModVisualHandler _sightModVisualHandler;
+    private TacticalVisualHandler _tacticalVisualHandler;
     private GameWorld _gameWorld;
     private bool _gameStarted;
 
     public void Start()
     {
         _sightModVisualHandler = new SightModVisualHandler(this);
+        _tacticalVisualHandler = new TacticalVisualHandler(this);
 
         if (Fika.IsFikaClient)
         {
@@ -188,12 +190,16 @@ public class DeviceManager : MonoBehaviour
         var index = GetItemIndex(item);
         if (index == -1) return;
 
-        var togglable = RelatedComponentRef[index] as TogglableComponent;
-#if DEBUG
-        if (togglable is null) LoggerUtil.Error($"Cannot get TogglableComponent of sight {item.ToFullString()}");
-#endif
-        _sightModVisualHandler.UpdateSightVisibility(item.Id, togglable!.On && IsActive[index]);
+        var relatedComponent = RelatedComponentRef[index];
+        if (relatedComponent is TogglableComponent togglable)
+        {
+            _sightModVisualHandler.UpdateSightVisibility(item, togglable!.On && IsActive[index]);
+        }
     }
+
+    public void UpdateDeviceMode(TacticalComboVisualController controller) => _tacticalVisualHandler.UpdateDeviceMode(controller);
+
+    public void TurnOffLightVisibility(Item item) => _tacticalVisualHandler.TurnOffLightVisibility(item);
 
     public bool IsItemRegistered(Item item) => IsItemRegistered(item.Id);
 
@@ -247,6 +253,7 @@ public class DeviceManager : MonoBehaviour
     {
         _gameStarted = true;
         _sightModVisualHandler.RemoveDestroyedControllers();
+        _tacticalVisualHandler.RemoveDestroyedControllers();
         RegisterWorldLootItems();
     }
 

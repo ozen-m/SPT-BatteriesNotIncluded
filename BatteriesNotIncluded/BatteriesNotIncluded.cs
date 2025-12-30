@@ -29,6 +29,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
     private static Dictionary<string, DeviceData> _deviceBatteryData = [];
     private static Dictionary<WildSpawnType, RangedInt> _botBatteries = [];
+    private static Dictionary<DeviceMode, float> _tacticalDevicesDrain = [];
 
     private static PatchManager _patchManager;
 
@@ -55,6 +56,20 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     public static RangedInt GetBotRange(WildSpawnType wildSpawnType) =>
         _botBatteries.GetValueOrDefault(wildSpawnType, _defaultRange);
 
+    public static float GetTacticalDrain(DeviceMode mode)
+    {
+#if DEBUG
+        if (_tacticalDevicesDrain.TryGetValue(mode, out var drain))
+        {
+            return drain;
+        }
+        LoggerUtil.Warning($"No drainPerSecond found for mode: {mode.ToString()}");
+        return 0.011111f;
+#else
+        return _tacticalDevicesDrain.GetValueOrDefault(mode, 0.011111f);
+#endif
+    }
+
     public static void DisablePatches() => _patchManager.DisablePatches();
 
     private static async Task GetConfigFromServerAsync()
@@ -71,8 +86,9 @@ public class BatteriesNotIncluded : BaseUnityPlugin
             var modConfig = JsonConvert.DeserializeObject<ModConfig>(json!);
             _deviceBatteryData = modConfig.DeviceBatteryData;
             _botBatteries = modConfig.BotBatteries;
+            _tacticalDevicesDrain = modConfig.TacticalDevicesDrain;
 
-            if (_deviceBatteryData.IsNullOrEmpty() || _botBatteries.IsNullOrEmpty())
+            if (_deviceBatteryData.IsNullOrEmpty() || _botBatteries.IsNullOrEmpty() || _tacticalDevicesDrain.IsNullOrEmpty())
             {
                 error = true;
             }
