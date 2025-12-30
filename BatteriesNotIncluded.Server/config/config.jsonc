@@ -40,7 +40,6 @@
         "5672cb124bdc2d1a0f8b4568": {
             "5c7d55de2e221644f31bff68": {"runtime": 80000},
             "6113d6c3290d254f5e6b27db": {"runtime": 3768},
-            "622efbcb99f4ea1a4d6c9a15": {"runtime": 100000},
             "65f05b9d39dab9e9ec049cfd": {"slots": 2, "runtime": 2900},
             "6284bd5f95250a29bc628a30": {"runtime": 500},
             "6477772ea8a38bb2050ed4db": {"runtime": 62500},
@@ -139,7 +138,8 @@
         // No Battery
         "000000000000000000000000": {
             "618a5d5852ecee1505530b2a": {},
-            "606f2696f2cb2e02a42aceb1": {}
+            "606f2696f2cb2e02a42aceb1": {},
+            "622efbcb99f4ea1a4d6c9a15": {}
         }
     }
 }
