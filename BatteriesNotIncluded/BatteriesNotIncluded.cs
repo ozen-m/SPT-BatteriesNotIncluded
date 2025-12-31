@@ -27,7 +27,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     public static ConfigEntry<bool> ShowRemainingBattery;
     public static ConfigEntry<bool> DebugLogs;
 
-    private static Dictionary<string, DeviceData> _deviceBatteryData = [];
+    private static Dictionary<MongoID, DeviceData> _deviceBatteryData = [];
     private static Dictionary<WildSpawnType, RangedInt> _botBatteries = [];
     private static Dictionary<DeviceMode, float> _tacticalDevicesDrain = [];
 
@@ -50,7 +50,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         _ = Task.Run(() => _ = GetConfigFromServerAsync());
     }
 
-    public static bool GetDeviceData(string templateId, out DeviceData deviceData) =>
+    public static bool GetDeviceData(MongoID templateId, out DeviceData deviceData) =>
         _deviceBatteryData.TryGetValue(templateId, out deviceData);
 
     public static RangedInt GetBotRange(WildSpawnType wildSpawnType) =>

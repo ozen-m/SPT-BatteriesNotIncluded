@@ -56,7 +56,7 @@ public class DeviceSyncClientManager : BaseSyncManager
 
     private void RegisterItem(Item item)
     {
-        if (!BatteriesNotIncluded.GetDeviceData(item.StringTemplateId, out var deviceData)) return;
+        if (!BatteriesNotIncluded.GetDeviceData(item.TemplateId, out var deviceData)) return;
         if (item is not CompoundItem compoundItem) return;
 
         var batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);

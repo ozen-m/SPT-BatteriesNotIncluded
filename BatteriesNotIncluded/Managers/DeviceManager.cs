@@ -295,7 +295,7 @@ public class DeviceManager : MonoBehaviour
     private void RegisterItem(Item item, bool isPlayerItem, Player player)
     {
         if (item is not CompoundItem compoundItem) return;
-        if (!BatteriesNotIncluded.GetDeviceData(compoundItem.StringTemplateId, out var deviceData)) return;
+        if (!BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData)) return;
 
         Slot[] batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
 

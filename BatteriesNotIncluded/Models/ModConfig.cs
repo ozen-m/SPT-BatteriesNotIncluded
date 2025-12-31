@@ -7,7 +7,7 @@ namespace BatteriesNotIncluded.Models;
 public record ModConfig
 {
     [JsonProperty("deviceBatteryData")]
-    public Dictionary<string, DeviceData> DeviceBatteryData { get; set; } = [];
+    public Dictionary<MongoID, DeviceData> DeviceBatteryData { get; set; } = [];
 
     [JsonProperty("botBatteries")]
     public Dictionary<WildSpawnType, RangedInt> BotBatteries { get; set; } = [];
