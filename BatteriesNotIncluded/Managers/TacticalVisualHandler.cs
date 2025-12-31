@@ -28,16 +28,17 @@ public class TacticalVisualHandler(DeviceManager manager)
         {
             if (!mode.gameObject.activeInHierarchy) continue;
 
-            foreach (var light in mode.GetChildren())
+            for (var i = 0; i < mode.childCount; i++)
             {
+                var light = mode.GetChild(i);
                 var lightName = light.name;
 
                 deviceMode |= lightName switch
                 {
-                    not null when lightName.StartsWith("light_0", StringComparison.OrdinalIgnoreCase) => DeviceMode.Flashlight,
-                    not null when lightName.StartsWith("vis_0", StringComparison.OrdinalIgnoreCase) => DeviceMode.VisibleLaser,
-                    not null when lightName.StartsWith("il_0", StringComparison.OrdinalIgnoreCase) => DeviceMode.IRFlood,
-                    not null when lightName.StartsWith("ir_0", StringComparison.OrdinalIgnoreCase) => DeviceMode.IRLaser,
+                    not null when lightName.StartsWith("light_", StringComparison.OrdinalIgnoreCase) => DeviceMode.Flashlight,
+                    not null when lightName.StartsWith("vis_", StringComparison.OrdinalIgnoreCase) => DeviceMode.VisibleLaser,
+                    not null when lightName.StartsWith("il_", StringComparison.OrdinalIgnoreCase) => DeviceMode.IRFlood,
+                    not null when lightName.StartsWith("ir_", StringComparison.OrdinalIgnoreCase) => DeviceMode.IRLaser,
                     _ => 0
                 };
             }
