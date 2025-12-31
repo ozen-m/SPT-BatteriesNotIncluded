@@ -19,7 +19,7 @@ public class CaptureSightControllerPatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(SightModVisualControllers __instance)
+    public static void Postfix(SightModVisualControllers __instance)
     {
         OnSetSightMode?.Invoke(__instance);
     }

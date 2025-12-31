@@ -18,7 +18,7 @@ public class AddFakeBonePatch : ModulePatch
     }
 
     [PatchPrefix]
-    protected static void Prefix(GClass3248 containerCollection, GClass768 collectionView)
+    public static void Prefix(GClass3248 containerCollection, GClass768 collectionView)
     {
         if (containerCollection.IsBatteryOperated())
         {

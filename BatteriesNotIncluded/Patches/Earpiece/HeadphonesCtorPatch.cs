@@ -17,7 +17,7 @@ public class HeadphonesCtorPatchPatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(HeadphonesItemClass __instance)
+    public static void Postfix(HeadphonesItemClass __instance)
     {
         if (!__instance.IsBatteryOperated()) return;
 

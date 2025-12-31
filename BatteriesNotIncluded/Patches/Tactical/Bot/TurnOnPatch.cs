@@ -16,7 +16,7 @@ public class TurnOnPatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(BotLight __instance)
+    public static void Postfix(BotLight __instance)
     {
         if (!__instance.HaveLight) return;
 

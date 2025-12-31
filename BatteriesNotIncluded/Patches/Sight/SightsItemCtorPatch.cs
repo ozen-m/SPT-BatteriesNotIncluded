@@ -14,7 +14,7 @@ public class SightsItemCtorPatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(SightsItemClass __instance)
+    public static void Postfix(SightsItemClass __instance)
     {
         if (!__instance.IsBatteryOperated()) return;
         if (__instance is NightVisionItemClass or ThermalVisionItemClass) return;

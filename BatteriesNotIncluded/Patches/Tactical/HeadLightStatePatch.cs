@@ -14,7 +14,7 @@ public class GetHeadLightStatePatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(LightComponent __instance, bool toggleActive, bool switchMod, ref FirearmLightStateStruct __result)
+    public static void Postfix(LightComponent __instance, bool toggleActive, bool switchMod, ref FirearmLightStateStruct __result)
     {
         if (!Singleton<DeviceManager>.Instantiated) return;
         if (!toggleActive) return;

@@ -18,7 +18,7 @@ public class GameWorldCreatePatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(GameWorld __result)
+    public static void Postfix(GameWorld __result)
     {
         if (Singleton<DeviceManager>.Instantiated)
         {

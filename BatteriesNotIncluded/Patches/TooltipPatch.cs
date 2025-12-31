@@ -15,7 +15,7 @@ public class TooltipPatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(GridItemView __instance, ref string __result)
+    public static void Postfix(GridItemView __instance, ref string __result)
     {
         if (!BatteriesNotIncluded.ShowRemainingBattery.Value) return;
         if (!BatteriesNotIncluded.GetDeviceData(__instance.Item.TemplateId, out var data)) return;

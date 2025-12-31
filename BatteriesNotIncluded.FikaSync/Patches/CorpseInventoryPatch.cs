@@ -19,7 +19,7 @@ public class CorpseInventoryPatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(ObservedPlayer __instance)
+    public static void Postfix(ObservedPlayer __instance)
     {
         OnCorpseNewInventory?.Invoke(__instance.Inventory.Equipment);
     }

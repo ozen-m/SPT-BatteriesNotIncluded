@@ -18,7 +18,7 @@ public class DeviceManagerStartPatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(DeviceManager __instance)
+    public static void Postfix(DeviceManager __instance)
     {
         IFikaNetworkManager networkManager = Singleton<IFikaNetworkManager>.Instance;
         DeviceSubPacketPoolManager.Instance.CreatePool();

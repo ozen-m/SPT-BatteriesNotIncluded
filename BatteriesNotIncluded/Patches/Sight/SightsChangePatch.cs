@@ -17,7 +17,7 @@ public class SightsChangePatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(ProceduralWeaponAnimation __instance)
+    public static void Postfix(ProceduralWeaponAnimation __instance)
     {
         if (!Singleton<DeviceManager>.Instantiated) return;
         if (!__instance.FirstPersonPointOfView) return;

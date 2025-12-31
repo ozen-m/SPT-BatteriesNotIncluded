@@ -20,7 +20,7 @@ public class NightVisionOnPatch : ModulePatch
     }
 
     [PatchPrefix]
-    protected static bool Prefix(NightVision __instance, bool on)
+    public static bool Prefix(NightVision __instance, bool on)
     {
         if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!on) return true;
@@ -50,7 +50,7 @@ public class ThermalVisionOnPatch : ModulePatch
     }
 
     [PatchPrefix]
-    protected static bool Prefix(ThermalVision __instance, bool on)
+    public static bool Prefix(ThermalVision __instance, bool on)
     {
         if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!on) return true;

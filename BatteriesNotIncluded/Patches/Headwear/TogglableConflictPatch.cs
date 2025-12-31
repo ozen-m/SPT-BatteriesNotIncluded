@@ -16,7 +16,7 @@ public class TogglableConflictPatch : ModulePatch
     }
 
     [PatchPrefix]
-    protected static bool Prefix(Player __instance)
+    public static bool Prefix(Player __instance)
     {
         if (__instance.InventoryController.Inventory.Equipment.GetSlot(EquipmentSlot.Headwear).ContainedItem is not CompoundItem containedItem)
         {

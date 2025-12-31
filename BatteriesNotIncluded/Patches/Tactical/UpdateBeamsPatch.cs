@@ -15,7 +15,7 @@ public class UpdateBeamsPatch : ModulePatch
     }
 
     [PatchPostfix]
-    protected static void Postfix(TacticalComboVisualController __instance, bool isYourPlayer)
+    public static void Postfix(TacticalComboVisualController __instance, bool isYourPlayer)
     {
         if (ToSkip || !Singleton<DeviceManager>.Instantiated || __instance.LightMod == null) return;
 
