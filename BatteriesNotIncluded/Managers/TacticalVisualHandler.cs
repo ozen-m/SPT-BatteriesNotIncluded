@@ -16,7 +16,8 @@ public class TacticalVisualHandler(DeviceManager manager)
     public void UpdateDeviceMode(TacticalComboVisualController controller)
     {
         var lightComponent = controller.LightMod;
-        var index = manager.GetItemIndex(lightComponent.Item);
+        var item = lightComponent.Item;
+        var index = manager.GetItemIndex(item);
         if (index == -1) return;
 
         _controllers.Add(controller);
@@ -27,6 +28,9 @@ public class TacticalVisualHandler(DeviceManager manager)
         foreach (var mode in _tacticalModesField(controller))
         {
             if (!mode.gameObject.activeInHierarchy) continue;
+
+            deviceMode = BatteriesNotIncluded.GetDeviceModeOverride(item.TemplateId, mode.name);
+            if (deviceMode is not DeviceMode.None) break;
 
             for (var i = 0; i < mode.childCount; i++)
             {
@@ -42,13 +46,13 @@ public class TacticalVisualHandler(DeviceManager manager)
                     _ => 0
                 };
             }
-
-            UpdateDeviceDrainPerSecond(index, deviceMode);
-#if DEBUG
-            LoggerUtil.Info($"{lightComponent.Item.LocalizedShortName()} ({lightComponent.Item.Id}): {deviceMode.ToString()}");
-#endif
-            return;
+            break;
         }
+
+        UpdateDeviceDrainPerSecond(index, deviceMode);
+#if DEBUG
+        LoggerUtil.Info($"{item.LocalizedShortName()} ({item.Id}): {deviceMode.ToString()}");
+#endif
     }
 
     public void TurnOffLightVisibility(Item item)

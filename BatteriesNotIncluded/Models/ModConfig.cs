@@ -14,4 +14,7 @@ public record ModConfig
 
     [JsonProperty("tacticalDevicesDrain")]
     public Dictionary<DeviceMode, float> TacticalDevicesDrain { get; set; } = [];
+    
+    [JsonProperty("tacticalDevicesModeOverride")]
+    public Dictionary<MongoID, Dictionary<string, DeviceMode>> TacticalDevicesModeOverride { get; set; } = [];
 }

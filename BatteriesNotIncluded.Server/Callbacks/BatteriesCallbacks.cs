@@ -23,7 +23,8 @@ public class BatteriesCallbacks(HttpResponseUtil httpResponseUtil, ModConfigCont
                 .SelectMany(devices => devices.Value)
                 .ToDictionary(),
             botBatteries = modConfigContainer.ModConfig.BotBatteries,
-            tacticalDevicesDrain = modConfigContainer.ModConfig.TacticalDevicesDrain
+            tacticalDevicesDrain = modConfigContainer.ModConfig.TacticalDevicesDrain,
+            tacticalDevicesModeOverride =  modConfigContainer.ModConfig.TacticalDevicesModeOverride
         };
         return new ValueTask<string>(httpResponseUtil.NoBody(payload));
     }

@@ -34,4 +34,7 @@ public record ModConfig
 
     [JsonPropertyName("deviceBatteryData")]
     public Dictionary<MongoId, Dictionary<MongoId, DeviceData>> DeviceBatteryData { get; set; } = [];
+
+    [JsonPropertyName("tacticalDevicesModeOverride")]
+    public Dictionary<MongoId, Dictionary<string, DeviceMode>> TacticalDevicesModeOverride { get; set; } = [];
 }

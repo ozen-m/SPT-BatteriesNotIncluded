@@ -30,6 +30,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     private static Dictionary<MongoID, DeviceData> _deviceBatteryData = [];
     private static Dictionary<WildSpawnType, RangedInt> _botBatteries = [];
     private static Dictionary<DeviceMode, float> _tacticalDevicesDrain = [];
+    private static Dictionary<MongoID, Dictionary<string, DeviceMode>> _tacticalDevicesOverride = [];
 
     private static PatchManager _patchManager;
 
@@ -70,6 +71,14 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 #endif
     }
 
+    public static DeviceMode GetDeviceModeOverride(MongoID templateId, string mode)
+    {
+        return _tacticalDevicesOverride.TryGetValue(templateId, out var deviceModeOverrides) &&
+               deviceModeOverrides.TryGetValue(mode, out var deviceMode)
+            ? deviceMode
+            : DeviceMode.None;
+    }
+
     public static void DisablePatches() => _patchManager.DisablePatches();
 
     private static async Task GetConfigFromServerAsync()
@@ -87,8 +96,12 @@ public class BatteriesNotIncluded : BaseUnityPlugin
             _deviceBatteryData = modConfig.DeviceBatteryData;
             _botBatteries = modConfig.BotBatteries;
             _tacticalDevicesDrain = modConfig.TacticalDevicesDrain;
+            _tacticalDevicesOverride = modConfig.TacticalDevicesModeOverride;
 
-            if (_deviceBatteryData.IsNullOrEmpty() || _botBatteries.IsNullOrEmpty() || _tacticalDevicesDrain.IsNullOrEmpty())
+            if (_deviceBatteryData.IsNullOrEmpty() ||
+                _botBatteries.IsNullOrEmpty() ||
+                _tacticalDevicesDrain.IsNullOrEmpty() ||
+                _tacticalDevicesOverride.IsNullOrEmpty())
             {
                 error = true;
             }

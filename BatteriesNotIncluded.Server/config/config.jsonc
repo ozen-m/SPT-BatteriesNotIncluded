@@ -87,10 +87,10 @@
             "66b5f68de98be930d701c00e": {"runtime": 160},
             "5c066e3a0db834001b7353f0": {"runtime": 40},
             "5c0558060db834001b735271": {"slots": 4, "runtime": 14},
-            "67506ca81f18589016006aa6": {"slots": 4, "runtime": 40},
+            "67506ca81f18589016006aa6": {"slots": 4, "runtime": 40}, // PNV-57E
             "5b3b6e495acfc4330140bd88": {"runtime": 50},
             "63fc44e2429a8a166c7f61e6": {"slots": 4, "runtime": 7},
-            "67641b461c2eb66ade05dba6": {"slots": 2, "runtime": 4},
+            "67641b461c2eb66ade05dba6": {"slots": 2, "runtime": 4}, // Cyclone Shakhin
             "5d1b5e94d7ad1a2b865a96b0": {"slots": 2, "runtime": 4},
             "6478641c19d732620e045e17": {"slots": 2, "runtime": 8},
             "609bab8b455afd752b2e6138": {"runtime": 8},
@@ -140,6 +140,65 @@
             "618a5d5852ecee1505530b2a": {},
             "606f2696f2cb2e02a42aceb1": {},
             "622efbcb99f4ea1a4d6c9a15": {}
+        }
+    },
+    "tacticalDevicesModeOverride": {
+        "57fd23e32459772d0805bcf1": {
+            // Mode, DeviceMode
+            "mode_001": "VisibleLaser",
+            "mode_002": "IRLaser",
+            "mode_003": "IRFlood",
+            "mode_004": "IRFlood, IRLaser"
+        },
+        "5d2369418abbc306c62e0c80": {
+            "mode_001": "Flashlight",
+            "mode_002": "VisibleLaser",
+            "mode_003": "Flashlight, VisibleLaser",
+            "mode_004": "IRFlood",
+            "mode_005": "IRLaser",
+            "mode_006": "IRFlood, IRLaser"
+        },
+        "61605d88ffa6e502ac5e7eeb": {
+            "mode_001": "IRLaser" // Rangefinder as IRLaser
+        },
+        "626becf9582c3e319310b837": {
+            "mode_002": "IRFlood" // mode_002 showing up as IRLaser
+        },
+        // NGAL (Epic's AIO)
+        "1de63dfb52c91ccb9dd2c83a": {
+            "mode_001": "VisibleLaser",
+            "mode_002": "VisibleLaser",
+            "mode_003": "IRLaser",
+            "mode_004": "IRFlood, IRLaser",
+            "mode_005": "IRLaser",
+            "mode_006": "IRFlood",
+            "mode_007": "IRFlood, IRLaser"
+        },
+        // OGL (Epic's AIO)
+        "253279f21f3222961c5dfa8d": {
+            "mode_001": "VisibleLaser",
+            "mode_002": "VisibleLaser",
+            "mode_003": "IRLaser",
+            "mode_004": "IRLaser",
+            "mode_005": "IRFlood, IRLaser",
+            "mode_006": "IRFlood, IRLaser",
+            "mode_007": "IRFlood",
+            "mode_008": "IRFlood",
+            "mode_009": "IRFlood, IRLaser",
+            "mode_010": "IRFlood, IRLaser"
+        },
+        // OGL FDE (Epic's AIO)
+        "c569fa63e462980552ecdc77": {
+            "mode_001": "VisibleLaser",
+            "mode_002": "VisibleLaser",
+            "mode_003": "IRLaser",
+            "mode_004": "IRLaser",
+            "mode_005": "IRFlood, IRLaser",
+            "mode_006": "IRFlood, IRLaser",
+            "mode_007": "IRFlood",
+            "mode_008": "IRFlood",
+            "mode_009": "IRFlood, IRLaser",
+            "mode_010": "IRFlood, IRLaser"
         }
     }
 }
