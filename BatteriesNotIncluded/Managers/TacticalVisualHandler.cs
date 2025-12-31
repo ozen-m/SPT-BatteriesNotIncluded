@@ -51,7 +51,7 @@ public class TacticalVisualHandler(DeviceManager manager)
 
         UpdateDeviceDrainPerSecond(index, deviceMode);
 #if DEBUG
-        LoggerUtil.Info($"{item.LocalizedShortName()} ({item.Id}): {deviceMode.ToString()}");
+        LoggerUtil.Info($"{item.LocalizedShortName()} ({item.StringTemplateId}): {deviceMode.ToString()}");
 #endif
     }
 
