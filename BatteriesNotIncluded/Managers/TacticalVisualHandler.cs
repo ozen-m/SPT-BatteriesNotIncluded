@@ -48,6 +48,10 @@ public class TacticalVisualHandler(DeviceManager manager)
             }
             break;
         }
+        if (deviceMode is DeviceMode.None)
+        {
+            LoggerUtil.Warning($"DeviceMode is `None` for item: {item.ToFullString()}");
+        }
 
         UpdateDeviceDrainPerSecond(index, deviceMode);
 #if DEBUG

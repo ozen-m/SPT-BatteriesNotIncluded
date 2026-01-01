@@ -59,16 +59,13 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
     public static float GetTacticalDrain(DeviceMode mode)
     {
-#if DEBUG
         if (_tacticalDevicesDrain.TryGetValue(mode, out var drain))
         {
             return drain;
         }
-        LoggerUtil.Warning($"No drainPerSecond found for mode: {mode.ToString()}");
+
+        LoggerUtil.Warning($"Missing DrainPerSecond for mode: {mode.ToString()}");
         return 0.011111f;
-#else
-        return _tacticalDevicesDrain.GetValueOrDefault(mode, 0.011111f);
-#endif
     }
 
     public static DeviceMode GetDeviceModeOverride(MongoID templateId, string mode)
