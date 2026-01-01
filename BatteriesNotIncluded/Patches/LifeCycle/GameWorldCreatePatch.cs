@@ -20,19 +20,19 @@ public class GameWorldCreatePatch : ModulePatch
     [PatchPostfix]
     public static void Postfix(GameWorld __result)
     {
-        if (Singleton<DeviceManager>.Instantiated)
-        {
-            // Probably only caused by the hideout
-            LoggerUtil.Info("DeviceManager already instantiated, destroying.");
-            Object.DestroyImmediate(Singleton<DeviceManager>.Instance);
-        }
-
         Fika.IsFikaSyncPresent = Chainloader.PluginInfos.ContainsKey("com.ozen.batteriesnotincluded.fikasync");
         if (Fika.IsFikaPresent && !Fika.IsFikaSyncPresent)
         {
             BatteriesNotIncluded.DisablePatches();
             LoggerUtil.Error("Fika is present but the sync addon is missing, please install the sync addon. Disabled mod Batteries Not Included.");
             return;
+        }
+
+        if (Singleton<DeviceManager>.Instantiated)
+        {
+            // Probably only caused by the hideout
+            LoggerUtil.Info("DeviceManager already instantiated, destroying.");
+            Object.DestroyImmediate(Singleton<DeviceManager>.Instance);
         }
 
         var manager = __result.gameObject.AddComponent<DeviceManager>();
