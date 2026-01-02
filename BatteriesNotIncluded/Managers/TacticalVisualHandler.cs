@@ -21,6 +21,7 @@ public class TacticalVisualHandler(DeviceManager manager)
         if (index == -1) return;
 
         _controllers.Add(controller);
+        if (!controller.gameObject.activeInHierarchy) return;
         if (!lightComponent.IsActive) return;
 
         // Thank you SAIN!
