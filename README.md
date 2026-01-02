@@ -51,11 +51,6 @@ In the BepInEx configuration manager (<kbd>F12</kbd>)
   <summary>Support</summary>
 
 If you find any bugs, issues, feature suggestions, or have balancing suggestions, feel free to post them on the comment section, or open an issue on GitHub, or most preferably through the SPT Discord, ozen
-
-#### Future Plans
-- Tactical device drain based on current mode: light/laser/IR
-- Disable only the reticle for optic sights
-
 </details>
 
 ### Credits
