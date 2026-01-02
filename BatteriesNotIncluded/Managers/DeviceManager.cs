@@ -287,6 +287,8 @@ public class DeviceManager : MonoBehaviour
         foreach (var item in worldItems)
         {
             RegisterItem(item, false, null);
+
+            // TODO: Add batteries to world items?
         }
 
         worldItems.Clear();

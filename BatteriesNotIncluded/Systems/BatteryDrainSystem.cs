@@ -32,7 +32,6 @@ public class BatteryDrainSystem(float runInterval) : BaseDelayedSystem(runInterv
                 continue;
             }
 
-            // TODO: Light drain based on modes: light/laser/ir?
             var currentCharge = Mathf.Max(resourceComponent.Value - (RunInterval / 1000f * manager.DrainPerSecond[i]), 0f);
             resourceComponent.Value = currentCharge;
 
