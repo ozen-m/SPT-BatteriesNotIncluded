@@ -7,6 +7,7 @@
   "5672cb304bdc2dc2088b456a Description": "A small, coin-cell lithium battery commonly used in general electronics like watches, and calculators. In military applications, it powers devices such as tactical devices, and military-grade sights, providing reliable, long-lasting energy in a compact form factor.",
   "TURNOFF": "TURN OFF",
   "TURNON": "TURN ON",
+  "tooltip-remaining": "(~{0}m left)",
   "load-disabled": "is disabled",
   "load-success": "loaded successfully!",
   "description-slots": "Uses %sx",

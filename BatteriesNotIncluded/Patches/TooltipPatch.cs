@@ -53,7 +53,7 @@ public class TooltipPatch : ModulePatch
 
         if (count == data.SlotCount && min > 0f)
         {
-            __result = $"{__result} (~{(int)(min / drainPerSecond / 60f)}m left)";
+            __result = $"{__result} {string.Format("tooltip-remaining".Localized(), (int)(min / drainPerSecond / 60f))}";
         }
     }
 }
