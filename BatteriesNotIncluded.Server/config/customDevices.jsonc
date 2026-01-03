@@ -1,12 +1,13 @@
 ﻿// Included mods:
 // - Artem 3.0.1
-// - Epic's All in One 4.0.4
-// - Eco's Attachment Emporium 2.0.2
+// - Epic's All in One 4.0.5
+// - Eco's Attachment Emporium 2.0.3
 // - C11 - True North 2.4.0
 // - Canted Aim 1.0.7
 // - Peltor TEP-300 1.0.4
-// - WTT - Armory 2.0.1
+// - WTT - Armory 2.0.2
 // - WTT - Content Backport 1.0.2 (1.0.1.1)
+// - Impractical Tactical 1.1.0
 
 {
     // Devices that use AA Battery.
@@ -92,7 +93,8 @@
         "d62cced77df83a0683e38fbc": {"runtime": 4},
         "e727709694036c1f49f234e6": {"runtime": 3},
         "8fb322f5202cf87746ec83b4": {"runtime": 4},
-        "694f146cd178947eaf000001": {}
+        "694f146cd178947eaf000001": {},
+        "6931ac76994f765b133f29a2": {"slots": 2}
     },
     // Devices that do not need batteries to operate
     "000000000000000000000000": {
@@ -110,6 +112,9 @@
         "877f002b7dadc7ae31d1fda1": {},
         "68d7db2929420f94ff04cb16": {},
         "c26f2af872656829feb27c08": {},
-        "693c59557af373b906645b54": {}
+        "693c59557af373b906645b54": {},
+        "6953fb73a080184e990e0530": {},
+        "6953fce4a080184e990e0534": {},
+        "69449388fb63590d888f3ede": {}
     }
 }
