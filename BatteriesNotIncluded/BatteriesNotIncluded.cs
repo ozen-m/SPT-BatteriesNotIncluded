@@ -19,7 +19,7 @@ using SPT.Reflection.Patching;
 
 namespace BatteriesNotIncluded;
 
-[BepInPlugin("com.ozen.batteriesnotincluded", "Batteries Not Included", "1.0.1")]
+[BepInPlugin("com.ozen.batteriesnotincluded", "Batteries Not Included", "1.0.2")]
 [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
 public class BatteriesNotIncluded : BaseUnityPlugin
 {
