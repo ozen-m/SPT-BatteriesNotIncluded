@@ -1,13 +1,14 @@
 ﻿// Included mods:
 // - Artem 3.0.1
-// - Epic's All in One 4.0.5
-// - Eco's Attachment Emporium 2.0.3
+// - Echoes of Tarkov - Requisitions - NG 2.0.4
+// - Eco's Attachment Emporium 2.0.5
+// - Epic's All in One 4.0.6
 // - C11 - True North 2.4.0
 // - Canted Aim 1.0.7
+// - Impractical Tactical 1.1.0
 // - Peltor TEP-300 1.0.4
 // - WTT - Armory 2.0.2
-// - WTT - Content Backport 1.0.2 (1.0.1.1)
-// - Impractical Tactical 1.1.0
+// - WTT - Content Backport 1.0.4
 
 {
     // Devices that use AA Battery.
@@ -56,7 +57,12 @@
         "688b44cb28bf8d85cd0ff108": {"runtime": 3000},
         "688b4bd81cef2a61d0052738": {"runtime": 3000},
         "69413241b1ce1e5fbb09ed0a": {"slots": 2, "runtime": 400},
-        "dd7caf9bd203b146528c8da4": {"runtime": 50000}
+        "dd7caf9bd203b146528c8da4": {"runtime": 50000},
+        "684ef6bc3fcbe11882807386": {"runtime": 5000},
+        "684f2ebbd4f01748a7d154b9": {"runtime": 5000},
+        "684f2eed5600200459543ecc": {"runtime": 5000},
+        "684ca7ab1a059f229b96e1a3": {"runtime": 3000},
+        "684ca7a7dd567362e6a2d719": {"runtime": 3000}
     },
     // CR123A
     "590a358486f77429692b2790": {
@@ -94,7 +100,11 @@
         "e727709694036c1f49f234e6": {"runtime": 3},
         "8fb322f5202cf87746ec83b4": {"runtime": 4},
         "694f146cd178947eaf000001": {},
-        "6931ac76994f765b133f29a2": {"slots": 2}
+        "6931ac76994f765b133f29a2": {"slots": 2},
+        "685b40db60670990eb71ca2d": {"runtime": 1000},
+        "6837716de936d83c13099eea": {"slots": 2},
+        "68398cd864a9d113ebab1b77": {"slots": 2},
+        "68363c6fbfd14a9526e8601b": {"slots": 2}
     },
     // Devices that do not need batteries to operate
     "000000000000000000000000": {
@@ -115,6 +125,7 @@
         "693c59557af373b906645b54": {},
         "6953fb73a080184e990e0530": {},
         "6953fce4a080184e990e0534": {},
-        "69449388fb63590d888f3ede": {}
+        "69449388fb63590d888f3ede": {},
+        "686a5a6247c881f613196f91": {}
     }
 }
