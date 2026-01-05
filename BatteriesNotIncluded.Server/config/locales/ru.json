@@ -12,10 +12,12 @@
   "load-success": "Успешно загружен!",
   "description-slots": "Требует %sx",
   "description-runtime": "Имеет время работы в %s",
+  "description-runtime_tactical": "Runtime depends on the active mode",
   "process-total_devices": "Добавлены слоты под батарейки для %s предметов",
   "process-add_battery_slot": "{{deviceName}} ({{deviceId}}) добавлены слоты ({{slotCount}}) с совместимой батарейкой {{batteryName}} ({{runtime}}m)",
   "process-default_battery": "{{deviceName}} ({{deviceId}}) не имеет определенной батарейки, изменено по умолчанию на батарейку типа CR2032",
   "process-mod_pools": "Добавлены батарейки к пулам модов для оружия",
   "process-barter_trades": "Добавлены обмены батареек для торговцев",
-  "process-sicc_container": "Батарейки добавлены к фильтрам кейса SICC"
+  "process-sicc_container": "Батарейки добавлены к фильтрам кейса SICC",
+  "process-profile_templates": "Added batteries to profile templates"
 }

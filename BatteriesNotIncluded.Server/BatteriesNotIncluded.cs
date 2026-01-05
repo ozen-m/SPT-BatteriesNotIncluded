@@ -15,7 +15,7 @@ namespace BatteriesNotIncluded;
 
 [Injectable(TypePriority = OnLoadOrder.TraderRegistration)]
 public class BatteriesNotIncluded(
-    ModConfigContainer modConfigContainer,
+    ConfigUtil configUtil,
     LoggerUtil loggerUtil,
     JsonUtil jsonUtil,
     DatabaseService databaseService,
@@ -27,10 +27,10 @@ public class BatteriesNotIncluded(
 
     public Task OnLoad()
     {
-        var localesPath = Path.Combine(modConfigContainer.ConfigPath, "locales");
+        var localesPath = Path.Combine(configUtil.ConfigPath, "locales");
         LoadLocales(localesPath);
 
-        if (!modConfigContainer.ModConfig.Enabled)
+        if (!configUtil.ModConfig.Enabled)
         {
             loggerUtil.Warning(localeService.GetText("load-disabled"));
             return Task.CompletedTask;
@@ -62,10 +62,10 @@ public class BatteriesNotIncluded(
             .Where(i => itemHelper.IsOfBaseclasses(i.Id, _batteryConsumers));
         AddBatterySlots(deviceTemplates);
 
-        ConvertTacticalDevicesDrain();
-        AddToModPool();
-        AddBarterTrades();
+        AddBatteryBarterTrades();
+        AddBatteriesToModPool();
         AddBatteriesToSicc(items.GetValueOrDefault(ItemTpl.CONTAINER_SICC));
+        AddBatteriesToProfileTemplates();
 
         loggerUtil.Success(localeService.GetText("load-success"));
         return Task.CompletedTask;
@@ -86,28 +86,36 @@ public class BatteriesNotIncluded(
     private void ProcessTemplate(TemplateItem template, ref int counter)
     {
         var deviceData = GetDeviceData(template.Id);
-        var batteryType = deviceData.Battery;
-        if (batteryType == MongoId.Empty()) return;
+        if (deviceData is null)
+        {
+            deviceData = SetDeviceDefaultBattery(template.Id);
+            loggerUtil.Warning(localeService.GetText("process-default_battery", new
+            {
+                deviceName = itemHelper.GetItemName(template.Id),
+                deviceId = template.Id
+            }));
+        }
 
-        AddBatteryToItemDescription(template.Id, batteryType, deviceData.SlotCount, deviceData.GameRuntimeSecs);
+        if (deviceData.Battery == MongoId.Empty()) return;
+
+        AddBatteryToItemDescription(template.Id, deviceData);
 
         var newSlots = new Slot[deviceData.SlotCount];
         for (var i = 0; i < newSlots.Length; i++)
         {
-            newSlots[i] = new Slot()
+            newSlots[i] = new Slot
             {
                 Name = $"mod_equipment_00{i}",
                 Id = template.Id,
                 Parent = template.Id,
-                Properties = new SlotProperties()
+                Properties = new SlotProperties
                 {
                     Filters =
                     [
-                        new SlotFilter()
+                        new SlotFilter
                         {
                             Shift = 0d,
-                            Filter = [batteryType]
-                            // TODO: Multiple battery filters?
+                            Filter = [deviceData.Battery]
                         }
                     ]
                 },
@@ -126,62 +134,45 @@ public class BatteriesNotIncluded(
             deviceName = itemHelper.GetItemName(template.Id),
             deviceId = template.Id,
             slotCount = deviceData.SlotCount,
-            batteryName = itemHelper.GetItemName(batteryType),
+            batteryName = itemHelper.GetItemName(deviceData.Battery),
             runtime = (int)(deviceData.GameRuntimeSecs / 60d)
         }));
     }
 
-    private DeviceData GetDeviceData(MongoId deviceId)
+    private DeviceData GetDeviceData(MongoId deviceId) =>
+        configUtil.ModConfig.DeviceBatteryDefinitions.GetValueOrDefault(deviceId, null);
+
+    private DeviceData SetDeviceDefaultBattery(MongoId deviceId)
     {
-        foreach (var (batteryType, deviceDatas) in modConfigContainer.ModConfig.DeviceBatteryData)
-        {
-            if (!deviceDatas.TryGetValue(deviceId, out var deviceData)) continue;
-
-            const double maxResourceValue = 100f; // Ideally should come from the battery template
-            var gameRuntimeSecs = RuntimeToSeconds(deviceData.RealRuntimeHr) / modConfigContainer.ModConfig.GlobalDrainMult;
-            deviceData.Battery = batteryType;
-            deviceData.GameRuntimeSecs = gameRuntimeSecs;
-            deviceData.DrainPerSecond = maxResourceValue / gameRuntimeSecs;
-
-            return deviceData;
-        }
-
         var defaultData = DeviceData.Default;
-        modConfigContainer.ModConfig.DeviceBatteryData[_cr2032BatteryId].Add(deviceId, defaultData);
-        loggerUtil.Warning(localeService.GetText("process-default_battery", new
-        {
-            deviceName = itemHelper.GetItemName(deviceId),
-            deviceId
-        }));
+        configUtil.ModConfig.DeviceBatteryDefinitions[deviceId] = defaultData;
         return defaultData;
     }
 
-    private void AddBatteryToItemDescription(MongoId deviceId, MongoId batteryId, int slots, double runtimeSeconds)
+    private void AddBatteryToItemDescription(MongoId deviceId, DeviceData deviceData)
     {
-        var t = TimeSpan.FromSeconds(runtimeSeconds);
-        var hours = (int)t.TotalHours;
-        var minutes = t.Minutes;
-        var runtime = hours > 0 ? $"{hours}h {minutes:D2}m" : $"{minutes:D2}m";
+        string runtime = string.Empty;
+        var isTacticalDevice = itemHelper.IsOfBaseclasses(deviceId, _tacticalDevices);
+        if (!isTacticalDevice)
+        {
+            var t = TimeSpan.FromSeconds(deviceData.GameRuntimeSecs);
+            var hours = (int)t.TotalHours;
+            var minutes = t.Minutes;
+            runtime = hours > 0 ? $"{hours}h {minutes:D2}m" : $"{minutes:D2}m";
+        }
 
         foreach (var (_, lazyLoadLocale) in _globalLocales)
         {
             lazyLoadLocale.AddTransformer((localeData) =>
             {
-                var slotsLocalized = ReplacePlaceholder(localeData["description-slots"], slots);
-                var runtimeLocalized = ReplacePlaceholder(localeData["description-runtime"], runtime);
-                localeData[$"{deviceId} Description"] = $"{slotsLocalized} {localeData[$"{batteryId} Name"]}\n{runtimeLocalized}\n\n{localeData[$"{deviceId} Description"]}";
+                var slotsLocalized = ReplacePlaceholder(localeData["description-slots"], deviceData.SlotCount);
+                var runtimeLocalized = !isTacticalDevice
+                    ? ReplacePlaceholder(localeData["description-runtime"], runtime)
+                    : localeData["description-runtime_tactical"];
 
+                localeData[$"{deviceId} Description"] = $"{slotsLocalized} {localeData[$"{deviceData.Battery} Name"]}\n{runtimeLocalized}\n\n{localeData[$"{deviceId} Description"]}";
                 return localeData;
             });
-        }
-    }
-
-    private void ConvertTacticalDevicesDrain()
-    {
-        foreach (var (mode, hours) in modConfigContainer.ModConfig.TacticalDevicesDrain)
-        {
-            var seconds = RuntimeToSeconds(hours);
-            modConfigContainer.ModConfig.TacticalDevicesDrain[mode] = 100d / seconds;
         }
     }
 
@@ -189,21 +180,18 @@ public class BatteriesNotIncluded(
     /// This suppresses warnings in the SPT server console/logs.
     /// We still add them, if not spawned since they're rolled, via client.
     /// </summary>
-    private void AddToModPool()
+    private void AddBatteriesToModPool()
     {
-        foreach (var (batteryId, deviceDatas) in modConfigContainer.ModConfig.DeviceBatteryData)
+        foreach (var (deviceId, deviceData) in configUtil.ModConfig.DeviceBatteryDefinitions)
         {
-            if (batteryId == MongoId.Empty()) continue;
+            if (deviceData.Battery == MongoId.Empty()) continue;
 
-            foreach (var (deviceId, deviceData) in deviceDatas)
-            {
-                AddBatteriesToModPool(deviceId, batteryId, deviceData.SlotCount);
-            }
+            ProcessModPoolForDevice(deviceId, deviceData.Battery, deviceData.SlotCount);
         }
         loggerUtil.Debug(localeService.GetText("process-mod_pools"));
     }
 
-    private void AddBatteriesToModPool(MongoId itemId, MongoId batteryId, int slots)
+    private void ProcessModPoolForDevice(MongoId itemId, MongoId batteryId, int slots)
     {
         var botTypes = databaseService.GetBots().Types;
         foreach (var (_, botType) in botTypes)
@@ -232,7 +220,7 @@ public class BatteriesNotIncluded(
         }
     }
 
-    private void AddBarterTrades()
+    private void AddBatteryBarterTrades()
     {
         var jaeger = databaseService.GetTrader(Traders.JAEGER)!;
 
@@ -246,6 +234,7 @@ public class BatteriesNotIncluded(
             SlotId = "hideout",
             Upd = new Upd
             {
+                UnlimitedCount = true,
                 StackObjectsCount = 9999999d,
                 BuyRestrictionMax = 4,
                 BuyRestrictionCurrent = 0
@@ -274,6 +263,7 @@ public class BatteriesNotIncluded(
             SlotId = "hideout",
             Upd = new Upd
             {
+                UnlimitedCount = true,
                 StackObjectsCount = 9999999d,
                 BuyRestrictionMax = 4,
                 BuyRestrictionCurrent = 0
@@ -302,6 +292,7 @@ public class BatteriesNotIncluded(
             SlotId = "hideout",
             Upd = new Upd
             {
+                UnlimitedCount = true,
                 StackObjectsCount = 9999999d,
                 BuyRestrictionMax = 4,
                 BuyRestrictionCurrent = 0
@@ -325,12 +316,57 @@ public class BatteriesNotIncluded(
 
     private void AddBatteriesToSicc(TemplateItem item)
     {
-        if (!modConfigContainer.ModConfig.SiccContainerBatteries) return;
+        if (!configUtil.ModConfig.SiccContainerBatteries) return;
         if (item.Id != ItemTpl.CONTAINER_SICC) return;
 
         item.Properties?.Grids?.FirstOrDefault()?.Properties?.Filters?.FirstOrDefault()?.Filter?.UnionWith(_batteryIds);
 
         loggerUtil.Debug(localeService.GetText("process-sicc_container"));
+    }
+
+    private void AddBatteriesToProfileTemplates()
+    {
+        var profileTemplates = databaseService.GetProfileTemplates();
+
+        foreach (var (_, sides) in profileTemplates)
+        {
+            if (sides.Usec is not null)
+            {
+                ProcessTemplateSide(sides.Usec);
+            }
+
+            if (sides.Bear is not null)
+            {
+                ProcessTemplateSide(sides.Bear);
+            }
+        }
+        loggerUtil.Debug(localeService.GetText("process-profile_templates"));
+    }
+
+    private void ProcessTemplateSide(TemplateSide side)
+    {
+        var sideItems = side.Character?.Inventory?.Items;
+        if (sideItems is null) return;
+
+        for (var i = 0; i < sideItems.Count; i++)
+        {
+            var item = sideItems[i];
+            var deviceData = GetDeviceData(item.Template);
+            if (deviceData is null) continue;
+            if (deviceData.Battery == MongoId.Empty()) continue;
+
+            for (var j = 0; j < deviceData.SlotCount; j++)
+            {
+                var battery = new Item
+                {
+                    Id = new MongoId(),
+                    ParentId = item.Id,
+                    Template = deviceData.Battery,
+                    SlotId = $"mod_equipment_00{j}"
+                };
+                sideItems.Add(battery);
+            }
+        }
     }
 
     private void LoadLocales(string localesPath)
@@ -400,27 +436,6 @@ public class BatteriesNotIncluded(
         return text.Replace("%s", value?.ToString() ?? string.Empty);
     }
 
-    private static readonly double _logMin = Math.Log10(1d);
-    private static readonly double _logRange = Math.Log10(100_000d) - _logMin;
-
-    /// <summary>
-    /// Normalized log interpolation.
-    /// Map minimum: 1 hour runtime to <see cref="ModConfig.MinGameRuntime"/>;
-    ///     maximum: 100,000 hours runtime to <see cref="ModConfig.MaxGameRuntime"/>.
-    ///     maximum: 100,000 hours runtime to <see cref="ModConfig.MaxGameRuntime"/>.
-    /// </summary>
-    /// <param name="runtimeHours">Device battery life in hours</param>
-    /// <returns>Real runtime hours mapped to game seconds</returns>
-    private double RuntimeToSeconds(double runtimeHours)
-    {
-        runtimeHours = Math.Clamp(runtimeHours, 1d, 100_000d);
-        double tMin = modConfigContainer.ModConfig.MinGameRuntime;
-        double tMax = modConfigContainer.ModConfig.MaxGameRuntime;
-
-        double factor = (Math.Log10(runtimeHours) - _logMin) / _logRange;
-        return (int)(tMin + (tMax - tMin) * factor);
-    }
-
     private static readonly MongoId _aaBatteryId = ItemTpl.BARTER_AA_BATTERY;
     private static readonly MongoId _cr2032BatteryId = ItemTpl.BARTER_D_SIZE_BATTERY;
     private static readonly MongoId _cr123ABatteryId = ItemTpl.BARTER_RECHARGEABLE_BATTERY;
@@ -444,5 +459,12 @@ public class BatteriesNotIncluded(
         BaseClasses.FLASHLIGHT, // Tactical Device
         BaseClasses.LIGHT_LASER, // Tactical Device
         BaseClasses.TACTICAL_COMBO // Tactical Device
+    ];
+
+    private static readonly MongoId[] _tacticalDevices =
+    [
+        BaseClasses.FLASHLIGHT,
+        BaseClasses.TACTICAL_COMBO,
+        BaseClasses.LIGHT_LASER
     ];
 }

@@ -12,10 +12,12 @@
   "load-success": "loaded successfully!",
   "description-slots": "Uses %sx",
   "description-runtime": "Has a runtime of %s",
+  "description-runtime_tactical": "Runtime depends on the active mode",
   "process-total_devices": "Added battery slots to %s items",
   "process-add_battery_slot": "{{deviceName}} ({{deviceId}}) added slots ({{slotCount}}) with compatible battery {{batteryName}} ({{runtime}}m)",
   "process-default_battery": "{{deviceName}} ({{deviceId}}) has no defined battery, defaulting to CR2032 Battery",
   "process-mod_pools": "Added batteries to mod pools",
   "process-barter_trades": "Added battery barter trades",
-  "process-sicc_container": "Added batteries to SICC Container filters"
+  "process-sicc_container": "Added batteries to SICC Container filters",
+  "process-profile_templates": "Added batteries to profile templates"
 }

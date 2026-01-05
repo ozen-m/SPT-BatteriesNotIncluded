@@ -2,8 +2,6 @@ using System.Text.Json.Serialization;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 
-// ReSharper disable CollectionNeverUpdated.Global
-
 namespace BatteriesNotIncluded.Models;
 
 public record ModConfig
@@ -33,7 +31,14 @@ public record ModConfig
     public Dictionary<DeviceMode, double> TacticalDevicesDrain { get; set; } = [];
 
     [JsonPropertyName("deviceBatteryData")]
+    [Obsolete($"For deserializing purposes only. Use {nameof(DeviceBatteryDefinitions)}")]
     public Dictionary<MongoId, Dictionary<MongoId, DeviceData>> DeviceBatteryData { get; set; } = [];
+
+    /// <summary>
+    /// Key: Device template ID, Value: DeviceData
+    /// </summary>
+    [JsonIgnore]
+    public Dictionary<MongoId, DeviceData> DeviceBatteryDefinitions { get; set; } = [];
 
     [JsonPropertyName("tacticalDevicesModeOverride")]
     public Dictionary<MongoId, Dictionary<string, DeviceMode>> TacticalDevicesModeOverride { get; set; } = [];

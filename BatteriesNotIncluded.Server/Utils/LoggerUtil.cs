@@ -1,15 +1,12 @@
-using BatteriesNotIncluded.Models;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
 
 namespace BatteriesNotIncluded.Utils;
 
 [Injectable]
-public class LoggerUtil(ISptLogger<BatteriesNotIncluded> logger, ModConfigContainer modConfigContainer)
+public class LoggerUtil(ISptLogger<BatteriesNotIncluded> logger, ConfigUtil configUtil)
 {
     private const string LogPrefix = "[BatteriesNI] ";
-
-    private ModConfig ModConfig => modConfigContainer.ModConfig;
 
     public void Success(object message) => logger.Success(LogPrefix + message);
 
@@ -21,7 +18,7 @@ public class LoggerUtil(ISptLogger<BatteriesNotIncluded> logger, ModConfigContai
 
     public void Debug(object message)
     {
-        if (ModConfig.DebugLogs)
+        if (configUtil.ModConfig.DebugLogs)
         {
             logger.Debug(LogPrefix + message);
         }

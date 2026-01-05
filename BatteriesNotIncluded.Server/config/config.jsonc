@@ -25,7 +25,7 @@
     // ADVANCED
     // Enable debug logging
     "debugLogs": false,
-    // Tactical devices runtime in real hours
+    // Tactical devices runtime in hours of continuous use
     "tacticalDevicesRuntime": {
         "Flashlight": 1.5,
         "VisibleLaser": 50.0,

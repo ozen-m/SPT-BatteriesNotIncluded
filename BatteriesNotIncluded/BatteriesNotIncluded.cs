@@ -27,7 +27,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     public static ConfigEntry<bool> ShowRemainingBattery;
     public static ConfigEntry<bool> DebugLogs;
 
-    private static Dictionary<MongoID, DeviceData> _deviceBatteryData = [];
+    private static Dictionary<MongoID, DeviceData> _deviceBatteryDefinitions = [];
     private static Dictionary<WildSpawnType, RangedInt> _botBatteries = [];
     private static Dictionary<DeviceMode, float> _tacticalDevicesDrain = [];
     private static Dictionary<MongoID, Dictionary<string, DeviceMode>> _tacticalDevicesOverride = [];
@@ -52,7 +52,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     }
 
     public static bool GetDeviceData(MongoID templateId, out DeviceData deviceData) =>
-        _deviceBatteryData.TryGetValue(templateId, out deviceData);
+        _deviceBatteryDefinitions.TryGetValue(templateId, out deviceData);
 
     public static RangedInt GetBotRange(WildSpawnType wildSpawnType) =>
         _botBatteries.GetValueOrDefault(wildSpawnType, _defaultRange);
@@ -90,12 +90,12 @@ public class BatteriesNotIncluded : BaseUnityPlugin
             }
 
             var modConfig = JsonConvert.DeserializeObject<ModConfig>(json!);
-            _deviceBatteryData = modConfig.DeviceBatteryData;
+            _deviceBatteryDefinitions = modConfig.DeviceBatteryDefinitions;
             _botBatteries = modConfig.BotBatteries;
             _tacticalDevicesDrain = modConfig.TacticalDevicesDrain;
             _tacticalDevicesOverride = modConfig.TacticalDevicesModeOverride;
 
-            if (_deviceBatteryData.IsNullOrEmpty() ||
+            if (_deviceBatteryDefinitions.IsNullOrEmpty() ||
                 _botBatteries.IsNullOrEmpty() ||
                 _tacticalDevicesDrain.IsNullOrEmpty() ||
                 _tacticalDevicesOverride.IsNullOrEmpty())
@@ -115,7 +115,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
             return;
         }
 
-        LoggerUtil.Info($"Successfully fetched {_deviceBatteryData.Count} battery operated devices!");
+        LoggerUtil.Info($"Successfully fetched {_deviceBatteryDefinitions.Count} battery operated devices!");
     }
 
     private static void CheckForPrepatch()

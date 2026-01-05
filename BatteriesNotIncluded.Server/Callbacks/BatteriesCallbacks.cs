@@ -7,24 +7,23 @@ using SPTarkov.Server.Core.Utils;
 namespace BatteriesNotIncluded.Callbacks;
 
 [Injectable]
-public class BatteriesCallbacks(HttpResponseUtil httpResponseUtil, ModConfigContainer modConfigContainer)
+public class BatteriesCallbacks(HttpResponseUtil httpResponseUtil, ConfigUtil configUtil)
 {
     public ValueTask<string> GetConfigAsync(string url, EmptyRequestData info, MongoId sessionID)
     {
-        if (!modConfigContainer.ModConfig.Enabled)
+        if (!configUtil.ModConfig.Enabled)
         {
             return new ValueTask<string>(httpResponseUtil.NullResponse());
         }
 
         var payload = new
         {
-            DeviceBatteryData = modConfigContainer.ModConfig.DeviceBatteryData
-                .Where(d => d.Key != MongoId.Empty())
-                .SelectMany(devices => devices.Value)
+            deviceBatteryDefinitions = configUtil.ModConfig.DeviceBatteryDefinitions
+                .Where(d => d.Value.Battery != MongoId.Empty())
                 .ToDictionary(),
-            botBatteries = modConfigContainer.ModConfig.BotBatteries,
-            tacticalDevicesDrain = modConfigContainer.ModConfig.TacticalDevicesDrain,
-            tacticalDevicesModeOverride =  modConfigContainer.ModConfig.TacticalDevicesModeOverride
+            botBatteries = configUtil.ModConfig.BotBatteries,
+            tacticalDevicesDrain = configUtil.ModConfig.TacticalDevicesDrain,
+            tacticalDevicesModeOverride =  configUtil.ModConfig.TacticalDevicesModeOverride
         };
         return new ValueTask<string>(httpResponseUtil.NoBody(payload));
     }
