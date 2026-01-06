@@ -68,6 +68,7 @@ public class BatteriesNotIncluded(
         AddBatteriesToModPool();
         AddBatteriesToSicc(items.GetValueOrDefault(ItemTpl.CONTAINER_SICC));
         AddBatteriesToProfileTemplates();
+        AddBatteriesToTraderItemsBuy();
 
         loggerUtil.Success(localeService.GetText("load-success"));
         return Task.CompletedTask;
@@ -208,7 +209,7 @@ public class BatteriesNotIncluded(
             foreach (var mods in apbsMods ?? [])
             {
                 if (mods is null) continue;
-            
+
                 ProcessModPoolForDevice(mods, deviceId, deviceData);
             }
         }
@@ -346,6 +347,9 @@ public class BatteriesNotIncluded(
         loggerUtil.Debug(localeService.GetText("process-sicc_container"));
     }
 
+    /// <summary>
+    /// Adds batteries to devices for new profiles
+    /// </summary>
     private void AddBatteriesToProfileTemplates()
     {
         var profileTemplates = databaseService.GetProfileTemplates();
@@ -388,6 +392,19 @@ public class BatteriesNotIncluded(
                 };
                 sideItems.Add(battery);
             }
+        }
+    }
+
+    /// <summary>
+    /// Adds batteries to all trader's buy list to make it easier to sell devices to a trader
+    /// </summary>
+    private void AddBatteriesToTraderItemsBuy()
+    {
+        var traders = databaseService.GetTraders();
+        foreach (var (_, trader) in traders)
+        {
+            var buyIdList = trader.Base.ItemsBuy?.IdList;
+            buyIdList?.UnionWith(_batteryIds);
         }
     }
 
