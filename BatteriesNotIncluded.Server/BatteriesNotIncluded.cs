@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using BatteriesNotIncluded.Models;
 using BatteriesNotIncluded.Utils;
 using SPTarkov.DI.Annotations;
@@ -185,8 +184,6 @@ public class BatteriesNotIncluded(
     /// </summary>
     private void AddBatteriesToModPool()
     {
-        var sw = Stopwatch.StartNew();
-
         var botTypes = databaseService.GetBots().Types;
 
         // APBS
@@ -215,7 +212,6 @@ public class BatteriesNotIncluded(
         }
 
         loggerUtil.Debug(localeService.GetText("process-mod_pools"));
-        loggerUtil.Success($"Added to mod pools in {sw.ElapsedMilliseconds}ms");
     }
 
     private static void ProcessModPoolForDevice(Dictionary<MongoId, Dictionary<string, HashSet<MongoId>>> mods, MongoId itemId, DeviceData data)
