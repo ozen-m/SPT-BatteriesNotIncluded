@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using BatteriesNotIncluded.Models;
 using BatteriesNotIncluded.Utils;
 using SPTarkov.DI.Annotations;
@@ -20,7 +21,8 @@ public class BatteriesNotIncluded(
     JsonUtil jsonUtil,
     DatabaseService databaseService,
     ItemHelper itemHelper,
-    ServerLocalisationService localeService
+    ServerLocalisationService localeService,
+    ApbsCompatibility apbsCompatibility
 ) : IOnLoad
 {
     private Dictionary<string, LazyLoad<Dictionary<string, string>>> _globalLocales;
@@ -124,7 +126,7 @@ public class BatteriesNotIncluded(
                 Prototype = "55d30c4c4bdc2db4468b457e"
             };
         }
-        template.Properties!.Slots = template.Properties.Slots != null
+        template.Properties!.Slots = template.Properties.Slots is not null
             ? template.Properties.Slots.Concat(newSlots)
             : newSlots;
 
@@ -182,40 +184,60 @@ public class BatteriesNotIncluded(
     /// </summary>
     private void AddBatteriesToModPool()
     {
+        var sw = Stopwatch.StartNew();
+
+        var botTypes = databaseService.GetBots().Types;
+
+        // APBS
+        const int apbsTierCount = 8;
+        var apbsMods = apbsCompatibility.GetModsData(apbsTierCount);
+
         foreach (var (deviceId, deviceData) in configUtil.ModConfig.DeviceBatteryDefinitions)
         {
             if (deviceData.Battery == MongoId.Empty()) continue;
 
-            ProcessModPoolForDevice(deviceId, deviceData.Battery, deviceData.SlotCount);
+            foreach (var (_, botType) in botTypes)
+            {
+                var mods = botType?.BotInventory.Mods;
+                if (mods is null) continue;
+
+                ProcessModPoolForDevice(mods, deviceId, deviceData);
+            }
+
+            // APBS
+            foreach (var mods in apbsMods ?? [])
+            {
+                if (mods is null) continue;
+            
+                ProcessModPoolForDevice(mods, deviceId, deviceData);
+            }
         }
+
         loggerUtil.Debug(localeService.GetText("process-mod_pools"));
+        loggerUtil.Success($"Added to mod pools in {sw.ElapsedMilliseconds}ms");
     }
 
-    private void ProcessModPoolForDevice(MongoId itemId, MongoId batteryId, int slots)
+    private static void ProcessModPoolForDevice(Dictionary<MongoId, Dictionary<string, HashSet<MongoId>>> mods, MongoId itemId, DeviceData data)
     {
-        var botTypes = databaseService.GetBots().Types;
-        foreach (var (_, botType) in botTypes)
+        if (mods.TryGetValue(itemId, out var botMods))
         {
-            if (botType!.BotInventory.Mods.TryGetValue(itemId, out var botMods))
+            for (var i = 0; i < data.SlotCount; i++)
             {
-                for (var i = 0; i < slots; i++)
+                if (botMods.TryGetValue($"mod_equipment_00{i}", out var botMod))
                 {
-                    if (botMods.TryGetValue($"mod_equipment_00{i}", out var botMod))
-                    {
-                        botMod.Add(batteryId);
-                        continue;
-                    }
-                    botMods[$"mod_equipment_00{i}"] = [batteryId];
+                    botMod.Add(data.Battery);
+                    continue;
                 }
+                botMods[$"mod_equipment_00{i}"] = [data.Battery];
             }
-            else
+        }
+        else
+        {
+            var newBotMod = mods[itemId] = [];
+            HashSet<MongoId> botMod = [data.Battery];
+            for (var i = 0; i < data.SlotCount; i++)
             {
-                var newBotMod = botType.BotInventory.Mods[itemId] = [];
-                HashSet<MongoId> botMod = [batteryId];
-                for (var i = 0; i < slots; i++)
-                {
-                    newBotMod[$"mod_equipment_00{i}"] = botMod;
-                }
+                newBotMod[$"mod_equipment_00{i}"] = botMod;
             }
         }
     }
