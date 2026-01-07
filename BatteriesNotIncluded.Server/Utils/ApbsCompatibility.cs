@@ -17,14 +17,26 @@ public class ApbsCompatibility(IReadOnlyList<SptMod> sptMods, LoggerUtil loggerU
     {
         if (!Init()) return null;
 
-        var tiers = new Dictionary<MongoId, Dictionary<string, HashSet<MongoId>>>[tierCount];
+        var modTiers = new Dictionary<MongoId, Dictionary<string, HashSet<MongoId>>>[tierCount];
         for (var i = 0; i < tierCount; i++)
         {
-            var tierMethodInfo = AccessTools.PropertyGetter(_dataLoaderType, $"Tier{i}ModsData");
-            tiers[i] = tierMethodInfo?.Invoke(_dataLoader, null) as Dictionary<MongoId, Dictionary<string, HashSet<MongoId>>>;
+            var modTierMethod = AccessTools.PropertyGetter(_dataLoaderType, $"Tier{i}ModsData");
+            if (modTierMethod is null)
+            {
+                loggerUtil.Warning($"[APBS Compatibility] Tier{i}ModsData cannot be found");
+                modTiers[i] = null;
+                continue;
+            }
+
+            var modTier = modTierMethod.Invoke(_dataLoader, null) as Dictionary<MongoId, Dictionary<string, HashSet<MongoId>>>;
+            if (modTier is null)
+            {
+                loggerUtil.Warning($"[APBS Compatibility] Tier{i}ModsData returned null");
+            }
+            modTiers[i] = modTier;
         }
 
-        return tiers;
+        return modTiers;
     }
 
     private bool Init()
@@ -41,18 +53,18 @@ public class ApbsCompatibility(IReadOnlyList<SptMod> sptMods, LoggerUtil loggerU
             if (_dataLoaderType == null) continue;
 
 #pragma warning disable CS0618 // Type or member is obsolete
-            _dataLoader = ServiceLocator.ServiceProvider.GetService(_dataLoaderType); // TODO: 4.1.x
+            _dataLoader = ServiceLocator.ServiceProvider.GetService(_dataLoaderType);
 #pragma warning restore CS0618 // Type or member is obsolete
             if (_dataLoader == null) continue;
 
-            loggerUtil.Debug("APBS DataLoader found!");
+            loggerUtil.Debug("[APBS Compatibility] DataLoader found");
             _dataLoaderFound = true;
             break;
         }
 
         if (!_dataLoaderFound.Value)
         {
-            loggerUtil.Warning($"APBS is installed but cannot find DataLoader, something went wrong");
+            loggerUtil.Warning($"[APBS Compatibility] APBS is installed but cannot find DataLoader, something went wrong");
         }
 
         return _dataLoaderFound.Value;
