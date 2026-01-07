@@ -1,0 +1,23 @@
+{
+  "590a358486f77429692b2790 Name": "CR123A 电池",
+  "590a358486f77429692b2790 ShortName": "CR123A",
+  "590a358486f77429692b2790 Description": "一个主要用于小型电子设备、战术设备、军规瞄准镜的紧凑高效锂电池，因其长效存放时间与可靠性而得以知名。",
+  "5672cb304bdc2dc2088b456a Name": "纽扣电池（CR2032）",
+  "5672cb304bdc2dc2088b456a ShortName": "CR2032",
+  "5672cb304bdc2dc2088b456a Description": "一个主要用于类似于手表或计算器等基础电子设备的，小型的、硬币大小的锂电池。在军事领域应用中，它用来驱动战术设备和军规瞄准镜，在紧凑的环境中提供长效和可靠的能源。",
+  "TURNOFF": "关闭用电设备",
+  "TURNON": "开启用电设备",
+  "tooltip-remaining": "(约剩余{0} 分)",
+  "load-disabled": "已关闭",
+  "load-success": "加载成功！",
+  "description-slots": "使用 %sx",
+  "description-runtime": "满电时可用时间为 %s",
+  "description-runtime_tactical": "使用时间取决于战术设备使用的模式",
+  "process-total_devices": "向 %s 增加电池槽位",
+  "process-add_battery_slot": "{{deviceName}} ({{deviceId}}) 增加了 ({{slotCount}}) 个兼容的 {{batteryName}} 电池，满电时可用时间为 ({{runtime}}m)",
+  "process-default_battery": "{{deviceName}} ({{deviceId}}) 没有定义电池, 默认使用CR2032电池",
+  "process-mod_pools": "已添加电池至Mod池",
+  "process-barter_trades": "已添加电池商品或报价",
+  "process-sicc_container": "已添加电池至 SICC 容器筛选表",
+  "process-profile_templates": "已添加电池至 玩家数据模板（Profile Templates） 内"
+}
