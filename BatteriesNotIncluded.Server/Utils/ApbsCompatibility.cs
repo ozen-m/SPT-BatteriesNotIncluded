@@ -1,13 +1,12 @@
 ﻿using HarmonyLib;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Spt.Mod;
 
 namespace BatteriesNotIncluded.Utils;
 
 [Injectable(InjectionType.Singleton)]
-public class ApbsCompatibility(IReadOnlyList<SptMod> sptMods, LoggerUtil loggerUtil)
+public class ApbsCompatibility(IReadOnlyList<SptMod> sptMods, LoggerUtil loggerUtil, IServiceProvider serviceProvider)
 {
     private bool? _dataLoaderFound;
     private Type _dataLoaderType;
@@ -52,9 +51,7 @@ public class ApbsCompatibility(IReadOnlyList<SptMod> sptMods, LoggerUtil loggerU
             _dataLoaderType = assembly.GetType("_progressiveBotSystem.Helpers.DataLoader");
             if (_dataLoaderType == null) continue;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-            _dataLoader = ServiceLocator.ServiceProvider.GetService(_dataLoaderType);
-#pragma warning restore CS0618 // Type or member is obsolete
+            _dataLoader = serviceProvider.GetService(_dataLoaderType);
             if (_dataLoader == null) continue;
 
             loggerUtil.Debug("[APBS Compatibility] DataLoader found");
