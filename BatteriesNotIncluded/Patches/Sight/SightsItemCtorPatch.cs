@@ -6,6 +6,7 @@ using SPT.Reflection.Patching;
 
 namespace BatteriesNotIncluded.Patches.Sight;
 
+[IgnoreAutoPatch]
 public class SightsItemCtorPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()

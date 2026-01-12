@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using BatteriesNotIncluded.External;
 using BatteriesNotIncluded.Models;
+using BatteriesNotIncluded.Patches.Earpiece;
+using BatteriesNotIncluded.Patches.Sight;
 using BatteriesNotIncluded.Utils;
 using BepInEx;
 using BepInEx.Bootstrap;
@@ -47,6 +49,9 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
         _patchManager = new PatchManager(this, true);
         _patchManager.EnablePatches();
+        
+        new HeadphonesItemCtorPatch().Enable();
+        new SightsItemCtorPatch().Enable();
 
         _ = Task.Run(() => _ = GetConfigFromServerAsync());
     }

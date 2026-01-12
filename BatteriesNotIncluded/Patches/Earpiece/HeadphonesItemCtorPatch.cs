@@ -9,7 +9,8 @@ namespace BatteriesNotIncluded.Patches.Earpiece;
 /// <summary>
 /// Add togglable component to HeadphonesItemClass
 /// </summary>
-public class HeadphonesCtorPatchPatch : ModulePatch
+[IgnoreAutoPatch]
+public class HeadphonesItemCtorPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {

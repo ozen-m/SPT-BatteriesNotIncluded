@@ -28,7 +28,7 @@ public class GameWorldCreatePatch : ModulePatch
             LoggerUtil.Error("Disabled mod Batteries Not Included. Fika is present but the sync addon is missing, please install the sync addon.");
             NotificationManagerClass.DisplayWarningNotification(
                 "Disabled mod Batteries Not Included. Fika is present but the sync addon is missing, please install the sync addon.",
-                ENotificationDurationType.Long
+                ENotificationDurationType.Infinite
             );
 
             return;
