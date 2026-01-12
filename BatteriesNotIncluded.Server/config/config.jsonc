@@ -15,8 +15,8 @@
         },
         // Scav bots
         "assault": {
-            "max": 20,
-            "min": 60
+            "max": 60,
+            "min": 20
         }
     },
     // Allow batteries in the SICC Case
