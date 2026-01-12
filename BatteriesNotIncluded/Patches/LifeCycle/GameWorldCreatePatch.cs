@@ -5,6 +5,7 @@ using BatteriesNotIncluded.Utils;
 using BepInEx.Bootstrap;
 using Comfort.Common;
 using EFT;
+using EFT.Communications;
 using SPT.Reflection.Patching;
 using UnityEngine;
 
@@ -24,7 +25,12 @@ public class GameWorldCreatePatch : ModulePatch
         if (Fika.IsFikaPresent && !Fika.IsFikaSyncPresent)
         {
             BatteriesNotIncluded.DisablePatches();
-            LoggerUtil.Error("Fika is present but the sync addon is missing, please install the sync addon. Disabled mod Batteries Not Included.");
+            LoggerUtil.Error("Disabled mod Batteries Not Included. Fika is present but the sync addon is missing, please install the sync addon.");
+            NotificationManagerClass.DisplayWarningNotification(
+                "Disabled mod Batteries Not Included. Fika is present but the sync addon is missing, please install the sync addon.",
+                ENotificationDurationType.Long
+            );
+
             return;
         }
 
