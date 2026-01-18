@@ -1,0 +1,23 @@
+{
+  "590a358486f77429692b2790 Name": "CR123A Batterie",
+  "590a358486f77429692b2790 ShortName": "CR123A",
+  "590a358486f77429692b2790 Description": "Kompakte und energiereiche Lithiumbatterie. Wird normalerweise in kleinen elektronischen Geräten und Waffenvisieren verwendet. Ist für ihre Zuverlässigkeit und lange Lebensdauer bekannt.",
+  "5672cb304bdc2dc2088b456a Name": "CR2032 Batterie",
+  "5672cb304bdc2dc2088b456a ShortName": "CR2032",
+  "5672cb304bdc2dc2088b456a Description": "Kleine Lithium-Knopfzelle. Wird normalerweise in solchen elektronischen Geräten wie Armbanduhren oder Taschenrechnern verwendet. Wird außerdem in einigen Militärgeräten wie Visieren und Laseraufsätzen benutzt. Zuverlässige und langlebige Stromquelle in einer kompakten Form.",
+  "TURNOFF": "EINSCHALTEN",
+  "TURNON": "AUSSCHALTEN",
+  "tooltip-remaining": "(noch ~{0}m übrig)",
+  "load-disabled": "Ausgeschaltet",
+  "load-success": "Erfolgreich geladen!",
+  "description-slots": "Benötigt %sx",
+  "description-runtime": "Hat eine Betriebszeit von %s",
+  "description-runtime_tactical": "Betriebszeit ist vom aktivierten Modus abhängig",
+  "process-total_devices": "Batteriefächer wurden für %s Gegenstände hinzugefügt",
+  "process-add_battery_slot": "{{deviceName}} ({{deviceId}}) Batteriefächer ({{slotCount}}) mit kompatiblen Batterien {{batteryName}} ({{runtime}}m) wurden hinzugefügt",
+  "process-default_battery": "{{deviceName}} ({{deviceId}}) hat keine festgelegte Batterie, wurde standardmäßig auf eine CR2032 Batterie geändert",
+  "process-mod_pools": "Batterien wurden zu Mod-Pools hinzugefügt",
+  "process-barter_trades": "Täusche für Batterien wurden hinzugefügt",
+  "process-sicc_container": "Batterien wurden zu den Filtern der SICC Organizer-Tasche hinzugefügt",
+  "process-profile_templates": "Batterien wurden zu Profilmustern hinzugefügt"
+}
