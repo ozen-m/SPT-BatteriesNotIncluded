@@ -207,13 +207,14 @@ public class DeviceManager : MonoBehaviour
 
     public void Remove(Item item)
     {
-        // I don't think this will ever get used
         var index = GetItemIndex(item);
-        if (index == -1)
-        {
-            throw new ArgumentException($"Can't find item {item.LocalizedShortName()} ({item.Id}) for removal");
-        }
+        if (index == -1) return;
+
+        // Update index lookup
+        var lastElement = Devices[^1];
+        _indexLookup[lastElement.Id] = index;
         _indexLookup.Remove(item.Id);
+
         RemoveAt(index);
     }
 

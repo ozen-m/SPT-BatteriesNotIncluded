@@ -7,6 +7,7 @@ using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Systems;
 using BatteriesNotIncluded.Utils;
 using EFT.InventoryLogic;
+using Fika.Core.Networking;
 
 namespace BatteriesNotIncluded.FikaSync.Managers;
 
@@ -19,11 +20,12 @@ public class DeviceSyncClientManager : BaseSyncManager
 
     private readonly List<Item> _itemsScratch = [];
 
-    public static DeviceSyncClientManager Create(DeviceManager deviceManager)
+    public static DeviceSyncClientManager Create(DeviceManager deviceManager, FikaClient fikaClient)
     {
         DeviceSyncClientManager syncManager = deviceManager.gameObject.AddComponent<DeviceSyncClientManager>();
         syncManager.DeviceManager = deviceManager;
 
+        fikaClient.RegisterNetReusable<DevicePacket>(syncManager.OnDevicePacketReceived);
         CorpseInventoryPatch.OnCorpseNewInventory += syncManager.OnCorpseNewInventory;
 
         return syncManager;
@@ -35,7 +37,7 @@ public class DeviceSyncClientManager : BaseSyncManager
         DeviceSubPacketPoolManager.Release();
     }
 
-    public void OnDevicePacketReceived(DevicePacket devicePacket)
+    private void OnDevicePacketReceived(DevicePacket devicePacket)
     {
         var index = DeviceManager.GetItemIndex(devicePacket.DeviceId);
         if (index == -1) return;

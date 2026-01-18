@@ -3,7 +3,7 @@
     <RootNamespace>BatteriesNotIncluded.FikaSync</RootNamespace>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>ozen</Authors>
     <RepositoryUrl>https://github.com/ozen-m/SPT-BatteriesNotIncluded</RepositoryUrl>
     <AssemblyName>$(Authors)-$(RootNamespace)</AssemblyName>

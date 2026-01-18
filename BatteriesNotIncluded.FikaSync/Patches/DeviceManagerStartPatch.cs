@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using BatteriesNotIncluded.FikaSync.Managers;
-using BatteriesNotIncluded.FikaSync.Packets;
 using BatteriesNotIncluded.FikaSync.Pools;
 using BatteriesNotIncluded.FikaSync.Utils;
 using BatteriesNotIncluded.Managers;
@@ -27,8 +26,7 @@ public class DeviceManagerStartPatch : ModulePatch
         {
             case FikaClient client:
             {
-                var syncManager = DeviceSyncClientManager.Create(__instance);
-                client.RegisterNetReusable<DevicePacket>(syncManager.OnDevicePacketReceived);
+                DeviceSyncClientManager.Create(__instance, client);
                 break;
             }
             case FikaServer server:

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace BatteriesNotIncluded.Utils;
 
@@ -8,7 +7,10 @@ public static class ListExtensions
     public static void SwapRemove<T>(this List<T> list, T toRemove)
     {
         int index = list.IndexOf(toRemove);
-        if (index == -1) throw new ArgumentException($"Element {toRemove} not found in list");
+        if (index == -1)
+        {
+            LoggerUtil.Warning($"Element {toRemove} not found in {list.GetType()}");
+        }
 
         list.SwapRemoveAt(index);
     }
