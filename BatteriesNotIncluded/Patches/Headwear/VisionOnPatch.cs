@@ -3,7 +3,6 @@ using BatteriesNotIncluded.Managers;
 using BSG.CameraEffects;
 using Comfort.Common;
 using EFT;
-using EFT.InventoryLogic;
 using SPT.Reflection.Patching;
 
 namespace BatteriesNotIncluded.Patches.Headwear;
@@ -22,13 +21,15 @@ public class NightVisionOnPatch : ModulePatch
     [PatchPrefix]
     public static bool Prefix(NightVision __instance, bool on)
     {
-        if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!on) return true;
 
-        NightVisionComponent component = GamePlayerOwner.MyPlayer.NightVisionObserver.Component;
+        var component = GamePlayerOwner.MyPlayer.NightVisionObserver.Component;
         if (component?.Item is null) return true;
 
-        if (!Singleton<DeviceManager>.Instance.GetIsOperable(component.Item))
+        var manager = Singleton<DeviceManager>.Instance;
+        if (manager == null) return true;
+
+        if (!manager.GetIsOperable(component.Item))
         {
             // Skip turning on components, but enable mask
             __instance.TextureMask.TryToEnable(__instance, true);
@@ -52,13 +53,15 @@ public class ThermalVisionOnPatch : ModulePatch
     [PatchPrefix]
     public static bool Prefix(ThermalVision __instance, bool on)
     {
-        if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!on) return true;
 
-        ThermalVisionComponent component = GamePlayerOwner.MyPlayer.ThermalVisionObserver.Component;
+        var component = GamePlayerOwner.MyPlayer.ThermalVisionObserver.Component;
         if (component?.Item is null) return true;
 
-        if (!Singleton<DeviceManager>.Instance.GetIsOperable(component.Item))
+        var manager = Singleton<DeviceManager>.Instance;
+        if (manager == null) return true;
+
+        if (!manager.GetIsOperable(component.Item))
         {
             // Skip turning on components, but enable mask
             __instance.TextureMask.TryToEnable(__instance, true);

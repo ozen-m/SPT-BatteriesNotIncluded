@@ -34,14 +34,15 @@ public class GameWorldCreatePatch : ModulePatch
             return;
         }
 
-        if (Singleton<DeviceManager>.Instantiated)
+        var manager = Singleton<DeviceManager>.Instance;
+        if (manager != null)
         {
             // Probably only caused by the hideout
             LoggerUtil.Info("DeviceManager already instantiated, destroying.");
-            Object.DestroyImmediate(Singleton<DeviceManager>.Instance);
+            Object.DestroyImmediate(manager);
         }
 
-        var manager = __result.gameObject.AddComponent<DeviceManager>();
+        manager = __result.gameObject.AddComponent<DeviceManager>();
         manager.SubscribeToGameWorld(__result);
         Singleton<DeviceManager>.Create(manager);
 

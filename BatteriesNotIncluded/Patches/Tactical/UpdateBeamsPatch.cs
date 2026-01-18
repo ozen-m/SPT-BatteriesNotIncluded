@@ -17,10 +17,15 @@ public class UpdateBeamsPatch : ModulePatch
     [PatchPostfix]
     public static void Postfix(TacticalComboVisualController __instance, bool isYourPlayer)
     {
-        if (ToSkip || !Singleton<DeviceManager>.Instantiated || __instance.LightMod == null) return;
+        if (ToSkip) return;
+
+        var lightMod = __instance.LightMod;
+        if (lightMod == null) return;
 
         var manager = Singleton<DeviceManager>.Instance;
-        manager.ManualUpdate(__instance.LightMod.Item);
+        if (manager == null) return;
+
+        manager.ManualUpdate(lightMod.Item);
         manager.UpdateDeviceMode(__instance);
 
         // BUG: Above not runs when turning dead bot's device on/off using item context menu extended

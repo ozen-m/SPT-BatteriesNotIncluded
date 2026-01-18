@@ -3,7 +3,6 @@ using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Utils;
 using Comfort.Common;
 using EFT;
-using EFT.InventoryLogic;
 using SPT.Reflection.Patching;
 using UnityEngine;
 
@@ -23,13 +22,14 @@ public class PlayNightVisionSoundPatch : ModulePatch
     [PatchPrefix]
     public static bool Prefix(Player __instance, AudioClip ___NightVisionOn, AudioClip ___NightVisionOff, Vector3 ___SpeechLocalPosition)
     {
-        if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!__instance.IsYourPlayer) return true;
-        
-        NightVisionComponent component = __instance.NightVisionObserver.Component;
+
+        var component = __instance.NightVisionObserver.Component;
         if (component?.Item is null) return true;
 
         var manager = Singleton<DeviceManager>.Instance;
+        if (manager == null) return true;
+
         var shouldPlayOnSound = component.Togglable == null || component.Togglable.On && manager.GetIsOperable(component.Item);
         __instance.PlayToggleSound(shouldPlayOnSound ? ___NightVisionOn : ___NightVisionOff, ___SpeechLocalPosition);
         return false;
@@ -46,13 +46,14 @@ public class PlayThermalVisionSoundPatch : ModulePatch
     [PatchPrefix]
     public static bool Prefix(Player __instance, AudioClip ___ThermalVisionOn, AudioClip ___ThermalVisionOff, Vector3 ___SpeechLocalPosition)
     {
-        if (!Singleton<DeviceManager>.Instantiated) return true;
         if (!__instance.IsYourPlayer) return true;
 
-        ThermalVisionComponent component = __instance.ThermalVisionObserver.Component;
+        var component = __instance.ThermalVisionObserver.Component;
         if (component?.Item is null) return true;
-        
+
         var manager = Singleton<DeviceManager>.Instance;
+        if (manager == null) return true;
+
         var shouldPlayOnSound = component.Togglable == null || component.Togglable.On && manager.GetIsOperable(component.Item);
         __instance.PlayToggleSound(shouldPlayOnSound ? ___ThermalVisionOn : ___ThermalVisionOff, ___SpeechLocalPosition);
         return false;

@@ -19,10 +19,11 @@ public class SightsChangePatch : ModulePatch
     [PatchPostfix]
     public static void Postfix(ProceduralWeaponAnimation __instance)
     {
-        if (!Singleton<DeviceManager>.Instantiated) return;
         if (!__instance.FirstPersonPointOfView) return;
 
         var manager = Singleton<DeviceManager>.Instance;
+        if (manager == null) return;
+
         foreach (var sight in __instance.ScopeAimTransforms)
         {
             if (sight.ScopePrefabCache == null) continue;

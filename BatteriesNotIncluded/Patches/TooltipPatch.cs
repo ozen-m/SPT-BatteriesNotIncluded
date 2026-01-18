@@ -24,9 +24,9 @@ public class TooltipPatch : ModulePatch
         if (__instance.Item is TacticalComboItemClass)
         {
             // Tactical devices drain is mode dependent
-            if (!Singleton<DeviceManager>.Instantiated) return;
-
             var manager = Singleton<DeviceManager>.Instance;
+            if (manager == null) return;
+
             var index = manager.GetItemIndex(__instance.Item.Id);
             if (index == -1) return;
 
