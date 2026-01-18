@@ -2,10 +2,11 @@
 // - Artem 3.0.1
 // - Echoes of Tarkov - Requisitions - NG 2.0.4
 // - Eco's Attachment Emporium 2.0.5
+// - ECOT - Eukyre's Consortium of Things 1.3.1
 // - Epic's All in One 4.0.6
 // - C11 - True North 2.4.0
 // - Canted Aim 1.0.7
-// - Impractical Tactical 1.1.0
+// - Impractical Tactical 1.2.0
 // - Peltor TEP-300 1.0.4
 // - WTT - Armory 2.0.2
 // - WTT - Content Backport 1.0.4
@@ -44,7 +45,16 @@
         "77f31a56076dc8e398797a7c": {"runtime": 5},
         "7e6c09774462ad3ef5025f08": {"slots": 2, "runtime": 120},
         "cd54f04eb7f0410772acbf35": {"slots": 2, "runtime": 120},
-        "e99dbf09963efebab19a118b": {"runtime": 5}
+        "e99dbf09963efebab19a118b": {"runtime": 5},
+        "6857c3a0b4fec9f18e5e5e36": {"runtime": 62500}, // ECOT - Eukyre's Consortium of Things - SIG Sauer ROMEO7 1x30 reflex sight
+        "685912a257837068f1460c7a": {"runtime": 62500}, // ECOT - Eukyre's Consortium of Things - SIG Sauer ROMEO7 1x30 reflex sight
+        "688aeef2c5d263a8c35b1f34": {"slots": 2, "runtime": 120}, // ECOT - Eukyre's Consortium of Things - Ops-Core AMP headset (Black Camo)
+        "688aefc150564afd4532b67f": {"slots": 2, "runtime": 120}, // ECOT - Eukyre's Consortium of Things - Ops-Core AMP headset (Coyote Tan Camo)
+        "688aefa52ef2321b6af2c455": {"slots": 2, "runtime": 120}, // ECOT - Eukyre's Consortium of Things - Ops-Core AMP headset (Coyote Tan)
+        "6933acf049b34a172e0fe627": {"slots": 2, "runtime": 50}, // ECOT - Eukyre's Consortium of Things - Peltor ComTac VI headset
+        "687306eb2a08d5fbb14e420f": {"slots": 2, "runtime": 50}, // ECOT - Eukyre's Consortium of Things - Walker's Razor Digital headset (Coyote Brown)
+        "687306ed80a6d21e454051a0": {"slots": 2, "runtime": 50}, // ECOT - Eukyre's Consortium of Things - Walker's Razor Digital headset (Multicam)
+        "687306f01fea767c8f3d41ed": {"slots": 2, "runtime": 50} // ECOT - Eukyre's Consortium of Things - Walker's Razor Digital headset (Special)
     },
     // CR2032
     "5672cb304bdc2dc2088b456a": {
@@ -62,7 +72,15 @@
         "684f2ebbd4f01748a7d154b9": {"runtime": 5000},
         "684f2eed5600200459543ecc": {"runtime": 5000},
         "684ca7ab1a059f229b96e1a3": {"runtime": 3000},
-        "684ca7a7dd567362e6a2d719": {"runtime": 3000}
+        "684ca7a7dd567362e6a2d719": {"runtime": 3000},
+        "686be3439781ee73643655df": {"runtime": 25000}, // ECOT - Eukyre's Consortium of Things - EOTech EFLX reflex sight
+        "686be3c56b940ba1dbd41a6c": {"runtime": 25000}, // ECOT - Eukyre's Consortium of Things - EOTech EFLX reflex sight (FDE)
+        "6858f8db6ed3644b6c11c9a0": {"runtime": 12000}, // ECOT - Eukyre's Consortium of Things - Holosun HE509T X2 reflex sight
+        "685904bd76b06df2198b2f1b": {"runtime": 12000}, // ECOT - Eukyre's Consortium of Things - Holosun HE509T X2 reflex sight (FDE)
+        "687e09aa7e70e1e285c59d4e": {"runtime": 20000}, // ECOT - Eukyre's Consortium of Things - Holosun HE510C reflex sight
+        "6960bc9172fcb3eb9da96b7c": {"runtime": 20000}, // ECOT - Eukyre's Consortium of Things - Holosun HE510C reflex sight (FDE)
+        "68642e0200397ba2b9e4ea9a": {"runtime": 1000}, // ECOT - Eukyre's Consortium of Things - Tasco ProPoint 1x42 reflex sight
+        "690d2fd49bf65492f6dcc8f1": {"runtime": 3000} // ECOT - Eukyre's Consortium of Things - Trijicon RMR HD reflex sight
     },
     // CR123A
     "590a358486f77429692b2790": {
@@ -104,28 +122,39 @@
         "685b40db60670990eb71ca2d": {"runtime": 1000},
         "6837716de936d83c13099eea": {"slots": 2},
         "68398cd864a9d113ebab1b77": {"slots": 2},
-        "68363c6fbfd14a9526e8601b": {"slots": 2}
+        "68363c6fbfd14a9526e8601b": {"slots": 2},
+        "685d43c384852051ef64e4e8": {"slots": 2, "runtime": 1100}, // ECOT - Eukyre's Consortium of Things - EOTech 553 holographic sight (FDE)
+        "6859411da7ac91f2e4088de4": {"runtime": 1000}, // ECOT - Eukyre's Consortium of Things - EOTech EXPS3-1 holographic sight
+        "696c2c39eaf80d744d6f5b36": {"runtime": 1000}, // ECOT - Eukyre's Consortium of Things - EOTech EXPS3-DCR holographic sight
+        "68922e39bacf39d24ca68ddf": {"runtime": 50000}, // ECOT - Eukyre's Consortium of Things - SIG Sauer ROMEO9T reflex sight
+        "6897de1182f827c8f199f355": {"runtime": 50000}, // ECOT - Eukyre's Consortium of Things - SIG Sauer ROMEO9T reflex sight (FDE)
+        "6925b6a0cb2dcc1e9f6081fd": {"slots": 2} // ECOT - Eukyre's Consortium of Things - CTF Photonics CTF-3 tactical device
     },
     // Devices that do not need batteries to operate
     "000000000000000000000000": {
-        "688a0b38467521f9080693a3": {},
-        "68c6e7ae55918f7c4f044d53": {},
-        "68c6e7ae55918f7c4f044d54": {},
-        "68c72885cac1ff3d420fceb1": {},
-        "68c72885cac1ff3d420fceb2": {},
-        "68c734bdcac1ff3d420fceb4": {},
-        "68c734bdcac1ff3d420fceb5": {},
-        "69069986473b8fd5e80545f3": {},
-        "6917bfb870f5e5d6aea8165d": {},
-        "6917c1976cf46fb7b4ffd866": {},
-        "692af926d829da17240a60d4": {},
-        "877f002b7dadc7ae31d1fda1": {},
-        "68d7db2929420f94ff04cb16": {},
-        "c26f2af872656829feb27c08": {},
-        "693c59557af373b906645b54": {},
-        "6953fb73a080184e990e0530": {},
-        "6953fce4a080184e990e0534": {},
-        "69449388fb63590d888f3ede": {},
-        "686a5a6247c881f613196f91": {}
+        "688a0b38467521f9080693a3": {}, // WTT-Content Backport - MeproLight Mepro M21 reflex sight
+        "68c6e7ae55918f7c4f044d53": {}, // Eco's Emporium - Strike Industries Sidewinder Rear Sight
+        "68c6e7ae55918f7c4f044d54": {}, // Eco's Emporium - Strike Industries Sidewinder Rear Sight (Red)
+        "68c72885cac1ff3d420fceb1": {}, // Eco's Emporium - Strike Industries Sidewinder Rear Sight Folded
+        "68c72885cac1ff3d420fceb2": {}, // Eco's Emporium - Strike Industries Sidewinder Rear Sight (Red) Folded
+        "68c734bdcac1ff3d420fceb4": {}, // Eco's Emporium - Strike Industries Sidewinder Rear Sight (FDE) Folded
+        "68c734bdcac1ff3d420fceb5": {}, // Eco's Emporium - Strike Industries Sidewinder Rear Sight (FDE)
+        "69069986473b8fd5e80545f3": {}, // Canted Aim - Canted Aim
+        "6917bfb870f5e5d6aea8165d": {}, // C11 - True North - Ops-Core AMP Arms
+        "6917c1976cf46fb7b4ffd866": {}, // C11 - True North - AXL Advanced RAC Link Gen 1
+        "692af926d829da17240a60d4": {}, // Eco's Emporium - Laser Products Model 7
+        "877f002b7dadc7ae31d1fda1": {}, // Epic's AIO - Unity Tactical FAST Micro Mount  2.26
+        "68d7db2929420f94ff04cb16": {}, // Eco's Emporium - Pressure pad for Steiner DBAL-A3
+        "c26f2af872656829feb27c08": {}, // Epic's AIO - Unity Tactical FAST Micro Mount  2.26 (FDE)
+        "693c59557af373b906645b54": {}, // UNITY Tactical Platform Adapter
+        "6953fb73a080184e990e0530": {}, // Eco's Emporium - Eratac Rear Sight
+        "6953fce4a080184e990e0534": {}, // Eco's Emporium - Eratac Rear Sight
+        "69449388fb63590d888f3ede": {}, // Impractical Tactical - Gentex CEP Integrated Communications System
+        "686a5a6247c881f613196f91": {}, // Echoes of Tarkov - Canted Aim
+        "695d6236499f37e727446f60": {}, // Impractical Tactical - LaRue Tactical C-Note Iron Sights
+        "68aa3a5f787df691308656c6": {}, // ECOT - Eukyre's Consortium of Things - Troy Battlesight offset rear sight
+        "68599b6ad4d99d0c051b5964": {}, // ECOT - Eukyre's Consortium of Things - Unity Tactical FAST Micro sight mount (Bronze)
+        "68599c5272359bd6b568656c": {}, // ECOT - Eukyre's Consortium of Things - Unity Tactical FAST Micro sight mount (Green)
+        "68599c64f0a918bcd731198f": {} // ECOT - Eukyre's Consortium of Things - Unity Tactical FAST Micro sight mount (White)
     }
 }
