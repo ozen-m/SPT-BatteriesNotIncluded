@@ -51,7 +51,7 @@ public class TooltipPatch : ModulePatch
             }
         }
 
-        if (count == data.SlotCount && min > 0f)
+        if (count == data.SlotCount && min < float.MaxValue)
         {
             __result = $"{__result} {string.Format("tooltip-remaining".Localized(), (int)(min / drainPerSecond / 60f))}";
         }

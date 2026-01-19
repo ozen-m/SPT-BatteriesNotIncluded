@@ -60,13 +60,12 @@ public class TacticalVisualHandler(DeviceManager manager)
 #endif
     }
 
-    public void TurnOffLightVisibility(Item item)
+    public void UpdateLightVisibility(Item item)
     {
         foreach (var controller in _controllers)
         {
             if (controller.LightMod.Item != item) continue;
 
-            controller.LightMod.IsActive = false;
             var isYourPlayer = controller.LightMod.Item.Owner is Player.PlayerInventoryController inv && inv.Player_0.IsYourPlayer;
 
             controller.UpdateBeams(isYourPlayer);
