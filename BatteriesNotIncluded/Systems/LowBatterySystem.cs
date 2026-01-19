@@ -77,7 +77,7 @@ public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval
             case ThermalVisionComponent:
             {
                 NotificationManagerClass.DisplayWarningNotification(
-                    $"Low Battery Warning: {item.LocalizedName()}",
+                    string.Format("low-battery".Localized(), item.LocalizedName()),
                     ENotificationDurationType.Long
                 );
 
@@ -99,7 +99,7 @@ public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval
                         break;
                     case HeadphonesItemClass:
                         NotificationManagerClass.DisplayWarningNotification(
-                            $"Low Battery: {item.LocalizedName()}",
+                            string.Format("low-battery".Localized(), item.LocalizedName()),
                             ENotificationDurationType.Long
                         );
                         break;
