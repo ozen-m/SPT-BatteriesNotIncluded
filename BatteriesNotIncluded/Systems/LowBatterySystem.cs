@@ -46,8 +46,8 @@ public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval
             }
         }
 
-        var runtimeMins = minResourceVal / manager.DrainPerSecond[i] / 60f;
-        return runtimeMins < 5f; // TODO: add config
+        var runtimeMins = (int)(minResourceVal / manager.DrainPerSecond[i] / 60f);
+        return runtimeMins < BatteriesNotIncluded.LowBatteryRuntimeThreshold.Value;
     }
 
     private static readonly WaitForSeconds _waitInterval = new(0.3f);

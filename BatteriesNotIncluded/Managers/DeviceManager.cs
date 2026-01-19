@@ -44,7 +44,7 @@ public class DeviceManager : MonoBehaviour
         _sightModVisualHandler = new SightModVisualHandler(this);
         _tacticalVisualHandler = new TacticalVisualHandler(this);
 
-        _systems.Add(new LowBatterySystem(60000f)); // TODO: Configurable interval
+        _systems.Add(new LowBatterySystem(BatteriesNotIncluded.LowBatterySystemInterval.Value * 1000f));
 
         if (Fika.IsFikaClient)
         {

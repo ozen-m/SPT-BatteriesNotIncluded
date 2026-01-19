@@ -27,6 +27,8 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 {
     public static ManualLogSource LogSource;
     public static ConfigEntry<bool> ShowRemainingBattery;
+    public static ConfigEntry<float> LowBatterySystemInterval;
+    public static ConfigEntry<int> LowBatteryRuntimeThreshold;
     public static ConfigEntry<bool> DebugLogs;
 
     private static Dictionary<MongoID, DeviceData> _deviceBatteryDefinitions = [];
@@ -42,7 +44,9 @@ public class BatteriesNotIncluded : BaseUnityPlugin
 
         CheckForPrepatch();
 
-        ShowRemainingBattery = Config.Bind("General", "Remaining Battery Tooltip", true, new ConfigDescription("Show remaining runtime when hovering over a device", null, new ConfigurationManagerAttributes() { Order = 1 }));
+        ShowRemainingBattery = Config.Bind("General", "Remaining Battery Tooltip", true, new ConfigDescription("Show remaining runtime when hovering over a device", null, new ConfigurationManagerAttributes() { Order = 3 }));
+        LowBatterySystemInterval = Config.Bind("Low Battery Indicator", "Interval (seconds)", 60f, new ConfigDescription("How often (in seconds) to check for low battery devices\nWill take effect next raid", null, new ConfigurationManagerAttributes() { Order = 2 }));
+        LowBatteryRuntimeThreshold = Config.Bind("Low Battery Indicator", "Runtime Threshold (minutes)", 5, new ConfigDescription("Remaining runtime (in minutes) for a device to be considered low battery", null, new ConfigurationManagerAttributes() { Order = 1 }));
         DebugLogs = Config.Bind("Debug", "Logging", false, new ConfigDescription("Show debug logs", null, new ConfigurationManagerAttributes() { IsAdvanced = true, Order = 0 }));
 
         Fika.IsFikaPresent = Chainloader.PluginInfos.ContainsKey("com.fika.core");
