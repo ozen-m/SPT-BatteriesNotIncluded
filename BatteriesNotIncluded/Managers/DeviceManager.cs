@@ -44,6 +44,8 @@ public class DeviceManager : MonoBehaviour
         _sightModVisualHandler = new SightModVisualHandler(this);
         _tacticalVisualHandler = new TacticalVisualHandler(this);
 
+        _systems.Add(new LowBatterySystem(BatteriesNotIncluded.LowBatterySystemInterval.Value * 1000f));
+
         if (Fika.IsFikaClient)
         {
             return;
@@ -185,7 +187,7 @@ public class DeviceManager : MonoBehaviour
         return index == -1 || IsOperable[index];
     }
 
-    public void UpdateSightVisibility(Item item)
+    public void EnforceSightVisibility(Item item)
     {
         var index = GetItemIndex(item);
         if (index == -1) return;
@@ -193,13 +195,15 @@ public class DeviceManager : MonoBehaviour
         var relatedComponent = RelatedComponentRef[index];
         if (relatedComponent is TogglableComponent togglable)
         {
-            _sightModVisualHandler.UpdateSightVisibility(item, togglable!.On && IsActive[index]);
+            SetSightVisibility(item, togglable!.On && IsActive[index]);
         }
     }
 
+    public void SetSightVisibility(Item item, bool shouldBeActive) => _sightModVisualHandler.SetSightVisibility(item, shouldBeActive);
+
     public void UpdateDeviceMode(TacticalComboVisualController controller) => _tacticalVisualHandler.UpdateDeviceMode(controller);
 
-    public void TurnOffLightVisibility(Item item) => _tacticalVisualHandler.TurnOffLightVisibility(item);
+    public void UpdateLightVisibility(Item item) => _tacticalVisualHandler.UpdateLightVisibility(item);
 
     public bool IsItemRegistered(Item item) => IsItemRegistered(item.Id);
 
@@ -361,23 +365,20 @@ public class DeviceManager : MonoBehaviour
         switch (component)
         {
             case LightComponent:
-                // Light component doesn't have an event we can subscribe to, do it in CanChangeLightStatePatch.
+                // Light component doesn't have an event we can subscribe to, do it in UpdateBeamsPatch.
                 return;
             case NightVisionComponent nightVisionComponent:
-                _unsubscribeEvents.Add(nightVisionComponent.Togglable.OnChanged.Subscribe(() =>
-                    ManualUpdate(nightVisionComponent.Togglable.Item)
-                ));
+                var item = nightVisionComponent.Togglable.Item;
+                _unsubscribeEvents.Add(nightVisionComponent.Togglable.OnChanged.Subscribe(() => ManualUpdate(item)));
                 return;
             case ThermalVisionComponent thermalVisionComponent:
-                _unsubscribeEvents.Add(thermalVisionComponent.Togglable.OnChanged.Subscribe(() =>
-                    ManualUpdate(thermalVisionComponent.Togglable.Item)
-                ));
+                item = thermalVisionComponent.Togglable.Item;
+                _unsubscribeEvents.Add(thermalVisionComponent.Togglable.OnChanged.Subscribe(() => ManualUpdate(item)));
                 return;
             case TogglableComponent togglableComponent:
             {
-                _unsubscribeEvents.Add(togglableComponent.OnChanged.Subscribe(() =>
-                    OnToggle(togglableComponent.Item)
-                ));
+                item = togglableComponent.Item;
+                _unsubscribeEvents.Add(togglableComponent.OnChanged.Subscribe(() => OnToggle(item)));
                 return;
             }
             default:
@@ -392,7 +393,8 @@ public class DeviceManager : MonoBehaviour
     {
         foreach (var slot in batterySlots)
         {
-            _unsubscribeEvents.Add(slot.ReactiveContainedItem.Subscribe((_) => ManualUpdate(slot.ParentItem)));
+            var parentItem = slot.ParentItem;
+            _unsubscribeEvents.Add(slot.ReactiveContainedItem.Subscribe((_) => ManualUpdate(parentItem)));
         }
     }
 
@@ -410,7 +412,7 @@ public class DeviceManager : MonoBehaviour
                 playerInvCont.Player_0.UpdatePhonesReally();
                 break;
             case SightsItemClass:
-                UpdateSightVisibility(item);
+                EnforceSightVisibility(item);
                 break;
         }
     }

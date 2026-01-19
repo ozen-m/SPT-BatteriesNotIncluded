@@ -19,7 +19,7 @@ public class DeviceEnforcementSystem : BaseSystem
 
         // Became inoperable/operable
         var component = manager.RelatedComponentRef[i];
-        var item = component.Item;
+        var item = manager.Devices[i];
         switch (component)
         {
             case LightComponent lightComponent:
@@ -28,7 +28,7 @@ public class DeviceEnforcementSystem : BaseSystem
                 {
                     // Removed batteries or battery drained
                     lightComponent.IsActive = false;
-                    SetLightState(lightComponent, manager);
+                    UpdateLightVisibility(lightComponent, manager);
                 }
                 /*
                  else if (isToggled)
@@ -91,7 +91,7 @@ public class DeviceEnforcementSystem : BaseSystem
                 switch (item)
                 {
                     case SightsItemClass:
-                        manager.UpdateSightVisibility(item);
+                        manager.EnforceSightVisibility(item);
                         return;
                     case HeadphonesItemClass:
                         // NOTE: UpdatePhonesReally runs twice, one on Player.OnItemAddedOrRemoved (too late)
@@ -108,7 +108,7 @@ public class DeviceEnforcementSystem : BaseSystem
         }
     }
 
-    public static void SetLightState(LightComponent lightComponent, DeviceManager manager)
+    public static void UpdateLightVisibility(LightComponent lightComponent, DeviceManager manager)
     {
         // Skip patch since we're the one calling
         UpdateBeamsPatch.ToSkip = true;
@@ -117,7 +117,7 @@ public class DeviceEnforcementSystem : BaseSystem
             if (lightComponent.Item.Owner is not Player.PlayerInventoryController playerInvCont)
             {
                 // Fallback to internal UpdateBeams
-                manager.TurnOffLightVisibility(lightComponent.Item);
+                manager.UpdateLightVisibility(lightComponent.Item);
                 return;
             }
 
@@ -131,7 +131,7 @@ public class DeviceEnforcementSystem : BaseSystem
                 {
                     if (lightController.LightMod.Item.Id != lightComponent.Item.Id) continue;
 
-                    SetHeadLightState(player);
+                    UpdateHeadLightState(player);
                     return;
                 }
             }
@@ -144,7 +144,7 @@ public class DeviceEnforcementSystem : BaseSystem
             }
 
             // Fallback to internal UpdateBeams
-            manager.TurnOffLightVisibility(lightComponent.Item);
+            manager.UpdateLightVisibility(lightComponent.Item);
         }
         finally
         {
@@ -152,7 +152,7 @@ public class DeviceEnforcementSystem : BaseSystem
         }
     }
 
-    private static void SetHeadLightState(Player player)
+    private static void UpdateHeadLightState(Player player)
     {
         // Set animation active to true to avoid animation
         _isHeadLightsAnimationActiveField(player) = true;

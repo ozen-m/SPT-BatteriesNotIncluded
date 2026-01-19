@@ -8,6 +8,7 @@
   "TURNOFF": "TURN OFF",
   "TURNON": "TURN ON",
   "tooltip-remaining": "(~{0}m left)",
+  "low-battery": "Low Battery: {0}",
   "load-disabled": "is disabled",
   "load-success": "loaded successfully!",
   "description-slots": "Uses %sx",

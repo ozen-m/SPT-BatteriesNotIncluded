@@ -8,6 +8,7 @@
   "TURNOFF": "ВЫКЛЮЧИТЬ",
   "TURNON": "ВКЛЮЧИТЬ",
   "tooltip-remaining": "(осталось ~{0}m)",
+  "low-battery": "Низкий заряд: {0}",
   "load-disabled": "Выключен",
   "load-success": "Успешно загружен!",
   "description-slots": "Требует %sx",

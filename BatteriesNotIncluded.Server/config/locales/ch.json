@@ -8,6 +8,7 @@
   "TURNOFF": "关闭用电设备",
   "TURNON": "开启用电设备",
   "tooltip-remaining": "(约剩余{0} 分)",
+  "low-battery": "Low Battery: {0}",
   "load-disabled": "已关闭",
   "load-success": "加载成功！",
   "description-slots": "使用 %sx",
