@@ -26,38 +26,34 @@ public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval
                 !playerInvCont.Player_0.IsYourPlayer ||
                 item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */) continue;
 
-            if (IsLowBattery(manager, i))
+            var minResourceVal = float.MaxValue;
+            foreach (var slot in manager.BatterySlots[i])
+            {
+                if (slot.ContainedItem is null || !slot.ContainedItem.TryGetItemComponent(out ResourceComponent resource))
+                {
+                    LoggerUtil.Warning($"{nameof(LowBatterySystem)}: Slot is missing battery while active for device {manager.Devices[i].ToFullString()}");
+                    continue;
+                }
+
+                var val = resource.Value;
+                if (val < minResourceVal)
+                {
+                    minResourceVal = val;
+                }
+            }
+            var runtimeMins = (int)(minResourceVal / manager.DrainPerSecond[i] / 60f);
+            var isLowBattery = runtimeMins < BatteriesNotIncluded.LowBatteryRuntimeThreshold.Value;
+
+            if (isLowBattery)
             {
                 manager.StartCoroutine(ShowWarning(manager, i, 3));
             }
         }
     }
 
-    private bool IsLowBattery(DeviceManager manager, int i)
-    {
-        var minResourceVal = float.MaxValue;
-        foreach (var slot in manager.BatterySlots[i])
-        {
-            if (slot.ContainedItem is null || !slot.ContainedItem.TryGetItemComponent(out ResourceComponent resource))
-            {
-                LoggerUtil.Warning($"{nameof(LowBatterySystem)}::{nameof(IsLowBattery)} Slot has missing batteries while active for device {manager.Devices[i].ToFullString()}");
-                continue;
-            }
-
-            var val = resource.Value;
-            if (val < minResourceVal)
-            {
-                minResourceVal = val;
-            }
-        }
-
-        var runtimeMins = (int)(minResourceVal / manager.DrainPerSecond[i] / 60f);
-        return runtimeMins < BatteriesNotIncluded.LowBatteryRuntimeThreshold.Value;
-    }
-
     private static readonly WaitForSeconds _waitInterval = new(0.3f);
 
-    private static IEnumerator ShowWarning(DeviceManager manager, int i, int count)
+    private static IEnumerator ShowWarning(DeviceManager manager, int i, int blinkCount)
     {
         var component = manager.RelatedComponentRef[i];
         var item = manager.Devices[i];
@@ -65,7 +61,7 @@ public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval
         {
             case LightComponent lightComponent:
             {
-                for (int j = 0; j < count; j++)
+                for (int j = 0; j < blinkCount; j++)
                 {
                     lightComponent.IsActive = false;
                     DeviceEnforcementSystem.UpdateLightVisibility(lightComponent, manager);
@@ -93,7 +89,7 @@ public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval
                 switch (item)
                 {
                     case SightsItemClass:
-                        for (int j = 0; j < count; j++)
+                        for (int j = 0; j < blinkCount; j++)
                         {
                             manager.SetSightVisibility(item, false);
                             yield return _waitInterval;
