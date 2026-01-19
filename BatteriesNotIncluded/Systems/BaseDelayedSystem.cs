@@ -8,17 +8,7 @@ public abstract class BaseDelayedSystem(float runInterval) : ISystem
     protected readonly float RunInterval = runInterval;
     private readonly Stopwatch _runTimer = Stopwatch.StartNew();
 
-    public virtual void Run(DeviceManager manager)
-    {
-        if (!CanRun()) return;
-
-        for (var i = 0; i < manager.Devices.Count; i++)
-        {
-            Run(manager, i);
-        }
-    }
-
-    public abstract void Run(DeviceManager manager, int i);
+    public abstract void Run(DeviceManager manager);
 
     public virtual void ForceRun(DeviceManager manager)
     {
@@ -26,7 +16,7 @@ public abstract class BaseDelayedSystem(float runInterval) : ISystem
         Run(manager);
     }
 
-    private bool CanRun()
+    protected bool CanRun()
     {
         if (_runTimer.ElapsedMilliseconds < RunInterval) return false;
 
@@ -34,8 +24,5 @@ public abstract class BaseDelayedSystem(float runInterval) : ISystem
         return true;
     }
 
-    private void RestartTimer()
-    {
-        _runTimer.Restart();
-    }
+    private void RestartTimer() => _runTimer.Restart();
 }

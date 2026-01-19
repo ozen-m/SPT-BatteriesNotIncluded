@@ -2,7 +2,7 @@
 
 namespace BatteriesNotIncluded.Systems;
 
-public interface ISystem
+public interface IManualSystem
 {
-    public void Run(DeviceManager manager);
+    public void Run(DeviceManager manager, int i);
 }

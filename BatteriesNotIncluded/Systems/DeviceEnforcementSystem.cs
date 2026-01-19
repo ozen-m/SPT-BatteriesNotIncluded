@@ -9,9 +9,9 @@ using HarmonyLib;
 
 namespace BatteriesNotIncluded.Systems;
 
-public class DeviceEnforcementSystem : BaseSystem
+public class DeviceEnforcementSystem : IManualSystem
 {
-    public override void Run(DeviceManager manager, int i)
+    public void Run(DeviceManager manager, int i)
     {
         var isOperable = manager.IsOperable[i];
         var sameState = manager.IsPrevOperable[i] == isOperable;

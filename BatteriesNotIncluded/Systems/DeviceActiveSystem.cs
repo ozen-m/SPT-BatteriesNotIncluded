@@ -4,9 +4,9 @@ using EFT.InventoryLogic;
 
 namespace BatteriesNotIncluded.Systems;
 
-public class DeviceActiveSystem : BaseSystem
+public class DeviceActiveSystem : IManualSystem
 {
-    public override void Run(DeviceManager manager, int i)
+    public void Run(DeviceManager manager, int i)
     {
         manager.IsPrevActive[i] = manager.IsActive[i];
 

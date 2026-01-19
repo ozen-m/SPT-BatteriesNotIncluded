@@ -24,7 +24,7 @@ public class DeviceManager : MonoBehaviour
     public readonly List<GClass3379> RelatedComponentRef = [];
 
     private readonly List<ISystem> _systems = [];
-    private readonly List<ISystem> _manualSystems = [];
+    private readonly List<IManualSystem> _manualSystems = [];
 
     private readonly List<Action> _unsubscribeEvents = [];
     private readonly List<Item> _playerItemsScratch = new(128);
@@ -75,14 +75,6 @@ public class DeviceManager : MonoBehaviour
         }
     }
 
-    public void ManualUpdate()
-    {
-        foreach (ISystem system in _manualSystems)
-        {
-            system.Run(this);
-        }
-    }
-
     public void ManualUpdate(Item item) => ManualUpdate(item.Id);
 
     public void ManualUpdate(string itemId)
@@ -90,7 +82,7 @@ public class DeviceManager : MonoBehaviour
         var index = GetItemIndex(itemId);
         if (index == -1) return;
 
-        foreach (ISystem system in _manualSystems)
+        foreach (IManualSystem system in _manualSystems)
         {
             system.Run(this, index);
         }

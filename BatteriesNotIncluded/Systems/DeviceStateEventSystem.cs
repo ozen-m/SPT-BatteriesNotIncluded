@@ -3,14 +3,14 @@ using BatteriesNotIncluded.Managers;
 
 namespace BatteriesNotIncluded.Systems;
 
-public class DeviceStateEventSystem : BaseSystem
+public class DeviceStateEventSystem : IManualSystem
 {
     /// <summary>
     /// Fika event hook: DeviceId, IsOperable, IsActive
     /// </summary>
     public event Action<string, bool, bool> OnDeviceStateChanged;
 
-    public override void Run(DeviceManager manager, int i)
+    public void Run(DeviceManager manager, int i)
     {
         var isOperable = manager.IsOperable[i];
         var isActive = manager.IsActive[i];

@@ -11,20 +11,25 @@ namespace BatteriesNotIncluded.Systems;
 
 public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval)
 {
-    public override void Run(DeviceManager manager, int i)
+    public override void Run(DeviceManager manager)
     {
-        var isActive = manager.IsActive[i];
-        if (!isActive) return;
+        if (!CanRun()) return;
 
-        // Only warn for your player and device is in your equipment
-        var item = manager.Devices[i];
-        if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
-            !playerInvCont.Player_0.IsYourPlayer ||
-            item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */) return;
-
-        if (IsLowBattery(manager, i))
+        for (var i = 0; i < manager.Devices.Count; i++)
         {
-            manager.StartCoroutine(ShowWarning(manager, i, 3));
+            var isActive = manager.IsActive[i];
+            if (!isActive) continue;
+
+            // Only warn for your player and device is in your equipment
+            var item = manager.Devices[i];
+            if (item.Owner is not Player.PlayerInventoryController playerInvCont ||
+                !playerInvCont.Player_0.IsYourPlayer ||
+                item.CurrentAddress is GClass3393 /* If in active slot (a grid?) */) continue;
+
+            if (IsLowBattery(manager, i))
+            {
+                manager.StartCoroutine(ShowWarning(manager, i, 3));
+            }
         }
     }
 
