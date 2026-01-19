@@ -187,7 +187,7 @@ public class DeviceManager : MonoBehaviour
         return index == -1 || IsOperable[index];
     }
 
-    public void UpdateSightVisibility(Item item)
+    public void EnforceSightVisibility(Item item)
     {
         var index = GetItemIndex(item);
         if (index == -1) return;
@@ -195,11 +195,11 @@ public class DeviceManager : MonoBehaviour
         var relatedComponent = RelatedComponentRef[index];
         if (relatedComponent is TogglableComponent togglable)
         {
-            UpdateSightVisibility(item, togglable!.On && IsActive[index]);
+            SetSightVisibility(item, togglable!.On && IsActive[index]);
         }
     }
 
-    public void UpdateSightVisibility(Item item, bool shouldBeActive) => _sightModVisualHandler.UpdateSightVisibility(item, shouldBeActive);
+    public void SetSightVisibility(Item item, bool shouldBeActive) => _sightModVisualHandler.SetSightVisibility(item, shouldBeActive);
 
     public void UpdateDeviceMode(TacticalComboVisualController controller) => _tacticalVisualHandler.UpdateDeviceMode(controller);
 
@@ -412,7 +412,7 @@ public class DeviceManager : MonoBehaviour
                 playerInvCont.Player_0.UpdatePhonesReally();
                 break;
             case SightsItemClass:
-                UpdateSightVisibility(item);
+                EnforceSightVisibility(item);
                 break;
         }
     }

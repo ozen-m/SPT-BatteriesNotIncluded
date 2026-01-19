@@ -90,10 +90,10 @@ public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval
                     case SightsItemClass:
                         for (int j = 0; j < count; j++)
                         {
-                            manager.UpdateSightVisibility(item, false);
+                            manager.SetSightVisibility(item, false);
                             yield return _waitInterval;
 
-                            manager.UpdateSightVisibility(item, true);
+                            manager.SetSightVisibility(item, true);
                             yield return _waitInterval;
                         }
                         break;

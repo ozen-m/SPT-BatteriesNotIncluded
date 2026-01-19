@@ -91,7 +91,7 @@ public class DeviceEnforcementSystem : BaseSystem
                 switch (item)
                 {
                     case SightsItemClass:
-                        manager.UpdateSightVisibility(item);
+                        manager.EnforceSightVisibility(item);
                         return;
                     case HeadphonesItemClass:
                         // NOTE: UpdatePhonesReally runs twice, one on Player.OnItemAddedOrRemoved (too late)

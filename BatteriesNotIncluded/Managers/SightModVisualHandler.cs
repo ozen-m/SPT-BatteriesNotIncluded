@@ -20,13 +20,13 @@ public class SightModVisualHandler
         CaptureSightControllerPatch.OnSetSightMode += AddController;
     }
 
-    public void UpdateSightVisibility(Item item, bool shouldBeActive)
+    public void SetSightVisibility(Item item, bool shouldBeActive)
     {
         foreach (var controller in _controllers)
         {
             if (controller.SightMod.Item != item) continue;
 
-            UpdateSightVisibilityInternal(controller, shouldBeActive);
+            SetSightVisibilityInternal(controller, shouldBeActive);
         }
     }
 
@@ -53,7 +53,7 @@ public class SightModVisualHandler
         }
     }
 
-    private void UpdateSightVisibilityInternal(SightModVisualControllers controller, bool shouldBeActive)
+    private void SetSightVisibilityInternal(SightModVisualControllers controller, bool shouldBeActive)
     {
         var scopePrefabCache = _scopePrefabCacheField(controller);
         var scopeModeInfos = _scopeModeInfosField(scopePrefabCache);
