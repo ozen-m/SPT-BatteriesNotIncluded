@@ -125,7 +125,7 @@ public class DeviceEnforcementSystem : IManualSystem
 
             // LightComponent is headlight
             var helmetLights = _helmetLightControllersField(player) as List<TacticalComboVisualController>;
-            if (helmetLights!.Count > 0)
+            if (helmetLights?.Count > 0)
             {
                 foreach (var lightController in helmetLights)
                 {

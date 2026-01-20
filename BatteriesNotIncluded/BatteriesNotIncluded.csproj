@@ -43,6 +43,10 @@
       <HintPath>$(SPTPath)BepInEx\plugins\spt\spt-reflection.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="spt-singleplayer">
+      <HintPath>$(SPTPath)BepInEx\plugins\spt\spt-singleplayer.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\references\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>

@@ -7,6 +7,7 @@ using BatteriesNotIncluded.Utils;
 using Comfort.Common;
 using EFT;
 using EFT.InventoryLogic;
+using SPT.SinglePlayer.Utils.InRaid;
 using UnityEngine;
 
 namespace BatteriesNotIncluded.Managers;
@@ -261,7 +262,7 @@ public class DeviceManager : MonoBehaviour
         player.Inventory.Equipment.GetAllItemsNonAlloc(_playerItemsScratch, false, false);
         foreach (var item in _playerItemsScratch)
         {
-            RegisterItem(item, true, player);
+            TryRegisterItem(item, player, true);
         }
 
         _playerItemsScratch.Clear();
@@ -283,7 +284,7 @@ public class DeviceManager : MonoBehaviour
         }
         foreach (var item in worldItems)
         {
-            RegisterItem(item, false, null);
+            TryRegisterItem(item, null, false);
 
             // TODO: Add batteries to world items?
         }
@@ -291,23 +292,27 @@ public class DeviceManager : MonoBehaviour
         worldItems.Clear();
     }
 
-    private void RegisterItem(Item item, bool isPlayerItem, Player player)
+    /// <summary>
+    /// Register a device into the manager, if it is a battery-operated device
+    /// </summary>
+    /// <param name="isPlayerItem">Used to avoid Unity null checks</param>
+    private void TryRegisterItem(Item item, Player player, bool isPlayerItem)
     {
         if (item is not CompoundItem compoundItem) return;
         if (!BatteriesNotIncluded.GetDeviceData(compoundItem.TemplateId, out var deviceData)) return;
 
         Slot[] batterySlots = compoundItem.GetBatterySlots(deviceData.SlotCount);
 
-        if (isPlayerItem && player.SearchController is BotSearchControllerClass)
+        if (isPlayerItem && (player.SearchController is BotSearchControllerClass || RaidChangesUtil.IsScavRaid))
         {
             // AI controlled, player.IsAI not yet available
-            AddBatteriesToBotDevice(player, compoundItem, batterySlots, ref deviceData);
+            AddBatteriesToDevice(player, compoundItem, batterySlots, ref deviceData);
         }
 
         Add(compoundItem, batterySlots, ref deviceData);
     }
 
-    private void AddBatteriesToBotDevice(Player player, CompoundItem device, Slot[] batterySlots, ref DeviceData deviceData)
+    private void AddBatteriesToDevice(Player player, Item device, Slot[] batterySlots, ref DeviceData deviceData)
     {
         for (var i = 0; i < batterySlots.Length; i++)
         {
