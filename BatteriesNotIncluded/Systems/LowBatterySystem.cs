@@ -75,30 +75,26 @@ public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval
             }
             case TogglableComponent:
             {
-                switch (item)
+                if (item is SightsItemClass)
                 {
-                    case SightsItemClass:
-                        for (int j = 0; j < blinkCount; j++)
-                        {
-                            manager.SetSightVisibility(item, false);
-                            yield return _waitInterval;
+                    for (int j = 0; j < blinkCount; j++)
+                    {
+                        manager.SetSightVisibility(item, false);
+                        yield return _waitInterval;
 
-                            manager.SetSightVisibility(item, true);
-                            yield return _waitInterval;
-                        }
-                        break;
+                        manager.SetSightVisibility(item, true);
+                        yield return _waitInterval;
+                    }
+                    yield break;
                 }
 
-                yield break;
-            }
-            default:
-            {
-                NotificationManagerClass.DisplayWarningNotification(
-                    string.Format("low-battery".Localized(), item.LocalizedName()),
-                    ENotificationDurationType.Long
-                );
-                yield break;
+                break;
             }
         }
+
+        NotificationManagerClass.DisplayWarningNotification(
+            string.Format("low-battery".Localized(), item.LocalizedName()),
+            ENotificationDurationType.Long
+        );
     }
 }
