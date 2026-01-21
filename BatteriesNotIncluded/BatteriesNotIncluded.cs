@@ -80,7 +80,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         );
         EnableSightsHotkey = Config.Bind(
             "Sights Hotkey",
-            "Enable",
+            "Enabled",
             false,
             new ConfigDescription(
                 "Enables toggling sights of your current weapon\nTakes effect next raid",
