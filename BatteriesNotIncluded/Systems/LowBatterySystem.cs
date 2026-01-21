@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Utils;
 using EFT;
@@ -74,16 +73,6 @@ public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval
 
                 yield break;
             }
-            case NightVisionComponent:
-            case ThermalVisionComponent:
-            {
-                NotificationManagerClass.DisplayWarningNotification(
-                    string.Format("low-battery".Localized(), item.LocalizedName()),
-                    ENotificationDurationType.Long
-                );
-
-                yield break;
-            }
             case TogglableComponent:
             {
                 switch (item)
@@ -98,19 +87,17 @@ public class LowBatterySystem(float runInterval) : BaseDelayedSystem(runInterval
                             yield return _waitInterval;
                         }
                         break;
-                    case HeadphonesItemClass:
-                        NotificationManagerClass.DisplayWarningNotification(
-                            string.Format("low-battery".Localized(), item.LocalizedName()),
-                            ENotificationDurationType.Long
-                        );
-                        break;
                 }
 
                 yield break;
             }
             default:
             {
-                throw new ArgumentException($"Component {component.GetType()} is not a valid component");
+                NotificationManagerClass.DisplayWarningNotification(
+                    string.Format("low-battery".Localized(), item.LocalizedName()),
+                    ENotificationDurationType.Long
+                );
+                yield break;
             }
         }
     }
