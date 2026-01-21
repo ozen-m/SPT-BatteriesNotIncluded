@@ -23,6 +23,7 @@ namespace BatteriesNotIncluded;
 
 [BepInPlugin("com.ozen.batteriesnotincluded", "Batteries Not Included", "1.0.3")]
 [BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("com.pein.fpvdronemod", BepInDependency.DependencyFlags.SoftDependency)]
 public class BatteriesNotIncluded : BaseUnityPlugin
 {
     public static ManualLogSource LogSource;
@@ -97,6 +98,12 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         new HeadphonesItemCtorPatch().Enable();
         new SightsItemCtorPatch().Enable();
 
+        if (Chainloader.PluginInfos.TryGetValue(FpvDrone.DroneModGuid, out var droneInfo) &&
+            droneInfo.Metadata.Version >= FpvDrone.MinimumVersion)
+        {
+            FpvDrone.Enable();
+        }
+
         _ = Task.Run(() => _ = GetConfigFromServerAsync());
     }
 
@@ -125,7 +132,15 @@ public class BatteriesNotIncluded : BaseUnityPlugin
             : DeviceMode.None;
     }
 
-    public static void DisablePatches() => _patchManager.DisablePatches();
+    public static void DisablePatches()
+    {
+        _patchManager.DisablePatches();
+
+        if (Chainloader.PluginInfos.ContainsKey(FpvDrone.DroneModGuid))
+        {
+            FpvDrone.Disable();
+        }
+    }
 
     private static async Task GetConfigFromServerAsync()
     {

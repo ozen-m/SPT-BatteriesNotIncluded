@@ -54,7 +54,8 @@
         "6933acf049b34a172e0fe627": {"slots": 2, "runtime": 50}, // ECOT - Eukyre's Consortium of Things - Peltor ComTac VI headset
         "687306eb2a08d5fbb14e420f": {"slots": 2, "runtime": 50}, // ECOT - Eukyre's Consortium of Things - Walker's Razor Digital headset (Coyote Brown)
         "687306ed80a6d21e454051a0": {"slots": 2, "runtime": 50}, // ECOT - Eukyre's Consortium of Things - Walker's Razor Digital headset (Multicam)
-        "687306f01fea767c8f3d41ed": {"slots": 2, "runtime": 50} // ECOT - Eukyre's Consortium of Things - Walker's Razor Digital headset (Special)
+        "687306f01fea767c8f3d41ed": {"slots": 2, "runtime": 50}, // ECOT - Eukyre's Consortium of Things - Walker's Razor Digital headset (Special)
+        "68f5333abc75f09d96d97500": {"slots": 2, "runtime": 10} // FPV Drone - Radio Controller
     },
     // CR2032
     "5672cb304bdc2dc2088b456a": {
@@ -128,7 +129,10 @@
         "696c2c39eaf80d744d6f5b36": {"runtime": 1000}, // ECOT - Eukyre's Consortium of Things - EOTech EXPS3-DCR holographic sight
         "68922e39bacf39d24ca68ddf": {"runtime": 50000}, // ECOT - Eukyre's Consortium of Things - SIG Sauer ROMEO9T reflex sight
         "6897de1182f827c8f199f355": {"runtime": 50000}, // ECOT - Eukyre's Consortium of Things - SIG Sauer ROMEO9T reflex sight (FDE)
-        "6925b6a0cb2dcc1e9f6081fd": {"slots": 2} // ECOT - Eukyre's Consortium of Things - CTF Photonics CTF-3 tactical device
+        "6925b6a0cb2dcc1e9f6081fd": {"slots": 2}, // ECOT - Eukyre's Consortium of Things - CTF Photonics CTF-3 tactical device
+        "690e9265772bfce1d043966d": {"slots": 4}, // FPV Drone - Kamikaze Drone
+        "695f8753d24480b7b1921023": {"slots": 4}, // FPV Drone - Recon Drone
+        "68f51bfb3e92385d1908db68": {"slots": 2, "runtime": 4} // FPV Drone - FPV Goggles
     },
     // Devices that do not need batteries to operate
     "000000000000000000000000": {

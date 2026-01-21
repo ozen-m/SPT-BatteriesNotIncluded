@@ -31,9 +31,20 @@ public static class CommonExtensions
         return false;
     }
 
-    public static Slot[] GetBatterySlots(this CompoundItem device, int slotCount)
+    public static Slot[] GetBatterySlots(this CompoundItem device, int? slotCount = null)
     {
-        var batterySlots = new Slot[slotCount];
+        if (slotCount is null)
+        {
+            slotCount = 0;
+            foreach (var slot in device.Slots)
+            {
+                if (!slot.IsBatterySlot()) continue;
+        
+                slotCount++;
+            }
+        }
+
+        var batterySlots = new Slot[slotCount.Value];
         var slotIndex = 0;
         foreach (var slot in device.Slots)
         {

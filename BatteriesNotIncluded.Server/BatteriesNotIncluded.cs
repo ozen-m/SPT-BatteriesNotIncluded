@@ -6,6 +6,7 @@ using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Enums;
+using SPTarkov.Server.Core.Models.Spt.Mod;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
 using SPTarkov.Server.Core.Utils.Json;
@@ -21,7 +22,8 @@ public class BatteriesNotIncluded(
     DatabaseService databaseService,
     ItemHelper itemHelper,
     ServerLocalisationService localeService,
-    ApbsCompatibility apbsCompatibility
+    ApbsCompatibility apbsCompatibility,
+    IReadOnlyList<SptMod> sptMods
 ) : IOnLoad
 {
     private Dictionary<string, LazyLoad<Dictionary<string, string>>> _globalLocales;
@@ -63,12 +65,31 @@ public class BatteriesNotIncluded(
             .Where(i => itemHelper.IsOfBaseclasses(i.Id, _batteryConsumers));
         AddBatterySlots(deviceTemplates);
 
+        if (sptMods.FirstOrDefault(m => m.ModMetadata.ModGuid == "com.pein.fpvdronemod") is not null)
+        {
+            var kamikazeDrone = new MongoId("690e9265772bfce1d043966d");
+            var reconDrone = new MongoId("695f8753d24480b7b1921023");
+            var radioController = new MongoId("68f5333abc75f09d96d97500");
+            var goggles = new MongoId("68f51bfb3e92385d1908db68");
+            HashSet<MongoId> droneIds = [kamikazeDrone, reconDrone, radioController, goggles];
+
+            var droneTemplates = items
+                .Values
+                .Where(i => droneIds.Contains(i.Id));
+            AddBatterySlots(droneTemplates);
+
+            // Has its own drain system
+            configUtil.ModConfig.DeviceBatteryDefinitions.Remove(kamikazeDrone);
+            configUtil.ModConfig.DeviceBatteryDefinitions.Remove(reconDrone);
+        }
+
         AddBatteryBarterTrades();
         AddBatteriesToModPool();
         AddBatteriesToSicc(items.GetValueOrDefault(ItemTpl.CONTAINER_SICC));
         AddBatteriesToProfileTemplates();
         AddBatteriesToTraderItemsBuy();
 
+        _globalLocales = null;
         loggerUtil.Success(localeService.GetText("load-success"));
         return Task.CompletedTask;
     }
@@ -81,7 +102,6 @@ public class BatteriesNotIncluded(
             .AsParallel()
             .ForAll(i => ProcessTemplate(i, ref counter));
 
-        _globalLocales = null;
         loggerUtil.Info(localeService.GetText("process-total_devices", counter));
     }
 
