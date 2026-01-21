@@ -32,26 +32,23 @@ public static class FpvDrone
     private static bool _isPiloting;
 
     // Reflection
-    private static readonly Type _droneHelperType =
-        AccessTools.TypeByName("FPVDroneModClient.Helpers.DroneHelper");
-
-    private static readonly Type _baseDroneControllerType =
-        AccessTools.TypeByName("FPVDroneModClient.Components.Base.BaseDroneController");
-
-    private static readonly AccessTools.FieldRef<object, float> _maxBattery =
-        AccessTools.FieldRefAccess<float>(_baseDroneControllerType, "MaxBattery");
-
-    private static readonly AccessTools.FieldRef<object, float> _batteryRemaining =
-        AccessTools.FieldRefAccess<float>(_baseDroneControllerType, "BatteryRemaining");
-
-    private static readonly AccessTools.FieldRef<object, object> _droneInput =
-        AccessTools.FieldRefAccess<object>(_baseDroneControllerType, "DroneInput");
-
-    private static readonly MethodInfo _controlDroneMethod = AccessTools.Method("FPVDroneModClient.Helpers.DroneHelper:ControlDrone");
+    private static Type _droneHelperType;
+    private static Type _baseDroneControllerType;
+    private static AccessTools.FieldRef<object, float> _maxBattery;
+    private static AccessTools.FieldRef<object, float> _batteryRemaining;
+    private static AccessTools.FieldRef<object, object> _droneInput;
+    private static MethodInfo _controlDroneMethod;
     #endregion
 
     public static void Enable()
     {
+        _droneHelperType = AccessTools.TypeByName("FPVDroneModClient.Helpers.DroneHelper");
+        _baseDroneControllerType = AccessTools.TypeByName("FPVDroneModClient.Components.Base.BaseDroneController");
+        _maxBattery = AccessTools.FieldRefAccess<float>(_baseDroneControllerType, "MaxBattery");
+        _batteryRemaining = AccessTools.FieldRefAccess<float>(_baseDroneControllerType, "BatteryRemaining");
+        _droneInput = AccessTools.FieldRefAccess<object>(_baseDroneControllerType, "DroneInput");
+        _controlDroneMethod = AccessTools.Method("FPVDroneModClient.Helpers.DroneHelper:ControlDrone");
+
         new CanPilotDronePatch().Enable();
         new GetFailReasonStringPatch().Enable();
         new StartPatch().Enable();
