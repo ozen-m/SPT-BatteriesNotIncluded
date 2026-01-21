@@ -16,6 +16,7 @@ using HarmonyLib;
 using Newtonsoft.Json;
 using SPT.Common.Http;
 using SPT.Reflection.Patching;
+using UnityEngine;
 
 #pragma warning disable CA2211
 
@@ -30,6 +31,8 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     public static ConfigEntry<bool> ShowRemainingBattery;
     public static ConfigEntry<float> LowBatterySystemInterval;
     public static ConfigEntry<int> LowBatteryRuntimeThreshold;
+    public static ConfigEntry<bool> EnableSightsHotkey;
+    public static ConfigEntry<KeyCode> SightsHotkey;
     public static ConfigEntry<bool> DebugLogs;
 
     private static Dictionary<MongoID, DeviceData> _deviceBatteryDefinitions = [];
@@ -52,7 +55,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
             new ConfigDescription(
                 "Show remaining runtime when hovering over a device",
                 null,
-                new ConfigurationManagerAttributes { Order = 3 }
+                new ConfigurationManagerAttributes { Order = 5 }
             )
         );
         LowBatterySystemInterval = Config.Bind(
@@ -60,9 +63,9 @@ public class BatteriesNotIncluded : BaseUnityPlugin
             "Interval (seconds)",
             60f,
             new ConfigDescription(
-                "How often (in seconds) to check for low battery devices\nWill take effect next raid",
+                "How often (in seconds) to check for low battery devices\nTakes effect next raid",
                 null,
-                new ConfigurationManagerAttributes { Order = 2 }
+                new ConfigurationManagerAttributes { Order = 4 }
             )
         );
         LowBatteryRuntimeThreshold = Config.Bind(
@@ -71,6 +74,26 @@ public class BatteriesNotIncluded : BaseUnityPlugin
             5,
             new ConfigDescription(
                 "Remaining runtime (in minutes) for a device to be considered low battery",
+                null,
+                new ConfigurationManagerAttributes { Order = 3 }
+            )
+        );
+        EnableSightsHotkey = Config.Bind(
+            "Sights Hotkey",
+            "Enable",
+            false,
+            new ConfigDescription(
+                "Enables toggling sights of your current weapon\nTakes effect next raid",
+                null,
+                new ConfigurationManagerAttributes { Order = 2 }
+            )
+        );
+        SightsHotkey = Config.Bind(
+            "Sights Hotkey",
+            "Hotkey",
+            KeyCode.Y,
+            new ConfigDescription(
+                "Hotkey used for toggling sights",
                 null,
                 new ConfigurationManagerAttributes { Order = 1 }
             )

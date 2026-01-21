@@ -46,6 +46,10 @@ public class DeviceManager : MonoBehaviour
         _tacticalVisualHandler = new TacticalVisualHandler(this);
 
         _systems.Add(new LowBatterySystem(BatteriesNotIncluded.LowBatterySystemInterval.Value * 1000f));
+        if (BatteriesNotIncluded.EnableSightsHotkey.Value)
+        {
+            _systems.Add(new SightsHotkey());
+        }
 
         if (Fika.IsFikaClient)
         {
@@ -324,7 +328,7 @@ public class DeviceManager : MonoBehaviour
             OnAddBatteryToSlot?.Invoke(device.Id, i, battery);
         }
 
-        device.TurnOnDevice();
+        device.ToggleItem(true);
     }
 
     private static GClass3379 GetRelatedComponentToSet(Item item)

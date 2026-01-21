@@ -92,16 +92,17 @@ public static class CommonExtensions
             5
         );
 
-    public static void TurnOnDevice(this Item item)
+    public static void ToggleItem(this Item item, bool? isActive = null)
     {
+        if (item.Owner is not TraderControllerClass invController) return;
         if (!item.TryGetItemComponent(out TogglableComponent togglableComponent)) return;
-        if (togglableComponent.Item.Owner is not InventoryController invController) return;
-        if (togglableComponent.On) return;
+        if (togglableComponent.On == isActive) return;
 
-        var toggleOperation = togglableComponent.Set(true, true);
+        isActive ??= !togglableComponent.On;
+        var toggleOperation = togglableComponent.Set(isActive.Value, true);
         if (toggleOperation.Failed)
         {
-            LoggerUtil.Warning($"Failed to turn on device {item.ToFullString()}: {toggleOperation.Error}");
+            LoggerUtil.Warning($"Failed to toggle {item.ToFullString()}: {toggleOperation.Error}");
             return;
         }
 
