@@ -349,7 +349,8 @@ public class DeviceManager : MonoBehaviour
         }
         else
         {
-            throw new ArgumentException($"Device {item.LocalizedShortName()} ({item.Id}) does not have a related component");
+            relatedComponent = null;
+            LoggerUtil.Warning($"Device {item.LocalizedShortName()} ({item.Id}) does not have a related component");
         }
         return relatedComponent;
     }
@@ -379,7 +380,8 @@ public class DeviceManager : MonoBehaviour
                 return;
             }
             default:
-                throw new ArgumentException($"Component {component} is not a valid component");
+                LoggerUtil.Warning($"Component {component} is not a valid component");
+                return;
         }
     }
 

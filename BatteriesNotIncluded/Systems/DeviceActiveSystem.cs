@@ -22,7 +22,7 @@ public class DeviceActiveSystem : IManualSystem
             NightVisionComponent nightVisionComponent => nightVisionComponent.Togglable.On,
             ThermalVisionComponent thermalVisionComponent => thermalVisionComponent.Togglable.On,
             TogglableComponent togglableComponent => togglableComponent.On,
-            _ => throw new ArgumentException($"Component {component} is not a valid component")
+            _ => false
         };
         return isToggled;
     }

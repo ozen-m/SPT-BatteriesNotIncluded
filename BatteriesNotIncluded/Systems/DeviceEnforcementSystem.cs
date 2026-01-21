@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Patches.Tactical;
 using BatteriesNotIncluded.Utils;
@@ -103,7 +102,8 @@ public class DeviceEnforcementSystem : IManualSystem
             }
             default:
             {
-                throw new ArgumentException($"Component {component} is not a valid component");
+                LoggerUtil.Debug($"Component {component} is not a valid component");
+                return;
             }
         }
     }
