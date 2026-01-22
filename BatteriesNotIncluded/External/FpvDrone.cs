@@ -25,6 +25,7 @@ public static class FpvDrone
     // Plugin Info
     public const string DroneModGuid = "com.pein.fpvdronemod";
     public static readonly Version MinimumVersion = new(0, 5, 0);
+    public static readonly Version MaximumVersion = new(0, 5, 0);
 
     // Update timers
     private const long BatterySlotUpdateInterval = 1000L;

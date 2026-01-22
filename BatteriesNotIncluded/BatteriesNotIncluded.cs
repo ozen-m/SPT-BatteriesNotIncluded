@@ -121,11 +121,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         new HeadphonesItemCtorPatch().Enable();
         new SightsItemCtorPatch().Enable();
 
-        if (Chainloader.PluginInfos.TryGetValue(FpvDrone.DroneModGuid, out var droneInfo) &&
-            droneInfo.Metadata.Version >= FpvDrone.MinimumVersion)
-        {
-            FpvDrone.Enable();
-        }
+        TryInitDroneModCompat();
 
         _ = Task.Run(() => _ = GetConfigFromServerAsync());
     }
@@ -203,6 +199,29 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         }
 
         LoggerUtil.Info($"Successfully fetched {_deviceBatteryDefinitions.Count} battery operated devices!");
+    }
+
+    private static void TryInitDroneModCompat()
+    {
+        if (!Chainloader.PluginInfos.TryGetValue(FpvDrone.DroneModGuid, out var droneInfo)) return;
+
+        if (droneInfo.Metadata.Version >= FpvDrone.MinimumVersion &&
+            droneInfo.Metadata.Version <= FpvDrone.MaximumVersion)
+        {
+            try
+            {
+                FpvDrone.Enable();
+            }
+            catch (Exception ex)
+            {
+                LoggerUtil.Warning(ex.ToString());
+                LoggerUtil.Warning($"Unable to initialize compatibility for {droneInfo.Metadata.Name} ({droneInfo.Metadata.GUID} {droneInfo.Metadata.Version})");
+            }
+        }
+        else
+        {
+            LoggerUtil.Warning($"{droneInfo.Metadata.Name} detected with incompatible version {droneInfo.Metadata.Version} (Min: {FpvDrone.MinimumVersion} Max: {FpvDrone.MaximumVersion})");
+        }
     }
 
     private static void CheckForPrepatch()

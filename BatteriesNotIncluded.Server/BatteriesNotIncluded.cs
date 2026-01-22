@@ -11,6 +11,7 @@ using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
 using SPTarkov.Server.Core.Utils.Json;
 using Path = System.IO.Path;
+using Version = SemanticVersioning.Version;
 
 namespace BatteriesNotIncluded;
 
@@ -65,18 +66,27 @@ public class BatteriesNotIncluded(
             .Where(i => itemHelper.IsOfBaseclasses(i.Id, _batteryConsumers));
         AddBatterySlots(deviceTemplates);
 
-        if (sptMods.FirstOrDefault(m => m.ModMetadata.ModGuid == "com.pein.fpvdronemod") is not null)
+        if (sptMods.FirstOrDefault(m => m.ModMetadata.ModGuid == "com.pein.fpvdronemod") is { } droneMod)
         {
             var kamikazeDrone = new MongoId("690e9265772bfce1d043966d");
             var reconDrone = new MongoId("695f8753d24480b7b1921023");
             var radioController = new MongoId("68f5333abc75f09d96d97500");
             var goggles = new MongoId("68f51bfb3e92385d1908db68");
-            HashSet<MongoId> droneIds = [kamikazeDrone, reconDrone, radioController, goggles];
 
-            var droneTemplates = items
-                .Values
-                .Where(i => droneIds.Contains(i.Id));
-            AddBatterySlots(droneTemplates);
+            var minimumVersion = new Version(0, 5, 0);
+            var maximumVersion = new Version(0, 5, 0);
+            if (droneMod.ModMetadata.Version >= minimumVersion && droneMod.ModMetadata.Version <= maximumVersion)
+            {
+                HashSet<MongoId> droneIds = [kamikazeDrone, reconDrone, radioController, goggles];
+                var droneTemplates = items
+                    .Values
+                    .Where(i => droneIds.Contains(i.Id));
+                AddBatterySlots(droneTemplates);
+            }
+            else
+            {
+                loggerUtil.Warning($"{droneMod.ModMetadata.Name} detected with incompatible version {droneMod.ModMetadata.Version} (Min: {minimumVersion} Max: {maximumVersion})");
+            }
 
             // Has its own drain system
             configUtil.ModConfig.DeviceBatteryDefinitions.Remove(kamikazeDrone);
