@@ -35,10 +35,10 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     public static ConfigEntry<KeyCode> SightsHotkey;
     public static ConfigEntry<bool> DebugLogs;
 
-    private static Dictionary<MongoID, DeviceData> _deviceBatteryDefinitions = [];
-    private static Dictionary<WildSpawnType, RangedInt> _botBatteries = [];
-    private static Dictionary<DeviceMode, float> _tacticalDevicesDrain = [];
-    private static Dictionary<MongoID, Dictionary<string, DeviceMode>> _tacticalDevicesOverride = [];
+    private static Dictionary<MongoID, DeviceData> _deviceBatteryDefinitions;
+    private static Dictionary<WildSpawnType, RangedInt> _botBatteries;
+    private static Dictionary<DeviceMode, float> _tacticalDevicesDrain;
+    private static Dictionary<MongoID, Dictionary<string, DeviceMode>> _tacticalDevicesOverride;
 
     private static PatchManager _patchManager;
 
