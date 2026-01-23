@@ -11,12 +11,14 @@ public static class ExternalMod
     public static readonly Fika Fika = new();
     public static readonly FikaSync FikaSync = new();
     public static readonly FpvDrone FpvDrone = new();
+    public static readonly Pause Pause = new();
 
     private static readonly AbstractExternalMod[] _externalMods =
     [
         Fika,
         FikaSync,
-        FpvDrone
+        FpvDrone,
+        Pause
     ];
 
     public static void CheckForExternalMods()
