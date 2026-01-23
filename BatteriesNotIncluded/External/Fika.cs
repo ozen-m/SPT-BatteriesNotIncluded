@@ -1,9 +1,13 @@
-﻿namespace BatteriesNotIncluded.External;
+﻿using SPT.Reflection.Patching;
 
-public static class Fika
+namespace BatteriesNotIncluded.External;
+
+public class Fika : AbstractExternalMod
 {
-    public static bool IsFikaPresent { get; set; }
-    public static bool IsFikaSyncPresent { get; set; }
-    public static bool IsFikaServer { get; set; }
-    public static bool IsFikaClient => IsFikaPresent && !IsFikaServer;
+    protected override string Guid { get; } = "com.fika.core";
+
+    protected override ModulePatch[] Patches { get; } = [];
+
+    public bool IsServer { get; set; }
+    public bool IsClient => IsPresent && !IsServer;
 }

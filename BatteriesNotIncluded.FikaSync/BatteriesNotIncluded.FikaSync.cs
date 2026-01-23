@@ -1,4 +1,5 @@
-﻿using BepInEx;
+﻿using BatteriesNotIncluded.Managers;
+using BepInEx;
 using BepInEx.Logging;
 using Fika.Core.Modding;
 using Fika.Core.Modding.Events;
@@ -31,10 +32,10 @@ public class BatteriesNotIncludedSync : BaseUnityPlugin
         switch (createNetworkManager.Manager)
         {
             case FikaClient:
-                External.Fika.IsFikaServer = false;
+                ExternalMod.Fika.IsServer = false;
                 return;
             case FikaServer:
-                External.Fika.IsFikaServer = true;
+                ExternalMod.Fika.IsServer = true;
                 return;
         }
     }

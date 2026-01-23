@@ -19,13 +19,23 @@ using UnityEngine;
 
 namespace BatteriesNotIncluded.External;
 
-public static class FpvDrone
+public class FpvDrone : AbstractExternalMod
 {
-    #region Fields
-    // Plugin Info
-    public const string DroneModGuid = "com.pein.fpvdronemod";
-    public static readonly Version MinimumVersion = new(0, 5, 0);
-    public static readonly Version MaximumVersion = new(0, 5, 0);
+    protected override string Guid { get; } = "com.pein.fpvdronemod";
+    public override Version MinimumVersion { get; } = new(0, 5, 0);
+    public override Version MaximumVersion { get; } = new(0, 5, 0);
+
+    protected override ModulePatch[] Patches { get; } =
+    [
+        new CanPilotDronePatch(),
+        new GetFailReasonStringPatch(),
+        new StartPatch(),
+        new OnPilotEnterPatch(),
+        new OnPilotExitPatch(),
+        new DroneControllerUpdate(),
+    ];
+
+    public override bool TryToInitialize() => TryToReflect() && base.TryToInitialize();
 
     // Update timers
     private const long BatterySlotUpdateInterval = 1000L;
@@ -39,35 +49,27 @@ public static class FpvDrone
     private static AccessTools.FieldRef<object, float> _batteryRemaining;
     private static AccessTools.FieldRef<object, object> _droneInput;
     private static MethodInfo _controlDroneMethod;
-    #endregion
 
-    public static void Enable()
+    protected override bool TryToReflect()
     {
-        _droneHelperType = AccessTools.TypeByName("FPVDroneModClient.Helpers.DroneHelper");
-        _baseDroneControllerType = AccessTools.TypeByName("FPVDroneModClient.Components.Base.BaseDroneController");
-        _maxBattery = AccessTools.FieldRefAccess<float>(_baseDroneControllerType, "MaxBattery");
-        _batteryRemaining = AccessTools.FieldRefAccess<float>(_baseDroneControllerType, "BatteryRemaining");
-        _droneInput = AccessTools.FieldRefAccess<object>(_baseDroneControllerType, "DroneInput");
-        _controlDroneMethod = AccessTools.Method("FPVDroneModClient.Helpers.DroneHelper:ControlDrone");
-
-        new CanPilotDronePatch().Enable();
-        new GetFailReasonStringPatch().Enable();
-        new StartPatch().Enable();
-        new OnPilotEnterPatch().Enable();
-        new OnPilotExitPatch().Enable();
-        new DroneControllerUpdate().Enable();
+        try
+        {
+            _droneHelperType = AccessTools.TypeByName("FPVDroneModClient.Helpers.DroneHelper");
+            _baseDroneControllerType = AccessTools.TypeByName("FPVDroneModClient.Components.Base.BaseDroneController");
+            _maxBattery = AccessTools.FieldRefAccess<float>(_baseDroneControllerType, "MaxBattery");
+            _batteryRemaining = AccessTools.FieldRefAccess<float>(_baseDroneControllerType, "BatteryRemaining");
+            _droneInput = AccessTools.FieldRefAccess<object>(_baseDroneControllerType, "DroneInput");
+            _controlDroneMethod = AccessTools.Method("FPVDroneModClient.Helpers.DroneHelper:ControlDrone");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.ToString();
+            return false;
+        }
+        return true;
     }
 
-    public static void Disable()
-    {
-        new CanPilotDronePatch().Disable();
-        new GetFailReasonStringPatch().Disable();
-        new StartPatch().Disable();
-        new OnPilotEnterPatch().Disable();
-        new OnPilotExitPatch().Disable();
-        new DroneControllerUpdate().Disable();
-    }
-
+    #region Patches
     /// <summary>
     /// Do not allow to pilot the drone if conditions are not met
     /// </summary>
@@ -363,7 +365,9 @@ public static class FpvDrone
             }
         }
     }
+    #endregion
 
+    #region Common Patch Methods
     /// <summary>
     /// Sets the drone's remaining battery based on the battery slot's charge.
     /// Average of batteries in slots.
@@ -391,24 +395,6 @@ public static class FpvDrone
 #if DEBUG
         LoggerUtil.Info($"Set drone RemainingBattery to {_batteryRemaining(droneControllerObj)}");
 #endif
-    }
-
-    private static Slot[] GetOrCreateBatterySlots(this object droneControllerObj)
-    {
-        if (droneControllerObj is not MonoBehaviour monoBehaviour)
-        {
-            throw new ArgumentException($"Object is not MonoBehaviour in {droneControllerObj.GetType().Name}");
-        }
-        if (monoBehaviour.GetComponent<LootItem>().Item is not CompoundItem droneItem)
-        {
-            throw new ArgumentException("Drone item cannot be found in baseDroneController");
-        }
-
-        if (droneItem.GetBatterySlot(out var batterySlots)) return batterySlots;
-
-        batterySlots = droneItem.GetBatterySlots();
-        droneItem.SetBatterySlot(batterySlots);
-        return batterySlots;
     }
 
     /// <summary>
@@ -441,6 +427,7 @@ public static class FpvDrone
             }
         }
     }
+    #endregion
 }
 
 public static class ExtraDroneProperties
@@ -463,5 +450,23 @@ public static class ExtraDroneProperties
     public static void SetBatterySlot(this Item drone, Slot[] batterySlot)
     {
         _properties.GetOrCreateValue(drone).BatterySlot = batterySlot;
+    }
+
+    public static Slot[] GetOrCreateBatterySlots(this object droneControllerObj)
+    {
+        if (droneControllerObj is not MonoBehaviour monoBehaviour)
+        {
+            throw new ArgumentException($"Object is not MonoBehaviour in {droneControllerObj.GetType().Name}");
+        }
+        if (monoBehaviour.GetComponent<LootItem>().Item is not CompoundItem droneItem)
+        {
+            throw new ArgumentException("Drone item cannot be found in baseDroneController");
+        }
+
+        if (droneItem.GetBatterySlot(out var batterySlots)) return batterySlots;
+
+        batterySlots = droneItem.GetBatterySlots();
+        droneItem.SetBatterySlot(batterySlots);
+        return batterySlots;
     }
 }

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BatteriesNotIncluded.External;
+using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Models;
 using BatteriesNotIncluded.Patches.Earpiece;
 using BatteriesNotIncluded.Patches.Sight;
 using BatteriesNotIncluded.Utils;
 using BepInEx;
-using BepInEx.Bootstrap;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using EFT;
@@ -23,8 +22,6 @@ using UnityEngine;
 namespace BatteriesNotIncluded;
 
 [BepInPlugin("com.ozen.batteriesnotincluded", "Batteries Not Included", "1.0.3")]
-[BepInDependency("com.fika.core", BepInDependency.DependencyFlags.SoftDependency)]
-[BepInDependency("com.pein.fpvdronemod", BepInDependency.DependencyFlags.SoftDependency)]
 public class BatteriesNotIncluded : BaseUnityPlugin
 {
     public static ManualLogSource LogSource;
@@ -113,24 +110,25 @@ public class BatteriesNotIncluded : BaseUnityPlugin
             )
         );
 
-        Fika.IsFikaPresent = Chainloader.PluginInfos.ContainsKey("com.fika.core");
-
         _patchManager = new PatchManager(this, true);
         _patchManager.EnablePatches();
 
         new HeadphonesItemCtorPatch().Enable();
         new SightsItemCtorPatch().Enable();
 
-        TryInitDroneModCompat();
-
         _ = Task.Run(() => _ = GetConfigFromServerAsync());
+    }
+
+    public void Start()
+    {
+        ExternalMod.CheckForExternalMods();
     }
 
     public static bool GetDeviceData(MongoID templateId, out DeviceData deviceData) =>
         _deviceBatteryDefinitions.TryGetValue(templateId, out deviceData);
 
     public static RangedInt GetBotRange(WildSpawnType wildSpawnType) =>
-        _botBatteries.GetValueOrDefault(wildSpawnType, _defaultRange);
+        _botBatteries.GetValueOrDefault(wildSpawnType, _defaultBatteriesSpawnedRange);
 
     public static float GetTacticalDrain(DeviceMode mode)
     {
@@ -154,11 +152,7 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     public static void DisablePatches()
     {
         _patchManager.DisablePatches();
-
-        if (Chainloader.PluginInfos.ContainsKey(FpvDrone.DroneModGuid))
-        {
-            FpvDrone.Disable();
-        }
+        ExternalMod.DisablePatches();
     }
 
     private static async Task GetConfigFromServerAsync()
@@ -201,29 +195,6 @@ public class BatteriesNotIncluded : BaseUnityPlugin
         LoggerUtil.Info($"Successfully fetched {_deviceBatteryDefinitions.Count} battery operated devices!");
     }
 
-    private static void TryInitDroneModCompat()
-    {
-        if (!Chainloader.PluginInfos.TryGetValue(FpvDrone.DroneModGuid, out var droneInfo)) return;
-
-        if (droneInfo.Metadata.Version >= FpvDrone.MinimumVersion &&
-            droneInfo.Metadata.Version <= FpvDrone.MaximumVersion)
-        {
-            try
-            {
-                FpvDrone.Enable();
-            }
-            catch (Exception ex)
-            {
-                LoggerUtil.Warning(ex.ToString());
-                LoggerUtil.Warning($"Unable to initialize compatibility for {droneInfo.Metadata.Name} ({droneInfo.Metadata.GUID} {droneInfo.Metadata.Version})");
-            }
-        }
-        else
-        {
-            LoggerUtil.Warning($"{droneInfo.Metadata.Name} detected with incompatible version {droneInfo.Metadata.Version} (Min: {FpvDrone.MinimumVersion} Max: {FpvDrone.MaximumVersion})");
-        }
-    }
-
     private static void CheckForPrepatch()
     {
         try
@@ -237,5 +208,5 @@ public class BatteriesNotIncluded : BaseUnityPlugin
     }
 
     public static AccessTools.FieldRef<HeadphonesItemClass, TogglableComponent> HeadphonesTogglableField;
-    private static readonly RangedInt _defaultRange = new(40, 60);
+    private static readonly RangedInt _defaultBatteriesSpawnedRange = new(40, 60);
 }

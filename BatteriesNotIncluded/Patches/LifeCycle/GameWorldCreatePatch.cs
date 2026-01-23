@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
-using BatteriesNotIncluded.External;
 using BatteriesNotIncluded.Managers;
 using BatteriesNotIncluded.Utils;
-using BepInEx.Bootstrap;
 using Comfort.Common;
 using EFT;
 using EFT.Communications;
@@ -21,8 +19,7 @@ public class GameWorldCreatePatch : ModulePatch
     [PatchPostfix]
     public static void Postfix(GameWorld __result)
     {
-        Fika.IsFikaSyncPresent = Chainloader.PluginInfos.ContainsKey("com.ozen.batteriesnotincluded.fikasync");
-        if (Fika.IsFikaPresent && !Fika.IsFikaSyncPresent)
+        if (ExternalMod.Fika.IsPresent && !ExternalMod.FikaSync.IsPresent)
         {
             BatteriesNotIncluded.DisablePatches();
             LoggerUtil.Error("Disabled mod Batteries Not Included. Fika is present but the sync addon is missing, please install the sync addon.");

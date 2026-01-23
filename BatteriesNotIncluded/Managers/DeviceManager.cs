@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BatteriesNotIncluded.External;
 using BatteriesNotIncluded.Models;
 using BatteriesNotIncluded.Systems;
 using BatteriesNotIncluded.Utils;
@@ -51,7 +50,7 @@ public class DeviceManager : MonoBehaviour
             _systems.Add(new SightsHotkey());
         }
 
-        if (Fika.IsFikaClient)
+        if (ExternalMod.Fika.IsClient)
         {
             return;
         }
@@ -138,7 +137,7 @@ public class DeviceManager : MonoBehaviour
         ManualUpdate(item);
 
         SubscribeToComponent(relatedComponent);
-        if (!Fika.IsFikaClient)
+        if (!ExternalMod.Fika.IsClient)
         {
             // Only the server needs to run this
             SubscribeToDeviceSlots(batterySlots);
@@ -159,7 +158,7 @@ public class DeviceManager : MonoBehaviour
 
         // Previous subscription is a leak!
         SubscribeToComponent(relatedComponent);
-        if (!Fika.IsFikaClient)
+        if (!ExternalMod.Fika.IsClient)
         {
             // Only the server needs to run this
             SubscribeToDeviceSlots(batterySlots);
