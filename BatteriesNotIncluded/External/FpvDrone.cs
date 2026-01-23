@@ -35,8 +35,6 @@ public class FpvDrone : AbstractExternalMod
         new DroneControllerUpdate(),
     ];
 
-    public override bool TryToInitialize() => TryToReflect() && base.TryToInitialize();
-
     // Update timers
     private const long BatterySlotUpdateInterval = 1000L;
     private static readonly Stopwatch _updateStopwatch = Stopwatch.StartNew();
