@@ -26,8 +26,9 @@ public static class ExternalMod
         foreach (var externalMod in _externalMods)
         {
             if (!externalMod.CheckIfPresent()) continue;
-            
+
             LoggerUtil.Info($"Found external mod: {externalMod.PluginInfo}");
+
             if (!externalMod.IsCompatible())
             {
                 LoggerUtil.Warning($"{externalMod.PluginInfo.Metadata.GUID} detected with incompatible version {externalMod.PluginInfo.Metadata.Version} (Min: {externalMod.MinimumVersion} Max: {externalMod.MaximumVersion})");

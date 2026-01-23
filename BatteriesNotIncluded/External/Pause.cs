@@ -23,6 +23,14 @@ public class Pause : AbstractExternalMod
     private static MethodInfo _pauseMethod;
     private static MethodInfo _unpauseMethod;
 
+    public override bool TryToInitialize()
+    {
+        if (!ExternalMod.Fika.IsPresent) return base.TryToInitialize();
+
+        ErrorMessage = $"{PluginInfo} is not compatible with {ExternalMod.Fika.PluginInfo}";
+        return false;
+    }
+
     protected override bool TryToReflect()
     {
         try
@@ -60,7 +68,7 @@ public class Pause : AbstractExternalMod
             manager.enabled = false;
         }
     }
-    
+
     /// <summary>
     /// Enables device manager to continue draining devices when game is unpaused
     /// </summary>
