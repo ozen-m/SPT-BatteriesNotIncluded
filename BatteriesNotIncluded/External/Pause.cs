@@ -10,8 +10,8 @@ namespace BatteriesNotIncluded.External;
 public class Pause : AbstractExternalMod
 {
     protected override string Guid { get; } = "com.netVnum.pause";
-    public override Version MinimumVersion { get; } = new(1, 4, 0);
-    public override Version MaximumVersion { get; } = new(1, 4, 999);
+    protected override Version MinimumVersion { get; } = new(1, 4, 0);
+    protected override Version MaximumVersion { get; } = new(1, 4, 999);
 
     protected override ModulePatch[] Patches { get; } =
     [

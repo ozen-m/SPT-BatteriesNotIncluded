@@ -22,8 +22,8 @@ namespace BatteriesNotIncluded.External;
 public class FpvDrone : AbstractExternalMod
 {
     protected override string Guid { get; } = "com.pein.fpvdronemod";
-    public override Version MinimumVersion { get; } = new(0, 5, 0);
-    public override Version MaximumVersion { get; } = new(0, 5, 0);
+    protected override Version MinimumVersion { get; } = new(0, 5, 0);
+    protected override Version MaximumVersion { get; } = new(0, 5, 0);
 
     protected override ModulePatch[] Patches { get; } =
     [

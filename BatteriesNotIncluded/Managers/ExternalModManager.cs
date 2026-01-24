@@ -31,7 +31,7 @@ public static class ExternalMod
 
             if (!externalMod.IsCompatible())
             {
-                LoggerUtil.Warning($"{externalMod.PluginInfo.Metadata.GUID} detected with incompatible version {externalMod.PluginInfo.Metadata.Version} (Min: {externalMod.MinimumVersion} Max: {externalMod.MaximumVersion})");
+                LoggerUtil.Warning($"{externalMod.PluginInfo.Metadata.GUID} detected with incompatible version {externalMod.PluginInfo.Metadata.Version}. Supported versions: {externalMod.VersionRange}");
                 continue;
             }
 

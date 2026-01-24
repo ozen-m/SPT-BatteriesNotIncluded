@@ -8,15 +8,15 @@ namespace BatteriesNotIncluded.External;
 public abstract class AbstractExternalMod
 {
     protected abstract string Guid { get; }
-    public virtual Version MinimumVersion { get; } = new(0, 0, 0);
-    public virtual Version MaximumVersion { get; } = new(999, 999, 999);
+    protected virtual Version MinimumVersion { get; } = new(0, 0, 0);
+    protected virtual Version MaximumVersion { get; } = new(999, 999, 999);
+    protected virtual ModulePatch[] Patches { get; } = [];
 
     public PluginInfo PluginInfo { get; private set; }
     public bool IsPresent => PluginInfo is not null;
     public bool IsInitialized { get; protected set; }
     public string ErrorMessage { get; protected set; } = string.Empty;
-
-    protected abstract ModulePatch[] Patches { get; }
+    public string VersionRange => $"{MinimumVersion} - {MaximumVersion}";
 
     public bool CheckIfPresent()
     {
