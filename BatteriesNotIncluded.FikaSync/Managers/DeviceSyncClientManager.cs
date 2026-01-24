@@ -8,6 +8,7 @@ using BatteriesNotIncluded.Systems;
 using BatteriesNotIncluded.Utils;
 using EFT.InventoryLogic;
 using Fika.Core.Networking;
+using LoggerUtil = BatteriesNotIncluded.FikaSync.Utils.LoggerUtil;
 
 namespace BatteriesNotIncluded.FikaSync.Managers;
 
@@ -40,7 +41,11 @@ public class DeviceSyncClientManager : BaseSyncManager
     private void OnDevicePacketReceived(DevicePacket devicePacket)
     {
         var index = DeviceManager.GetItemIndex(devicePacket.DeviceId);
-        if (index == -1) return;
+        if (index == -1)
+        {
+            LoggerUtil.Warning($"Received device packet with sub packet type: {devicePacket.Type.ToString()}) for item: {devicePacket.DeviceId} but is NOT registered in the client's device manager!");
+            return;
+        }
 
         devicePacket.Execute(this, index);
     }

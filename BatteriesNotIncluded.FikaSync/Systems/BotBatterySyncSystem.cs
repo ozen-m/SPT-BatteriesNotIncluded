@@ -24,11 +24,11 @@ public class BotBatterySyncSystem : PacketBaseSystem<BotBatteryPacket>
                 if (!slot.ContainedItem!.TryGetItemComponent<ResourceComponent>(out var resourceComponent)) return;
 
                 resourceComponent.Value = CurrentPacket.Battery.GetItemComponent<ResourceComponent>()!.Value;
-                LoggerUtil.Info($"Set existing battery {slot.ContainedItem} charge to {resourceComponent.Value}");
+                LoggerUtil.Debug($"Set existing battery {slot.ContainedItem} charge to {resourceComponent.Value}");
                 return;
             }
             default:
-                LoggerUtil.Info($"Set battery {slot.ContainedItem} charge to {slot.ContainedItem!.GetItemComponent<ResourceComponent>()?.Value}");
+                LoggerUtil.Debug($"Set battery {slot.ContainedItem} charge to {slot.ContainedItem!.GetItemComponent<ResourceComponent>()?.Value}");
                 return;
         }
     }
