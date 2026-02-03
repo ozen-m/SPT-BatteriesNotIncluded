@@ -39,7 +39,7 @@ public static class CommonExtensions
             foreach (var slot in device.Slots)
             {
                 if (!slot.IsBatterySlot()) continue;
-        
+
                 slotCount++;
             }
         }
@@ -156,6 +156,8 @@ public static class CommonExtensions
         if (player.Profile.Info.Settings.Role.IsABossOrFollower())
         {
             baseValue = maxValue;
+
+            item.SpawnedInSession = true;
         }
         else if (player.Side is not EPlayerSide.Savage)
         {
@@ -168,6 +170,8 @@ public static class CommonExtensions
             // Scav
             var range = BatteriesNotIncluded.GetBotRange(WildSpawnType.assault);
             baseValue = (int)Mathf.Lerp(range.Min, range.Max, levelFactor);
+
+            item.SpawnedInSession = true;
         }
 
         var lowerLimit = baseValue - 10;

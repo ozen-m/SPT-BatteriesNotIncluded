@@ -3,7 +3,7 @@
     <RootNamespace>BatteriesNotIncluded</RootNamespace>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Authors>ozen</Authors>
     <RepositoryUrl>https://github.com/ozen-m/SPT-BatteriesNotIncluded</RepositoryUrl>
     <AssemblyName>$(Authors)-$(RootNamespace)</AssemblyName>

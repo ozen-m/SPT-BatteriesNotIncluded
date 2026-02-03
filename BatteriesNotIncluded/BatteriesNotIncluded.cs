@@ -21,7 +21,7 @@ using UnityEngine;
 
 namespace BatteriesNotIncluded;
 
-[BepInPlugin("com.ozen.batteriesnotincluded", "Batteries Not Included", "1.0.3")]
+[BepInPlugin("com.ozen.batteriesnotincluded", "Batteries Not Included", "1.0.4")]
 public class BatteriesNotIncluded : BaseUnityPlugin
 {
     public static ManualLogSource LogSource;
