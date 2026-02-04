@@ -72,16 +72,6 @@ public class TacticalVisualHandler(DeviceManager manager)
         }
     }
 
-    /// <summary>
-    /// Remove null controllers, used OnGameStart.
-    /// I'm assuming these are templates of controllers added before the start of the game.
-    /// </summary>
-    public void RemoveDestroyedControllers()
-    {
-        var num = _controllers.RemoveWhere((c) => c == null);
-        LoggerUtil.Debug($"Removed {num} null tactical controllers");
-    }
-
     private void UpdateDeviceDrainPerSecond(int index, DeviceMode deviceMode)
     {
         var newDrain = BatteriesNotIncluded.GetTacticalDrain(deviceMode);

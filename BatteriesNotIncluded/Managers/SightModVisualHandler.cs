@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using BatteriesNotIncluded.Patches.Sight;
-using BatteriesNotIncluded.Utils;
 using EFT.CameraControl;
 using EFT.InventoryLogic;
 using HarmonyLib;
@@ -28,16 +27,6 @@ public class SightModVisualHandler
 
             SetSightVisibilityInternal(controller, shouldBeActive);
         }
-    }
-
-    /// <summary>
-    /// Remove null controllers, used OnGameStart.
-    /// I'm assuming these are templates of controllers added before the start of the game.
-    /// </summary>
-    public void RemoveDestroyedControllers()
-    {
-        var num = _controllers.RemoveWhere((c) => c == null);
-        LoggerUtil.Debug($"Removed {num} null sight controllers");
     }
 
     public void Cleanup()

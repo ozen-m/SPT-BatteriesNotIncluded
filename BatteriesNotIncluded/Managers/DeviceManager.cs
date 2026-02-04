@@ -253,8 +253,6 @@ public class DeviceManager : MonoBehaviour
     private void RunAfterGameStart()
     {
         _gameStarted = true;
-        _sightModVisualHandler.RemoveDestroyedControllers();
-        _tacticalVisualHandler.RemoveDestroyedControllers();
         RegisterWorldLootItems();
     }
 
