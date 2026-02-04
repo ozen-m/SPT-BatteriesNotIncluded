@@ -39,7 +39,7 @@ public class DeviceManager : MonoBehaviour
     private GameWorld _gameWorld;
     private bool _gameStarted;
 
-    public void Start()
+    public void Awake()
     {
         _sightModVisualHandler = new SightModVisualHandler(this);
         _tacticalVisualHandler = new TacticalVisualHandler(this);

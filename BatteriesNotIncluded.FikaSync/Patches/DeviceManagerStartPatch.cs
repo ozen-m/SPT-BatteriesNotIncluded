@@ -13,7 +13,7 @@ public class DeviceManagerStartPatch : ModulePatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(DeviceManager).GetMethod(nameof(DeviceManager.Start));
+        return typeof(DeviceManager).GetMethod(nameof(DeviceManager.Awake));
     }
 
     [PatchPostfix]
