@@ -284,9 +284,7 @@ public class BatteriesNotIncluded(
             Upd = new Upd
             {
                 UnlimitedCount = true,
-                StackObjectsCount = 9999999d,
-                BuyRestrictionMax = 4,
-                BuyRestrictionCurrent = 0
+                StackObjectsCount = 9999999d
             }
         });
         List<List<BarterScheme>> cr2032Barter =
@@ -313,9 +311,7 @@ public class BatteriesNotIncluded(
             Upd = new Upd
             {
                 UnlimitedCount = true,
-                StackObjectsCount = 9999999d,
-                BuyRestrictionMax = 4,
-                BuyRestrictionCurrent = 0
+                StackObjectsCount = 9999999d
             }
         });
         List<List<BarterScheme>> cr123ABarter =
@@ -342,9 +338,7 @@ public class BatteriesNotIncluded(
             Upd = new Upd
             {
                 UnlimitedCount = true,
-                StackObjectsCount = 9999999d,
-                BuyRestrictionMax = 4,
-                BuyRestrictionCurrent = 0
+                StackObjectsCount = 9999999d
             }
         });
         List<List<BarterScheme>> aaBarter =
