@@ -10,17 +10,19 @@
     "botBatteries": {
         // Pmc bots
         "pmcBot": {
-            "max": 100,
-            "min": 50
+            "min": 50,
+            "max": 100
         },
         // Scav bots
         "assault": {
-            "max": 60,
-            "min": 20
+            "min": 20,
+            "max": 60
         }
     },
     // Allow batteries in the SICC Case
     "siccContainerBatteries": true,
+    // Add batteries to devices sold by traders. Warning: May be unbalanced since prices are unchanged.
+    "traderDeviceBatteries": false,
 
     // ADVANCED
     // Enable debug logging

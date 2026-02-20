@@ -24,6 +24,9 @@ public record ModConfig
     [JsonPropertyName("siccContainerBatteries")]
     public bool SiccContainerBatteries { get; set; } = true;
 
+    [JsonPropertyName("traderDeviceBatteries")]
+    public bool TraderDeviceBatteries { get; set; } = false;
+
     [JsonPropertyName("debugLogs")]
     public bool DebugLogs { get; set; } = false;
 

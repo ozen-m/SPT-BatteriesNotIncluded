@@ -98,6 +98,7 @@ public class BatteriesNotIncluded(
         AddBatteriesToSicc(items.GetValueOrDefault(ItemTpl.CONTAINER_SICC));
         AddBatteriesToProfileTemplates();
         AddBatteriesToTraderItemsBuy();
+        AddBatteriesToTraderAssorts();
 
         _globalLocales = null;
         loggerUtil.Success(localeService.GetText("load-success"));
@@ -425,6 +426,41 @@ public class BatteriesNotIncluded(
         {
             var buyIdList = trader.Base.ItemsBuy?.IdList;
             buyIdList?.UnionWith(_batteryIds);
+        }
+    }
+
+    /// <summary>
+    /// Adds batteries to devices sold by traders
+    /// </summary>
+    private void AddBatteriesToTraderAssorts()
+    {
+        if (!configUtil.ModConfig.TraderDeviceBatteries) return;
+
+        var batteryItemsToAdd = new List<Item>();
+        var traders = databaseService.GetTraders();
+        foreach (var (_, trader) in traders)
+        {
+            foreach (var item in trader.Assort.Items)
+            {
+                var deviceData = GetDeviceData(item.Template);
+                if (deviceData is null) continue;
+                if (deviceData.Battery == MongoId.Empty()) continue;
+
+                for (var j = 0; j < deviceData.SlotCount; j++)
+                {
+                    var battery = new Item
+                    {
+                        Id = new MongoId(),
+                        ParentId = item.Id,
+                        Template = deviceData.Battery,
+                        SlotId = $"mod_equipment_00{j}"
+                    };
+                    batteryItemsToAdd.Add(battery);
+                }
+            }
+
+            trader.Assort.Items.AddRange(batteryItemsToAdd);
+            batteryItemsToAdd.Clear();
         }
     }
 
