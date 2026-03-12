@@ -1,6 +1,6 @@
 ﻿// Included mods:
 // - Artem 3.0.1
-// - C11 - True North 2.4.0
+// - C11 - True North 2.5.1
 // - Canted Aim 1.0.7
 // - Echoes of Tarkov - Requisitions - NG 2.0.4
 // - Eco's Attachment Emporium 2.0.5
@@ -55,7 +55,9 @@
         "687306eb2a08d5fbb14e420f": {"slots": 2, "runtime": 50}, // ECOT - Eukyre's Consortium of Things - Walker's Razor Digital headset (Coyote Brown)
         "687306ed80a6d21e454051a0": {"slots": 2, "runtime": 50}, // ECOT - Eukyre's Consortium of Things - Walker's Razor Digital headset (Multicam)
         "687306f01fea767c8f3d41ed": {"slots": 2, "runtime": 50}, // ECOT - Eukyre's Consortium of Things - Walker's Razor Digital headset (Special)
-        "68f5333abc75f09d96d97500": {"slots": 2, "runtime": 10} // FPV Drone - Radio Controller
+        "68f5333abc75f09d96d97500": {"slots": 2, "runtime": 10}, // FPV Drone - Radio Controller
+        "6998e54173a6181d15f7a061": {"slots": 2, "runtime": 200}, // C11 - True North - Peltor ComTac V tactical headset (AOR1)
+        "6998e57bc11d47d1b7f7a063": {"slots": 2, "runtime": 200} // C11 - True North - Peltor ComTac V tactical headset (MultiCam)
     },
     // CR2032
     "5672cb304bdc2dc2088b456a": {
@@ -81,7 +83,8 @@
         "687e09aa7e70e1e285c59d4e": {"runtime": 20000}, // ECOT - Eukyre's Consortium of Things - Holosun HE510C reflex sight
         "6960bc9172fcb3eb9da96b7c": {"runtime": 20000}, // ECOT - Eukyre's Consortium of Things - Holosun HE510C reflex sight (FDE)
         "68642e0200397ba2b9e4ea9a": {"runtime": 1000}, // ECOT - Eukyre's Consortium of Things - Tasco ProPoint 1x42 reflex sight
-        "690d2fd49bf65492f6dcc8f1": {"runtime": 3000} // ECOT - Eukyre's Consortium of Things - Trijicon RMR HD reflex sight
+        "690d2fd49bf65492f6dcc8f1": {"runtime": 3000}, // ECOT - Eukyre's Consortium of Things - Trijicon RMR HD reflex sight
+        "695e89ae12149be247446f63": {"runtime": 30000} // C11 - True North - DeltaPoint Micro (Glock)
     },
     // CR123A
     "590a358486f77429692b2790": {
@@ -132,7 +135,8 @@
         "6925b6a0cb2dcc1e9f6081fd": {"slots": 2}, // ECOT - Eukyre's Consortium of Things - CTF Photonics CTF-3 tactical device
         "690e9265772bfce1d043966d": {"slots": 4}, // FPV Drone - Kamikaze Drone
         "695f8753d24480b7b1921023": {"slots": 4}, // FPV Drone - Recon Drone
-        "68f51bfb3e92385d1908db68": {"slots": 2, "runtime": 4} // FPV Drone - FPV Goggles
+        "68f51bfb3e92385d1908db68": {"slots": 2, "runtime": 4}, // FPV Drone - FPV Goggles
+        "695ffdaedd28a71ea5446f66": {} // C11 - True North - ZenitCo Vzor-4 Sight/Laser/Illuminator Combo
     },
     // Devices that do not need batteries to operate
     "000000000000000000000000": {
