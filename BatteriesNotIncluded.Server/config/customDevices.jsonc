@@ -3,7 +3,7 @@
 // - C11 - True North 2.5.1
 // - Canted Aim 1.0.7
 // - Echoes of Tarkov - Requisitions - NG 2.0.4
-// - Eco's Attachment Emporium 2.0.5
+// - Eco's Attachment Emporium 2.0.6
 // - ECOT - Eukyre's Consortium of Things 1.3.1
 // - Epic's All in One 4.0.6
 // - Impractical Tactical 1.2.0
@@ -136,7 +136,12 @@
         "690e9265772bfce1d043966d": {"slots": 4}, // FPV Drone - Kamikaze Drone
         "695f8753d24480b7b1921023": {"slots": 4}, // FPV Drone - Recon Drone
         "68f51bfb3e92385d1908db68": {"slots": 2, "runtime": 4}, // FPV Drone - FPV Goggles
-        "695ffdaedd28a71ea5446f66": {} // C11 - True North - ZenitCo Vzor-4 Sight/Laser/Illuminator Combo
+        "695ffdaedd28a71ea5446f66": {}, // C11 - True North - ZenitCo Vzor-4 Sight/Laser/Illuminator Combo
+        "6989305de267989d260aeef0": {"slots": 2}, // Eco's Attachment Emporium - Steiner DBAL-A4 Dual Beam aiming laser
+        "6989305de267989d260aeef2": {"slots": 2}, // Eco's Attachment Emporium - Steiner DBAL-A4 Dual Beam aiming laser FDE
+        "6989c980c4751ad87805e091": {}, // Eco's Attachment Emporium - B.E. Meyers & Co.™ SAL-UHP
+        "698a751e1bb1f79e210fe920": {}, // Eco's Attachment Emporium - SureFire M323V Weaponlight
+        "698a7eaa1bb1f79e210fe928": {} // Eco's Attachment Emporium - SureFire M323V Weaponlight FDE
     },
     // Devices that do not need batteries to operate
     "000000000000000000000000": {
@@ -163,6 +168,7 @@
         "68aa3a5f787df691308656c6": {}, // ECOT - Eukyre's Consortium of Things - Troy Battlesight offset rear sight
         "68599b6ad4d99d0c051b5964": {}, // ECOT - Eukyre's Consortium of Things - Unity Tactical FAST Micro sight mount (Bronze)
         "68599c5272359bd6b568656c": {}, // ECOT - Eukyre's Consortium of Things - Unity Tactical FAST Micro sight mount (Green)
-        "68599c64f0a918bcd731198f": {} // ECOT - Eukyre's Consortium of Things - Unity Tactical FAST Micro sight mount (White)
+        "68599c64f0a918bcd731198f": {}, // ECOT - Eukyre's Consortium of Things - Unity Tactical FAST Micro sight mount (White)
+        "695d3348cfc7cb0dce06be03": {} // Eco's Attachment Emporium - USPS Rear Sight
     }
 }
